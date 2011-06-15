@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 
 
+    ('playing/draw/', 'd_game.views.draw'),
     ('', 'd_game.views.playing'),
 
     ('', 'django.views.generic.simple.direct_to_template',

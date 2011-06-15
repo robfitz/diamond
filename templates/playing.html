@@ -34,8 +34,31 @@ Fuck yeah bitches
         {% endfor %}
     </div>
 
+    <ul id="friendly_hand">
+    </ul>
+
     <script>
         $(function() {
+            draw();
         });
+        function draw() {
+            $.ajax({ url: "/playing/draw/",
+                success: function(hand_data_text) {
+                    hand_data = eval('(' + hand_data_text + ')');
+
+                    alert('got hand: ' + hand_data_text);
+
+                    $("#friendly_hand").empty();
+                    for (var i = 0; i < hand_data.length; i ++) {
+                        var card_json = hand_data[i];
+                        add_card_to_hand(card_json);
+                    }
+                }
+            }); 
+        }
+        function add_card_to_hand(card_json) {
+            alert("card: " + card_json);
+            $("<li class='card'>" + card_json["pk"] + "</li>").appendTo("#friendly_hand");       
+        }
     </script>
 {% endblock content %}
