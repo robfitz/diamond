@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block header_title %}
+Fuck yeah bitches
+{% endblock header_title %}
+
+{% block style %}
+#friendly_board {
+    width:600px;
+    height:400px;
+    position:relative;
+    background-color:#ccc;
+}
+.node {
+    width:100px;
+    height:100px;
+    margin:10px;
+    color:#fff;
+    background-color:#000;
+    position:absolute;
+    border:1px solid white;
+}
+.node:hover {
+    background-color:#124;
+}
+{% endblock style %}
+
+{% block content %}
+    
+    <div id="friendly_board">
+        {% for node in board %}
+            <div class="node" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        $(function() {
+        });
+    </script>
+{% endblock content %}

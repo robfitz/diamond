@@ -1,0 +1,214 @@
+[
+    {
+        "pk": 155, 
+        "model": "d_cards.targetting", 
+        "fields": {
+            "location": "chosen", 
+            "name": "Summon", 
+            "alignment": "friendly", 
+            "occupant": "empty"
+        }
+    }, 
+    {
+        "pk": 158, 
+        "model": "d_cards.targetting", 
+        "fields": {
+            "location": "chosen", 
+            "name": "Direct damage", 
+            "alignment": "enemy", 
+            "occupant": "unit"
+        }
+    }, 
+    {
+        "pk": 161, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "melee", 
+            "attack": 1, 
+            "defense": 2, 
+            "name": "Soldier"
+        }
+    }, 
+    {
+        "pk": 163, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "ranged", 
+            "attack": 1, 
+            "defense": 1, 
+            "name": "Archer"
+        }
+    }, 
+    {
+        "pk": 165, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "ranged", 
+            "attack": 2, 
+            "defense": 1, 
+            "name": "Longbowman"
+        }
+    }, 
+    {
+        "pk": 167, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "ranged", 
+            "attack": 3, 
+            "defense": 1, 
+            "name": "Wizard"
+        }
+    }, 
+    {
+        "pk": 169, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "melee", 
+            "attack": 2, 
+            "defense": 3, 
+            "name": "Swordsman"
+        }
+    }, 
+    {
+        "pk": 171, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "melee", 
+            "attack": 3, 
+            "defense": 4, 
+            "name": "Knight"
+        }
+    }, 
+    {
+        "pk": 174, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "defender", 
+            "attack": 1, 
+            "defense": 3, 
+            "name": "Dwarf"
+        }
+    }, 
+    {
+        "pk": 176, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "defender", 
+            "attack": 2, 
+            "defense": 5, 
+            "name": "Hydra"
+        }
+    }, 
+    {
+        "pk": 178, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "melee", 
+            "attack": 1, 
+            "defense": 1, 
+            "name": "Worker"
+        }
+    }, 
+    {
+        "pk": 181, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "wall", 
+            "attack": 0, 
+            "defense": 3, 
+            "name": "Fence"
+        }
+    }, 
+    {
+        "pk": 184, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "wall", 
+            "attack": 0, 
+            "defense": 5, 
+            "name": "Wall"
+        }
+    }, 
+    {
+        "pk": 186, 
+        "model": "d_cards.unit", 
+        "fields": {
+            "attack_type": "wall", 
+            "attack": 0, 
+            "defense": 7, 
+            "name": "Fortress"
+        }
+    }, 
+    {
+        "pk": 190, 
+        "model": "d_cards.card", 
+        "fields": {
+            "rubble_duration": 0, 
+            "health_change": 0, 
+            "tech_change": 0, 
+            "summon": 161, 
+            "targetting": 155, 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 192, 
+        "model": "d_cards.card", 
+        "fields": {
+            "rubble_duration": 0, 
+            "health_change": 0, 
+            "tech_change": 0, 
+            "summon": 163, 
+            "targetting": 155, 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 194, 
+        "model": "d_cards.card", 
+        "fields": {
+            "rubble_duration": 0, 
+            "health_change": 0, 
+            "tech_change": 0, 
+            "summon": 165, 
+            "targetting": 155, 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 196, 
+        "model": "d_cards.card", 
+        "fields": {
+            "rubble_duration": 0, 
+            "health_change": 0, 
+            "tech_change": 0, 
+            "summon": 167, 
+            "targetting": 155, 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 198, 
+        "model": "d_cards.card", 
+        "fields": {
+            "rubble_duration": 0, 
+            "health_change": 0, 
+            "tech_change": 0, 
+            "summon": 169, 
+            "targetting": 155, 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 200, 
+        "model": "d_cards.card", 
+        "fields": {
+            "rubble_duration": 0, 
+            "health_change": 0, 
+            "tech_change": 0, 
+            "summon": 171, 
+            "targetting": 155, 
+            "tech_level": 5
+        }
+    }
+]

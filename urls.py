@@ -11,6 +11,9 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
+
+    ('', 'd_game.views.playing'),
+
     ('', 'django.views.generic.simple.direct_to_template',
      {'template': 'home.html'}),
 

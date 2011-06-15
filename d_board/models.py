@@ -14,6 +14,13 @@ class Node(models.Model):
     x = models.IntegerField(default = 0)
 
 
+    # layout helper functions
+    def board_x_friendly(self):
+        return (self.x + 2) * 100 
+    def board_y_friendly(self):
+        return (2 - self.row) * 100
+
+
     def __unicode__(self):
         return "Node: row=%s, x=%s" % (self.row, self.x)
 

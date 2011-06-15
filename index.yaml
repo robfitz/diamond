@@ -31,6 +31,16 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: d_cards_targetting
+  properties:
+  - name: __key__
+    direction: desc
+
+- kind: d_cards_unit
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: invoice_invoice
   properties:
   - name: __key__
