@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+
+        <script type="text/javascript" src="/media/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/media/js/jqModal.js"></script>
+        <script type="text/javascript" src="/media/js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="/media/js/showdown.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="/media/css/popups.css" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="/media/css/style.css" type="text/css" />
+
+        {% block meta %}
+        {% endblock meta %}
+
+        {% block head %}
+        {% endblock head %}
+
+        <style> 
+            {% block style %}
+            {% endblock %}
+        </style>
+
+        <script type="text/javascript" language="javascript">
+            $( function () {
+                {% block ready_script %}
+                {% endblock %}
+
+                $('#feedbackDialog').jqm();
+
+                $('#feedback_button').click(function() {
+                    //popup('/ajax/feedback_form.html');
+                    $('#feedback_working').hide(); //not loading
+                    $('#feedback_submit').show();  //can submit again
+
+                    $("#feedbackDialog").load('/ajax/feedback_form.html');
+                    $('#feedbackDialog').jqmShow();
+                });
+            } );
+
+            function popup(url) {
+
+                $("#dialog").jqm({ajax:url, ajaxText: 'Loading' });
+                $("#dialog").jqmShow();
+
+                setTimeout("window_resize(dialog)", 1000);
+            }
+
+            function window_resize(event) {
+                if ( $("#dialog").css("display") != "none" ) {
+                    var height = $("#dialog").height() - 70;
+                    $("#dialog .popup_content").css("height", height + "px");
+                }
+            }
+
+            function sendFeedback() {
+
+                $.post('/util/send_feedback/',
+                    $('#feedback_form').serialize(),
+                    function(data) {
+                        //$('#feedback_working').hide(); //not loading
+                        $('#feedback_submit').show();  //can submit again
+                        //$('#feedbackDialog').jqmHide(); //close the popup
+                    });
+
+
+                $('#feedbackDialog').jqmHide(); //close the popup
+
+                return false; //cancel form submission
+            }
+
+            {% block script %}
+            {% endblock %}
+        </script>
+
+    </head>
+    <body>
+
+        <div class="jqmWindow hidden" id="dialog" style="overflow:auto;">
+            {% block jqmWindow %}
+            {% endblock %}
+        </div>
+
+        <div class="jqmWindow hidden" id="feedbackDialog">
+        </div>
+
+	</div>
+
+        <div id="body">
+
+            {% block header %}
+
+                <div class="header">
+
+                    <h1><a href="/">{% block header_title %}block header_title{% endblock %}</a></h1>
+
+                    <ul id="nav">
+                        <li>
+                            <a href="/">Navigation</a>
+                            <ul>
+                                <li><a>Choice</a></li>
+                                <li><a>Choice</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            {% endblock header %}
+
+            <div class="border rounded fl" style="padding:40px;width:898px;background-color:#fff;">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <div class="footer small">
+
+                {% block footer %}
+                {% endblock %}
+
+                <p class="fl">
+                    <a class="home" href="/about/" style="margin-right:30px;">About</a>
+                    <a class="home" href="/terms/" style="margin-right:30px;">Legal &amp; terms</a>
+                    <a class="home" href="/contact/" style="margin-right:30px;">Contact &amp; feedback</a>
+                </p>
+            </div>
+
+        </div>
+
+        <!--
+		<div id="feedback_button" style="float:right;position:fixed;right:0px;top:30%;">
+			<img src='/media/feedback-tab.png' style="cursor:pointer;" />
+		</div>
+        -->
+
+    </body>
+
+</html>

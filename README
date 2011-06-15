@@ -1,0 +1,77 @@
+# Infrastructure
+
+Django 1.3 running on Google App Engine via Django-nonrel
+
+http://code.google.com/appengine/articles/django-nonrel.html
+
+## Motivation
+
+* Cut infrastructure time & costs while avoiding vendor lock-in
+* Easy scaling until its clear what the major choke points will be
+
+## Benefits
+
+* Perks of appengine without the lockin
+* No database migrations
+* Simpler deployment
+* Linear scaling instead of 1-server to 3-server to X-server jumps
+
+## Drawbacks
+
+* Scales differently than django on a relational DB
+** Exploding index problem needs to be understood by everyone writing models and queries
+* Missing many common and convenient django queries and features
+** No filtering on null foreign key: model.objects.filter(foreign_key_field__isnull=True)
+** No __iexact, __beginswith, etc
+** No ManyToManyField
+
+
+# Setup
+
+Follow guide at http://www.allbuttonspressed.com/projects/djangoappengine
+
+
+# Development
+
+Run development server using django manage.py commands, *not* appengine's dev_appserver.py commands or GUI
+
+* python manage.py syncdb
+* python manage.py createsuperuser
+* python manage.py runserver
+* python manage.py shell
+
+http://localhost:8000
+http://localhost:8000/admin/
+
+
+# Deployment
+
+Deploy using modified commands in django's manage.py, *not* appengine's command line or GUI. 
+
+#. Commit, pull, and push git version
+#. Deploy
+** python manage.py deploy
+#. Load fixtures & update index.yaml
+** python manage.py remote syncdb
+#. Tag stable release in git for future rollback purposes
+
+
+# Rollback & disaster recovery
+
+For major recoveries, roll back to most recent git version tagged as a stable release and then follow deploy steps
+
+For minor fixes, e.g. setting a field's default after changing the models, *carefully* use shell
+
+* python manage.py remote shell
+* *Never* delete objects or erase fields through shell, use /admin/ for that for built-in undo
+
+
+# Common errors (for those used to django)
+
+index.yaml needs an entry - syncdb (local or remote)
+
+index.yaml changes are in progress - just wait, can take a few minutes. You can monitor the progress in the appengine dashboard
+
+Doing a query, models claims not to have a foreign key field which it really does have - nonrel throws an does not exist error when you do a query on or try to access a null foreign key field. Current solution is to add a default model to the initial_data fixture and set the model's foreign key to default to the fixture's pk, treating that default value as you would normally treat isnull.
+
+Exploding index problem - no clear heuristics about when it's going to happen. Google it and stay aware. Sanity check index.yaml every so often to see if it has exploded.

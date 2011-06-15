@@ -1,0 +1,6 @@
+*.pyc
+media/uploads/*
+*.swp
+*~
+.gae*
+ga_*

@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <link rel="stylesheet" type="text/css" href="/media/boom.css" type="text/css" />
+
+        <style>
+            body {
+                width:610px;
+                text-align:left;
+                padding:40px;
+            }
+            h1 {
+                font-size:32px;
+                margin-bottom:10px;
+            }
+            table {
+                width:100%;
+            }
+            td {
+                width:33%;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+        {% block content %}
+        <table>
+            <tr>
+                <td colspan="2">
+                    <h1 class="fl">Robert Fitzpatrick</h1>
+                </td>
+                <td>
+                    <h1 class="fr lighter">INVOICE</h1>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>Company info</h3>
+                    <p>
+                        Rob Fitzpatrick
+                        <br/>
+                        robftz@gmail.com
+                        <br/>
+                        07940435340
+                    </p>
+                </td>
+                <td>
+                </td>
+                <td style="text-align:right;">
+                    <h3>Invoice info</h3>
+                    <p>
+                        {{ invoice.created_on }}
+                        <br />
+                        Invoice # {{ invoice.invoice_number }}
+                        <br />
+                        {% if invoice.po %}
+                            PO # {{ invoice.po }}
+                            <br />
+                        {% endif %}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>Bill to</h3>
+                    <p>
+                        {{ client.company_name }}
+                        <br/>
+                        {% if client.contact_name %}
+                            c/o {{ client.contact_name }}
+                            <br/>
+                        {% endif %}
+                        {% if client.address_1 %}
+                            {{ client.address_1 }}
+                            <br/>
+                        {% endif %}
+                        {% if client.address_2 %}
+                            {{ client.address_2 }}
+                            <br/>
+                        {% endif %}
+                        {% if client.address_3 %}
+                            {{ client.address_3 }}
+                            <br/>
+                        {% endif %}
+                        {% if client.address_4 %}
+                            {{ client.address_4 }}
+                            <br/>
+                        {% endif %}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <h3>Project description</h3>
+                    {{ project.description }}
+                </td>
+                <td>
+                    <h3>Hours <span class="fr">Amount</span></h3>
+                    <p>
+                    {{ invoice.hours|floatformat:"1" }} hrs @ {{ project.hourly_wage }} {{ project.currency }}
+                    <span class="fr">{{ invoice.amount|floatformat:"2" }} {{ project.currency }}</span>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                    <p>
+                    <strong>Total <span class="fr">{{ invoice.amount|floatformat:"2" }} {{ project.currency }}</span></strong>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>Comments</h3>
+                    <p>
+                        Thanks!
+                    </p>
+                </td>
+                <td>
+                    <h3>Payments - Deposit</h3>
+                    <p>
+                    Robert Fitzpatrick
+                    <br/>
+                    Bank of America
+                    <br/>
+                    Acct: 0117866693
+                    <br/>
+                    Routing: 121000358 
+                    </p>
+                </td>
+                <td>
+                    <h3>Payments - Paypal</h3>
+                    <p>
+                    Robert Fitzpatrick
+                    <br/>
+                    robftz@gmail.com
+                    </p>
+                </td>
+
+
+        {% endblock content %} 
+    </body>
+</html>
+

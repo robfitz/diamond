@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block style %}
+
+.time_entry {
+position:relative;
+}
+
+.edit_time_entry {
+position:absolute;
+left:-50px;
+}
+.edit_project, .edit_invoice {
+position:absolute;
+left:-40px;
+}
+
+th, td {
+padding:0 10px;
+}
+
+{% endblock %}
+
+{% block content %}
+
+    <form id='natural_text_form' method='post' action='/time/add/'>
+
+        {% csrf_token %}
+
+        <input type="hidden" name="now_posix" id="now_posix" />
+        <input type="hidden" name="start_posix" id="start_posix" />
+
+        <p>
+            <label for='natural_text'>Enter time chunk</label>
+            <br />
+            <input name="natural_text" id="natural_text" />
+            <input type="submit" value="Add time" />
+            <br />
+            <span class="lighter">[project] start[-end] tag</span>
+        </p>
+        <div style="position:relative;">
+            <p>
+                <div id="timer_off">
+                    <a href="javascript:void(0);" onclick="begin_task_timer();update_session_timer();">Start task timer</a>
+                </div>
+                <div id="timer_running" class="hidden">
+                    <a href="javascript:void(0);" onclick="cancel_task_timer();">Cancel task timer</a>
+                    <span id="ellapsed_time"></span>
+                </div>
+            </p>
+        </div>
+
+        <h2>Recent work</h2>
+
+        {% for entry in time_entries %}
+
+            {% ifchanged entry.start_time.date %}
+                {% if forloop.counter != 1 %}
+                    </ul>
+                    </p>
+                {% endif %}
+
+                <p>
+                {{ entry.start_time|date:"F j" }}
+                <ul>
+            {% endifchanged %}
+
+            <li class="time_entry">
+            <strong>{{ entry.project }}</strong> {{ entry.duration_in_minutes }}m on <i>{{ entry.task_description }}</i> from {{ entry.start_time|date:"P" }} to {{ entry.end_time|date:"P" }}
+                <a href="/admin/invoice/timeentry/{{ entry.pk }}/" class="small edit_time_entry">Edit</a>
+            </li>
+
+        {% endfor %}
+    </form>
+
+    <form id="start_timer_form" class="hidden">
+        {% csrf_token %}
+        <input type="hidden" name="timer_start_time" id="timer_start_time" />
+    </form>
+
+
+    <script>
+        $(function() {
+            {% if timer_start_time %}
+                begin_task_timer();
+                timer_start_time = parseInt("{{timer_start_time}}");
+            {% endif %}
+        });
+
+        var timer_id = 0;
+        var timer_start_time = 0;
+
+        function begin_task_timer() {
+            if (timer_id) {
+                clearInterval(timer_id);
+            }
+            timer_start_time = parseInt(new Date().getTime() / 1000);
+            timer_id = setInterval(update_task_timer, 1000); 
+
+            $("#start_posix").val(parseInt(timer_start_time));
+
+            $("#timer_off").hide();
+            $("#timer_running").show(); 
+        }
+
+        function update_session_timer() {
+            //put the latest value into the form
+            $("#timer_start_time").val(timer_start_time);
+            //ship the form
+            $.post("/time/start_timer/", 
+                $("#start_timer_form").serialize());
+        }
+
+        function cancel_task_timer() {
+            if (timer_id) {
+                clearInterval(timer_id);
+                timer_id = 0;
+            }
+
+            $("#start_posix").val("");
+
+            $("#timer_off").show();
+            $("#timer_running").hide(); 
+
+            $.post("/time/clear_timer/", 
+                $("#start_timer_form").serialize());
+        }
+
+        function update_task_timer() {
+            var timer_seconds = new Date().getTime() / 1000 - timer_start_time;
+            $("#ellapsed_time").text(parseInt(timer_seconds / 60) + "m" + parseInt(timer_seconds % 60) + "s");
+        }
+
+        $("#natural_text_form").submit(function() {
+            var now = new Date();
+            $("#now_posix").val(parseInt(now.getTime() / 1000));
+        });
+    </script>
+
+    <h2>Projects</h2>
+
+    {% if projects %}
+        <table>
+
+            <tr>
+                <th>Project</th>
+                <th>Client</th>
+                <th style="text-align:right;">Unbilled hours</th>
+                <th style="text-align:right;">Unbilled amount</th>
+                <th>&nbsp;</th>
+            </tr>
+
+            {% for project in projects %}
+                <tr>
+                    <td>
+                        <span style="position:relative;"><a href="/admin/timetracker/project/{{ project.pk }}/" class="small edit_project">Edit</a></span>
+                        {{ project.name }}
+                    </td>
+                    <td>
+                        {% if project.client %}
+                            <a href="/admin/timetracker/client/{{ project.client.pk }}/">{{ project.client }}</a>
+                        {% else %}
+                            <a href="/admin/timetracker/project/{{ project.pk }}/">None</a>
+                        {% endif %}
+
+                    </td>
+                    <td style="text-align:right;">{{ project.unpaid_hours|floatformat:"1" }}</td>
+                    <td style="text-align:right;">{{ project.unpaid_amount|floatformat:"2" }} {{ project.currency }}</td>
+                    {% if project.unpaid_amount > 0 %}
+                        {% if project.client %}
+                            <td><a href="/invoice/new/{{ project.id }}/">Invoice now</a></td>
+                        {% else %} 
+                            <td><a href="/admin/timetracker/project/{{ project.pk }}/">Set client before invoicing</a></td> 
+                        {% endif %}
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+        </table>
+    {% else %}
+        <p>
+        No projects yet. Add a TimeEntry using the field above to automatically create your first project.
+        </p>
+    {% endif %}
+
+    <h2>Invoices</h2>
+
+    {% if invoices %}
+        <table>
+
+            <tr>
+                <th>Project</th>
+                <th style="text-align:right;">Amount</th>
+                <th>Status</th>
+                <th>&nbsp;</th>
+            </tr>
+
+            {% for invoice in invoices %}
+                <tr>
+                    <td><span style="position:relative;"><a href="/admin/invoice/invoice/{{ invoice.pk }}/" class="edit_invoice">Edit</a></span>
+                        <a href="/invoice/{{ invoice.key }}/">{{ invoice.project }}</a>
+                    </td>
+                    <td style="text-align:right;">{{ invoice.amount|floatformat:"2" }} {{ invoice.project.currency }}</td>
+                    {% if invoice.is_paid %}
+
+                        <td class="green">Paid</td>
+                        <td></td>
+
+                    {% else %}{% if invoice.num_times_sent == 0 %}
+                    
+                        <td>Draft</td>
+                        <td>
+                            <a href="/invoice/{{ invoice.id }}/send/">Send</a> 
+                            <a href="/admin/invoice/invoice/{{ invoice.pk }}/delete/">Delete</a></td>
+                    
+                    {% else %}{% if invoice.num_times_sent == 1 %}
+
+                        <td class="yellow">{{ invoice.originally_sent|timesince }} since sent on {{ invoice.originally_sent_on|date:"M j" }}</td>
+                        <td><a href="/invoice/send/">Send reminder</a></td>
+
+                    {% else %}{% if invoice.num_times_sent > 1 %}
+
+                        <td class="red">{{ invoice.last_sent_on|timesince }} since sent on {{ invoice.last_sent_on|date:"M j" }}</td> 
+                        <td><a href="/invoice/send/">Send reminder</a></td> 
+
+                    {% endif %}{% endif %}{% endif %}{% endif %}
+
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+        No invoices yet.
+        </p>
+    {% endif %}
+        
+
+{% endblock content %}

@@ -1,0 +1,6 @@
+- model: invoice.invoice
+  pk: 1
+  fields: 
+    key: default_invoice 
+    invoice_number: 0
+    is_default: True
