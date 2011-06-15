@@ -90,6 +90,9 @@ INSTALLED_APPS = (
     'autoload',
     'dbindexer',
 
+    'd_cards',
+    'd_board',
+
     'django.contrib.admin',
     'django.contrib.admindocs',
 
