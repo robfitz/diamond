@@ -21,6 +21,16 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: d_board_node
+  properties:
+  - name: __key__
+    direction: desc
+
+- kind: d_cards_card
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: invoice_invoice
   properties:
   - name: __key__
