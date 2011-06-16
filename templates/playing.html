@@ -112,7 +112,7 @@ Wooooooooo
         }
 
         function add_card_to_hand(card_json) {
-            var card = $("<li class='card' id='" + card_json.pk + "'>" + card_json.fields.name + "</li>").appendTo("#friendly_hand");
+            var card = $("<li class='card' id='" + card_json.pk + "'>T" + card_json.fields.tech_level + " " + card_json.fields.name + "</li>").appendTo("#friendly_hand");
 
             card.click( function(event) {
 
@@ -122,18 +122,30 @@ Wooooooooo
                     //not in an interactive phase, so no clicky
                     return;
                 }
+                if (tech_level < card_json.fields.tech_level 
+                    && tech_level > MAX_TECH) {
+
+                    //we can neither play nor tech up with this
+                    //card, so don't allow it to be clicked
+                    return;
+                }
 
                 $(this).addClass("selected");
 
-                // find valid targets based on card targetting type
-                // e.g. summoning is: friendly board > empty nodes
-                var targets = $(".board." + card_json.fields.target_alignment + " ." + card_json.fields.target_occupant);
+                //if the tech level is high enough, select the places
+                //on the board we can use this card
+                if (tech_level >= card_json.fields.tech_level) {
+                    // find valid targets based on card targetting type
+                    // e.g. summoning is: friendly board > empty nodes
+                    var targets = $(".board." + card_json.fields.target_alignment + " ." + card_json.fields.target_occupant);
 
-                // highlight valid targets and allow them to respond to click
-                targets.addClass("targettable").click( function (event) {
-                    cast($(".card.selected"), $(this));
-                });
+                    // highlight valid targets and allow them to respond to click
+                    targets.addClass("targettable").click( function (event) {
+                        cast($(".card.selected"), $(this));
+                    });
+                }
 
+                //and if we
                 if (tech_level < MAX_TECH) {
                     $("#friendly_tech").addClass("targettable").click( function (event) {
                         trash($(".card.selected"));
