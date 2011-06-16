@@ -74,6 +74,8 @@ class Unit(models.Model):
 
 class Card(models.Model):
 
+    name = models.CharField(max_length="20", blank=True)
+
     # where/how this card can be played
     targetting = models.ForeignKey(Targetting)
 
@@ -98,6 +100,9 @@ class Card(models.Model):
 
 
     def __unicode__(self):
+
+        if self.name:
+            return "T%s: %s" % (self.tech_level, self.name)
 
         str = "T%s" % self.tech_level
 
@@ -125,7 +130,12 @@ class Card(models.Model):
         return str
 
 
+class CardAdmin(admin.ModelAdmin):
+    list_display_links = ('__unicode__',)
+    list_display = ('__unicode__', 'tech_level', 'name',)
+    list_editable = ('name', 'tech_level')
+
     
+admin.site.register(Card, CardAdmin) 
 admin.site.register(Targetting)
-admin.site.register(Unit)
-admin.site.register(Card) 
+admin.site.register(Unit) 

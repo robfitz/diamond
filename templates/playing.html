@@ -46,8 +46,6 @@ Fuck yeah bitches
                 success: function(hand_data_text) {
                     hand_data = eval('(' + hand_data_text + ')');
 
-                    alert('got hand: ' + hand_data_text);
-
                     $("#friendly_hand").empty();
                     for (var i = 0; i < hand_data.length; i ++) {
                         var card_json = hand_data[i];
@@ -57,8 +55,7 @@ Fuck yeah bitches
             }); 
         }
         function add_card_to_hand(card_json) {
-            alert("card: " + card_json);
-            $("<li class='card'>" + card_json["pk"] + "</li>").appendTo("#friendly_hand");       
+            $("<li class='card'>" + card_json.fields.name + "</li>").appendTo("#friendly_hand");       
         }
     </script>
 {% endblock content %}
