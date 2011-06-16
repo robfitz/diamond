@@ -1,5 +1,18 @@
 #friendly_hand {
     float:left;
+    border:1px solid gray;
+    padding:10px;
+}
+
+#friendly_tech {
+    float:left;
+    border:1px solid gray;
+    padding:10px;
+}
+
+#friendly_tech h1 {
+    font-size:60px;
+    margin:0;
 }
 
 .board {
@@ -32,7 +45,7 @@
     background-color:#124;
 }
 
-.node.targettable {
+.targettable {
    background-color:#0f0; 
 }
 

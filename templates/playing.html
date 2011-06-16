@@ -12,21 +12,22 @@ Wooooooooo
 {% endblock style %}
 
 {% block content %}
+
     <ul id="phases">
         <li class="active draw">
-        Draw
+            Draw
         </li>
         <li class="play play_1">
-        Play
+            Play (offensive)
         </li>
         <li class="attack">
-        Attack!
+            Attack
         </li>
         <li class="play play_2">
-        Play
+            Play (strategic)
         </li>
     </ul>
-    
+
     <div class="friendly board">
         {% for node in board %}
             <div class="node empty" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
@@ -37,10 +38,16 @@ Wooooooooo
     <ul id="friendly_hand">
     </ul>
 
+    <div id="friendly_tech">
+        <h1>T1</h1>
+    </div>
+
     <script>
 
         var phases = ["draw", "play_1", "attack", "play_2"];
         var phase = 0;
+        var tech_level = 1;
+        var MAX_TECH = 5;
 
         //hand_cards[card_pk] = card.fields
         var hand_cards = {};
@@ -126,7 +133,38 @@ Wooooooooo
                 targets.addClass("targettable").click( function (event) {
                     cast($(".card.selected"), $(this));
                 });
+
+                if (tech_level < MAX_TECH) {
+                    $("#friendly_tech").addClass("targettable").click( function (event) {
+                        trash($(".card.selected"));
+                    });
+                }
             });
+        }
+
+        function trash(hand_card) {
+
+            if (phase != 1 && phase != 3) {
+                //not in an interactive phase, so no clicky
+                return;
+            }
+
+            //visually remove from hand
+            hand_card.remove();
+
+            tech_up(1);
+
+            next_phase();
+        }
+
+        function tech_up(amount) {
+
+            //tech up one notch
+            tech_level += amount; 
+
+            if (tech_level > MAX_TECH) tech_level = MAX_TECH;
+
+            $("#friendly_tech h1").text("T" + tech_level);
         }
 
         function cast(hand_card, node) { 
@@ -163,6 +201,8 @@ Wooooooooo
 
             //clear old targetting events 
             $(".node").removeClass("targettable").unbind("click");
+
+            $("#friendly_tech").removeClass("targettable").unbind("click");
         }
 
     </script>
