@@ -12,6 +12,20 @@ Wooooooooo
 {% endblock style %}
 
 {% block content %}
+    <ul id="phases">
+        <li class="active draw">
+        Draw
+        </li>
+        <li class="play play_1">
+        Play
+        </li>
+        <li class="attack">
+        Attack!
+        </li>
+        <li class="play play_2">
+        Play
+        </li>
+    </ul>
     
     <div class="friendly board">
         {% for node in board %}
@@ -25,6 +39,9 @@ Wooooooooo
 
     <script>
 
+        var phases = ["draw", "play_1", "attack", "play_2"];
+        var phase = 0;
+
         //hand_cards[card_pk] = card.fields
         var hand_cards = {};
 
@@ -37,6 +54,10 @@ Wooooooooo
             draw();
         });
         function draw() {
+            //visual feedback about which phase we're in
+            $("#phases li").removeClass("active");
+            $("#phases .draw").addClass("active");
+
             $.ajax({ url: "/playing/draw/",
                 success: function(hand_data_text) {
                     //convert to json
@@ -55,15 +76,45 @@ Wooooooooo
                         //track it for lookup when its played
                         hand_cards[card_json.pk] = card_json.fields;
                     }
+                    next_phase();
                 }
             }); 
+        }
+
+        function next_phase() {
+
+            phase ++;
+            cancel_cast();
+
+            if (phase >= phases.length) {
+                phase = 0;
+                $("#phases li.active").removeClass("active").siblings().first().addClass("active");
+            }
+            else {
+                $("#phases li.active").removeClass("active").next().addClass("active");
+            }
+
+            if (phase == 0) {
+                //draw cards
+                draw(); 
+            }
+            else if (phase == 2) {
+                //begin logic for auto-attacking
+                setTimeout(next_phase, 1000);
+            }
         }
 
         function add_card_to_hand(card_json) {
             var card = $("<li class='card' id='" + card_json.pk + "'>" + card_json.fields.name + "</li>").appendTo("#friendly_hand");
 
             card.click( function(event) {
+
                 cancel_cast();
+
+                if (phase != 1 && phase != 3) {
+                    //not in an interactive phase, so no clicky
+                    return;
+                }
 
                 $(this).addClass("selected");
 
@@ -79,6 +130,11 @@ Wooooooooo
         }
 
         function cast(hand_card, node) { 
+
+            if (phase != 1 && phase != 3) {
+                //not in an interactive phase, so no clicky
+                return;
+            }
 
             //visually remove from hand
             hand_card.remove();
@@ -99,7 +155,7 @@ Wooooooooo
                 played_cards[hand_card.attr("id")] = hand_card.fields;
             }
 
-            cancel_cast();
+            next_phase();
         }
 
         function cancel_cast() {

@@ -1,4 +1,9 @@
+#friendly_hand {
+    float:left;
+}
+
 .board {
+    float:left;
     width:600px;
     height:400px;
     position:relative;
@@ -33,4 +38,24 @@
 
 .node.unit {
     background-color:#fff;
+}
+
+#phases {
+    float:left;
+}
+#phases li {
+    float:left;
+    font-weight: bold;
+    text-decoration: none;
+    display: block;
+    padding: 8px 12px;
+    font-size: 113%;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+
+    margin-bottom:10px;
+}
+#phases li.active {
+    background-color:#ddd;
+    border:1px solid #ccc;
 }
