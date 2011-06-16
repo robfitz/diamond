@@ -4,21 +4,21 @@
     padding:10px;
 }
 
-#friendly_tech {
+.tech {
     float:left;
     border:1px solid gray;
     padding:10px;
 }
 
-#friendly_tech h1 {
+.tech h1 {
     font-size:60px;
     margin:0;
 }
 
 .board {
     float:left;
-    width:600px;
-    height:400px;
+    width:540px;
+    height:350px;
     position:relative;
     background-color:#ccc;
 }
@@ -30,6 +30,10 @@
 }
 .card.selected {
     background-color:orange;
+}
+
+.node .unit {
+    color:#000;
 }
 
 .node {

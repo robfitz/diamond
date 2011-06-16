@@ -28,6 +28,17 @@ Wooooooooo
         </li>
     </ul>
 
+    <div class="enemy board">
+        {% for node in board %}
+            <div class="node empty" style="left:{{node.board_x_enemy}}px;top:{{node.board_y_enemy}}px;">
+            </div>
+        {% endfor %}
+    </div>
+
+    <div id="enemy_tech" class="tech">
+        <h1>T1</h1>
+    </div>
+
     <div class="friendly board">
         {% for node in board %}
             <div class="node empty" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
@@ -38,11 +49,13 @@ Wooooooooo
     <ul id="friendly_hand">
     </ul>
 
-    <div id="friendly_tech">
+    <div id="friendly_tech" class="tech">
         <h1>T1</h1>
     </div>
 
     <script>
+
+        var UNIT_R = 25;
 
         var phases = ["draw", "play_1", "attack", "play_2"];
         var phase = 0;
@@ -132,8 +145,8 @@ Wooooooooo
 
                 $(this).addClass("selected");
 
-                //if the tech level is high enough, select the places
-                //on the board we can use this card
+                // if the tech level is high enough, select the places
+                // on the board we can use this card
                 if (tech_level >= card_json.fields.tech_level) {
                     // find valid targets based on card targetting type
                     // e.g. summoning is: friendly board > empty nodes
@@ -145,7 +158,8 @@ Wooooooooo
                     });
                 }
 
-                //and if we
+                // and if we have already teched fully, 
+                // don't allow it to go higher
                 if (tech_level < MAX_TECH) {
                     $("#friendly_tech").addClass("targettable").click( function (event) {
                         trash($(".card.selected"));
@@ -203,6 +217,9 @@ Wooooooooo
                 node.attr("id", hand_card.attr("id"));
 
                 played_cards[hand_card.attr("id")] = hand_card.fields;
+
+                var unit = $("<div class='unit' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
+
             }
 
             next_phase();
