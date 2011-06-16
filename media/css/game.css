@@ -1,0 +1,36 @@
+.board {
+    width:600px;
+    height:400px;
+    position:relative;
+    background-color:#ccc;
+}
+
+.card {
+}
+.card:hover {
+    background-color:yellow;
+}
+.card.selected {
+    background-color:orange;
+}
+
+.node {
+    width:100px;
+    height:100px;
+    margin:10px;
+    color:#fff;
+    background-color:#000;
+    position:absolute;
+    border:1px solid white;
+}
+.node:hover {
+    background-color:#124;
+}
+
+.node.targettable {
+   background-color:#0f0; 
+}
+
+.node.unit {
+    background-color:#fff;
+}

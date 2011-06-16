@@ -1,35 +1,21 @@
 {% extends 'base.html' %}
 
+{% block meta %}
+<link rel="stylesheet" type="text/css" href="/media/css/game.css" type="text/css" />
+{% endblock meta %}
+
 {% block header_title %}
-Fuck yeah bitches
+Wooooooooo
 {% endblock header_title %}
 
 {% block style %}
-#friendly_board {
-    width:600px;
-    height:400px;
-    position:relative;
-    background-color:#ccc;
-}
-.node {
-    width:100px;
-    height:100px;
-    margin:10px;
-    color:#fff;
-    background-color:#000;
-    position:absolute;
-    border:1px solid white;
-}
-.node:hover {
-    background-color:#124;
-}
 {% endblock style %}
 
 {% block content %}
     
-    <div id="friendly_board">
+    <div class="friendly board">
         {% for node in board %}
-            <div class="node" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+            <div class="node empty" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
             </div>
         {% endfor %}
     </div>
@@ -38,24 +24,90 @@ Fuck yeah bitches
     </ul>
 
     <script>
+
+        //hand_cards[card_pk] = card.fields
+        var hand_cards = {};
+
+        //same format as hand_cards, but contains
+        //every card played so far this game as a
+        //lookup for what's already happened
+        var played_cards = {};
+        
         $(function() {
             draw();
         });
         function draw() {
             $.ajax({ url: "/playing/draw/",
                 success: function(hand_data_text) {
+                    //convert to json
                     hand_data = eval('(' + hand_data_text + ')');
 
+                    //clear old cards
+                    hand_cards = {};
                     $("#friendly_hand").empty();
+
                     for (var i = 0; i < hand_data.length; i ++) {
                         var card_json = hand_data[i];
+
+                        //display card in hand area
                         add_card_to_hand(card_json);
+
+                        //track it for lookup when its played
+                        hand_cards[card_json.pk] = card_json.fields;
                     }
                 }
             }); 
         }
+
         function add_card_to_hand(card_json) {
-            $("<li class='card'>" + card_json.fields.name + "</li>").appendTo("#friendly_hand");       
+            var card = $("<li class='card' id='" + card_json.pk + "'>" + card_json.fields.name + "</li>").appendTo("#friendly_hand");
+
+            card.click( function(event) {
+                cancel_cast();
+
+                $(this).addClass("selected");
+
+                // find valid targets based on card targetting type
+                // e.g. summoning is: friendly board > empty nodes
+                var targets = $(".board." + card_json.fields.target_alignment + " ." + card_json.fields.target_occupant);
+
+                // highlight valid targets and allow them to respond to click
+                targets.addClass("targettable").click( function (event) {
+                    cast($(".card.selected"), $(this));
+                });
+            });
         }
+
+        function cast(hand_card, node) { 
+
+            //visually remove from hand
+            hand_card.remove();
+
+            //convert jquery element into json w/ game logic
+            var card = hand_cards[hand_card.attr("id")];
+
+            if (card.defense) {
+                //create a summon
+                node.addClass("unit");
+                node.addClass("occupied"); 
+
+                node.removeClass("empty");
+
+                //for lookup of unit behaviour later
+                node.attr("id", hand_card.attr("id"));
+
+                played_cards[hand_card.attr("id")] = hand_card.fields;
+            }
+
+            cancel_cast();
+        }
+
+        function cancel_cast() {
+            $(".card").removeClass("selected");
+
+            //clear old targetting events 
+            $(".node").removeClass("targettable").unbind("click");
+        }
+
     </script>
 {% endblock content %}
