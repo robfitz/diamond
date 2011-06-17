@@ -5,7 +5,7 @@
 {% endblock meta %}
 
 {% block header_title %}
-Wooooooooo
+Fuck ya bitches
 {% endblock header_title %}
 
 {% block style %}
@@ -26,11 +26,23 @@ Wooooooooo
         <li class="play play_2">
             Play (strategic)
         </li>
+        <li class="active draw">
+            AI Draw
+        </li>
+        <li class="play play_1">
+            AI Play (offensive)
+        </li>
+        <li class="attack">
+            AI Attack
+        </li>
+        <li class="play play_2">
+            AI Play (strategic)
+        </li>
     </ul>
 
     <div class="enemy board">
         {% for node in board %}
-            <div class="node empty" style="left:{{node.board_x_enemy}}px;top:{{node.board_y_enemy}}px;">
+        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_enemy}}px;top:{{node.board_y_enemy}}px;">
             </div>
         {% endfor %}
     </div>
@@ -41,7 +53,7 @@ Wooooooooo
 
     <div class="friendly board">
         {% for node in board %}
-            <div class="node empty" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
             </div>
         {% endfor %}
     </div>
@@ -53,17 +65,39 @@ Wooooooooo
         <h1>T1</h1>
     </div>
 
+    <form id="current_turn" method="post" action="/playing/end_turn/">
+        {% csrf_token %}
+
+        <input name="card1" />
+        <input name="node1" />
+        <input name="align1" />
+
+        <input name="card2" />
+        <input name="node2" />
+        <input name="align2" />
+
+        <input name="i_win" type="checkbox" />
+    </form>
+
     <script>
 
         var UNIT_R = 25;
 
-        var phases = ["draw", "play_1", "attack", "play_2"];
-        var phase = 0;
+        var phases = ["draw", "play_1", "attack", "play_2", "ai_draw", "ai_play_1", "ai_attack", "ai_play_2"];
+        var phase = -1;
+
         var tech_level = 1;
+        var ai_tech_level = 1;
+
         var MAX_TECH = 5;
 
         //hand_cards[card_pk] = card.fields
         var hand_cards = {};
+
+        //the data returned from the server after ending
+        //a turn, including what the ai opponent does and
+        //which cards you draw
+        var turn_data = null;
 
         //same format as hand_cards, but contains
         //every card played so far this game as a
@@ -71,12 +105,10 @@ Wooooooooo
         var played_cards = {};
         
         $(function() {
-            draw();
+            next_phase();
         });
-        function draw() {
-            //visual feedback about which phase we're in
-            $("#phases li").removeClass("active");
-            $("#phases .draw").addClass("active");
+
+        function draw_starting_hand() {
 
             $.ajax({ url: "/playing/draw/",
                 success: function(hand_data_text) {
@@ -96,9 +128,20 @@ Wooooooooo
                         //track it for lookup when its played
                         hand_cards[card_json.pk] = card_json.fields;
                     }
+
                     next_phase();
                 }
             }); 
+        }
+
+        function end_turn() {
+            $.post("playing/end_turn/",
+                $("#current_turn").serialize(),
+                function(data) {
+                    turn_data = eval('(' + data + ')');
+                    next_phase();
+                }
+            );
         }
 
         function next_phase() {
@@ -111,17 +154,85 @@ Wooooooooo
                 $("#phases li.active").removeClass("active").siblings().first().addClass("active");
             }
             else {
-                $("#phases li.active").removeClass("active").next().addClass("active");
+                $("#phases li.active").removeClass("active").parent().children().eq(phase).addClass("active");
             }
 
             if (phase == 0) {
-                //draw cards
-                draw(); 
+                if (turn_data) {
+                    //draw cards
+                    setTimeout( function () {
+                        add_card_to_hand( turn_data.player_draw[0] );
+                        setTimeout ( function() {
+                            add_card_to_hand( turn_data.player_draw[1] );
+                            next_phase();
+                        }, 500);
+                    }, 500); 
+                }
+                else {
+                    //special case first turn
+                    draw_starting_hand();
+                }
+            }
+            else if (phase == 1) {
+                //do nothing.
+                //wait for player to play card
             }
             else if (phase == 2) {
                 //begin logic for auto-attacking
                 setTimeout(next_phase, 1000);
             }
+            else if (phase == 3) {
+                //do nothing.
+                //wait for player to play card
+            }
+            else if (phase == 4) {
+                //ai draw
+                end_turn();
+            }
+            else if (phase == 5) {
+                //ai play 1
+                var ai_play = turn_data.ai_cards[0];
+                var target = turn_data.ai_turn[0].fields.target_node_1;
+                var align = turn_data.ai_turn[0].fields.target_alignment_1; 
+                var node = $(".board.enemy .node[name='" + target + "']");
+                alert("enemy play on: " + target);
+                ai_cast(ai_play, node);
+            }
+
+            else if (phase == 6) {
+                //ai attack
+                setTimeout(next_phase, 1000);
+            }
+            else if (phase == 7) {
+                //ai play 2
+                var ai_play = turn_data.ai_cards[1];
+                var target = turn_data.ai_turn[0].fields.target_node_2;
+                var align = turn_data.ai_turn[0].fields.target_alignment_2; 
+                var node = $(".board.enemy .node[name='" + target + "']");
+                alert("enemy play on: " + target);
+                ai_cast(ai_play, node);
+            }
+        }
+
+        function ai_cast(card, node) { 
+
+            if (card.fields.defense) {
+                //create a summon
+                node.addClass("unit");
+                node.addClass("occupied"); 
+
+                node.removeClass("empty");
+
+                //for lookup of unit behaviour later
+                node.attr("id", card.pk);
+
+                played_cards[card.pk] = card.fields;
+
+                var unit = $("<div class='unit' id='" + card.pk + "'>" + card.fields.attack + "/" + card.fields.defense + card.fields.attack_type[0] + "</div>").appendTo(node);
+
+            }
+
+            next_phase();
         }
 
         function add_card_to_hand(card_json) {
@@ -200,11 +311,33 @@ Wooooooooo
                 return;
             }
 
-            //visually remove from hand
-            hand_card.remove();
-
             //convert jquery element into json w/ game logic
             var card = hand_cards[hand_card.attr("id")];
+
+            //record it for sending to server
+            if (phase == 1) {
+                $("input[name='card1']").val(hand_card.attr("id")); 
+                $("input[name='node1']").val(node.attr("name")); 
+                if (node.parent().hasClass("friendly")) {
+                    $("input[name='align1']").val("friendly"); 
+                }
+                else {
+                    $("input[name='align1']").val("enemy"); 
+                }
+            }
+            else if (phase == 3) {
+                $("input[name='card2']").val(hand_card.attr("id")); 
+                $("input[name='node2']").val(node.attr("name")); 
+                if (node.parent().hasClass("friendly")) {
+                    $("input[name='align2']").val("friendly"); 
+                }
+                else {
+                    $("input[name='align2']").val("enemy"); 
+                }
+            }
+
+            //visually remove from hand
+            hand_card.remove(); 
 
             if (card.defense) {
                 //create a summon

@@ -13,6 +13,7 @@ urlpatterns = patterns('',
 
 
     ('playing/draw/', 'd_game.views.draw'),
+    ('playing/end_turn/', 'd_game.views.end_turn'),
     ('', 'd_game.views.playing'),
 
     ('', 'django.views.generic.simple.direct_to_template',
