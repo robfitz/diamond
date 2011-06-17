@@ -179,7 +179,7 @@ Fuck ya bitches
             }
             else if (phase == 2) {
                 //begin logic for auto-attacking
-                setTimeout(next_phase, 1000);
+                setTimeout(next_phase, 500);
             }
             else if (phase == 3) {
                 //do nothing.
@@ -195,13 +195,12 @@ Fuck ya bitches
                 var target = turn_data.ai_turn[0].fields.target_node_1;
                 var align = turn_data.ai_turn[0].fields.target_alignment_1; 
                 var node = $(".board.enemy .node[name='" + target + "']");
-                alert("enemy play on: " + target);
                 ai_cast(ai_play, node);
             }
 
             else if (phase == 6) {
                 //ai attack
-                setTimeout(next_phase, 1000);
+                setTimeout(next_phase, 500);
             }
             else if (phase == 7) {
                 //ai play 2
@@ -209,7 +208,6 @@ Fuck ya bitches
                 var target = turn_data.ai_turn[0].fields.target_node_2;
                 var align = turn_data.ai_turn[0].fields.target_alignment_2; 
                 var node = $(".board.enemy .node[name='" + target + "']");
-                alert("enemy play on: " + target);
                 ai_cast(ai_play, node);
             }
         }

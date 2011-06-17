@@ -16,9 +16,12 @@ def playing(request):
 
     # keep current game state in the session.
     # when the board changes, we'll set
-    # request.session.X_board[row][x] = unit.pk or "rubble"
+    # request.session[X_board][row][x] = unit.pk or "rubble"
+
     request.session["friendly_board"] = {}
     request.session["ai_board"] = {}
+
+    logging.info("**** wiping session boards")
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
@@ -33,10 +36,14 @@ def end_turn(request):
 
     logging.info("** chose cards to play")
 
-    ai_board = request.session["ai_board"];
+    logging.info("** session board: %s" % dir(request.session["ai_board"]))
+
+    target_node_1 = None
+    target_node_2 = None
+
     for node in Node.objects.all():
         try:
-            if ai_board[node.row][node.x] == "":
+            if request.session["ai_board_%s_%s" % (node.row, node.x)] == "":
                 target_node_1 = node
                 break
         except KeyError:
@@ -46,16 +53,12 @@ def end_turn(request):
     if not target_node_1:
         target_node_1 = "tech"
     else:
-        try:
-            ai_board[target_node_1.row][target_node_1.x] = play_1.pk
-        except KeyError:
-            ai_board[target_node_1.row] = {}
-            ai_board[target_node_1.row][target_node_1.x] = play_1.pk
+        request.session["ai_board_%s_%s" % (node.row, node.x)] = play_1.pk
         logging.info("** set node %s %s to: %s" % (target_node_1.row, target_node_1.x, play_1.pk))
 
     for node in Node.objects.all():
         try:
-            if ai_board[node.row][node.x] == "":
+            if request.session["ai_board_%s_%s" % (node.row, node.x)] == "":
                 target_node_2 = node
                 break
         except KeyError:
@@ -65,11 +68,7 @@ def end_turn(request):
     if not target_node_2: 
         target_node_2 = "tech"
     else:
-        try:
-            ai_board[target_node_2.row][target_node_2.x] = play_2.pk
-        except KeyError:
-            ai_board[target_node_2.row] = {}
-            ai_board[target_node_2.row][target_node_2.x] = play_2.pk 
+        request.session["ai_board_%s_%s" % (node.row, node.x)] = play_2.pk
         logging.info("** set node %s %s to: %s" % (target_node_2.row, target_node_2.x, play_2.pk))
 
     logging.info("** chose targets")
