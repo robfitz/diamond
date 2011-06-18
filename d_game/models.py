@@ -27,12 +27,16 @@ class Turn(models.Model):
     #this might be ignored, e.g. in the case of "all" targetting
     target_node_1 = models.ForeignKey(Node, null=True)
 
+    is_tech_1 = models.BooleanField(default=False)
+
     target_alignment_1 = models.CharField(max_length=10, choices=ALIGNMENT_CHOICES)
 
     play_2 = models.ForeignKey(Card, null=True)
 
     #this might be ignored, e.g. in the case of "all" targetting
     target_node_2 = models.ForeignKey(Node, null=True)
+
+    is_tech_2 = models.BooleanField(default=False)
 
     target_alignment_2 = models.CharField(max_length=10, choices=ALIGNMENT_CHOICES, null=True)
 

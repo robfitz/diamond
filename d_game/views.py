@@ -18,8 +18,7 @@ def playing(request):
     # when the board changes, we'll set
     # request.session[X_board][row][x] = unit.pk or "rubble"
 
-    request.session["friendly_board"] = {}
-    request.session["ai_board"] = {}
+    request.session.flush();
 
     logging.info("**** wiping session boards")
 
@@ -36,10 +35,10 @@ def end_turn(request):
 
     logging.info("** chose cards to play")
 
-    logging.info("** session board: %s" % dir(request.session["ai_board"]))
-
     target_node_1 = None
     target_node_2 = None
+    is_tech_1 = False
+    is_tech_2 = False
 
     for node in Node.objects.all():
         try:
@@ -51,7 +50,7 @@ def end_turn(request):
             break
                 
     if not target_node_1:
-        target_node_1 = "tech"
+        is_tech_1 = True
     else:
         request.session["ai_board_%s_%s" % (node.row, node.x)] = play_1.pk
         logging.info("** set node %s %s to: %s" % (target_node_1.row, target_node_1.x, play_1.pk))
@@ -66,7 +65,7 @@ def end_turn(request):
             break 
 
     if not target_node_2: 
-        target_node_2 = "tech"
+        is_tech_2 = True
     else:
         request.session["ai_board_%s_%s" % (node.row, node.x)] = play_2.pk
         logging.info("** set node %s %s to: %s" % (target_node_2.row, target_node_2.x, play_2.pk))
@@ -75,9 +74,11 @@ def end_turn(request):
 
     ai_turn = Turn(play_1=play_1,
             target_node_1=target_node_1,
+            is_tech_1=is_tech_1,
             target_alignment_1="friendly",
             play_2=play_2,
             target_node_2=target_node_2,
+            is_tech_2=is_tech_2,
             target_alignment_2="friendly")
 
     logging.info("** did ai turn")
@@ -100,6 +101,8 @@ def end_turn(request):
             }""" % (serializers.serialize("json", [draw_1, draw_2]),
                     serializers.serialize("json", [ai_turn]),
                     serializers.serialize("json", [play_1, play_2]))
+
+    logging.info(hand_and_turn_json);
 
     return HttpResponse(hand_and_turn_json, "application/javascript")
 
