@@ -47,8 +47,11 @@ Fuck ya bitches
         {% endfor %}
     </div>
 
-    <div id="enemy_tech" class="tech">
+    <div id="enemy_tech" class="enemy tech">
         <h1>T1</h1>
+    </div>
+    <div id="enemy_life" class="enemy life">
+        <h1>10</h1> 
     </div>
 
     <div class="friendly board">
@@ -63,6 +66,9 @@ Fuck ya bitches
 
     <div id="friendly_tech" class="tech">
         <h1>T1</h1>
+    </div>
+    <div id="friendly_life" class="friendly life">
+        <h1>10</h1> 
     </div>
 
     <form id="current_turn" method="post" action="/playing/end_turn/">
@@ -88,6 +94,8 @@ Fuck ya bitches
 
         var tech_level = 1;
         var ai_tech_level = 1;
+
+        var life = { 'friendly': 10, 'enemy': 10 };
 
         var MAX_TECH = 5;
 
@@ -121,6 +129,7 @@ Fuck ya bitches
             {% endfor %} 
 
             next_phase();
+
         });
 
         function draw_starting_hand() {
@@ -195,33 +204,36 @@ Fuck ya bitches
             else if (phase == 2) {
                 //begin logic for auto-attacking
                 var i = 1;
-                $(".board.friendly .node.unit").each( function () { 
-                            $(this).animate(
-                                {
-                                    top:'-=100',
-                                },
-                                500, 
-                                //completed advance
-                                function() { 
-                                    //find target
-                                    var attacker_id = $(this).attr("id");
-                                    var node_id = $(this).attr("name");
+                $(".board.friendly .node.unit").each( 
+                    function () { 
+                        $(this).animate(
+                            {
+                                top:'-=100',
+                            },
+                            500, 
+                            //completed advance
+                            function() { 
+                                //find target
+                                //var attacker_id = $(this).attr("id");
+                                var node_id = $(this).attr("name");
 
-                                    var hit = get_attack_target(attacker_id, node_id, "friendly");
+                                var attacker_json = boards["friendly"][node_id];
 
-                                    //deal damage 
+                                var hit = get_attack_target(attacker_json, node_id, "friendly");
 
-                                    //begin retreat
-                                    $(this).animate(
-                                        {
-                                            top:'+=100',
-                                        },
-                                        250, 
-                                        function() {
-                                            //completed retreat
-                                        }
-                                    );
-                                });
+                                //deal damage 
+
+                                //begin retreat
+                                $(this).animate(
+                                    {
+                                        top:'+=100',
+                                    },
+                                    250, 
+                                    function() {
+                                        //completed retreat
+                                    }
+                                );
+                            });
                         i ++;
                 });
                 setTimeout(next_phase, 500);
@@ -240,7 +252,7 @@ Fuck ya bitches
                     ai_tech_up(1); 
                 }
                 else {
-                    var ai_play = turn_data.ai_cards[0];
+                    var ai_play = turn_data.ai_cards[0].fields;
                     var target = turn_data.ai_turn[0].fields.target_node_1;
                     var align = turn_data.ai_turn[0].fields.target_alignment_1; 
                     //ai summons
@@ -259,7 +271,7 @@ Fuck ya bitches
                     ai_tech_up(1); 
                 }
                 else {
-                    var ai_play = turn_data.ai_cards[1];
+                    var ai_play = turn_data.ai_cards[1].fields;
                     var target = turn_data.ai_turn[0].fields.target_node_2;
                     var align = turn_data.ai_turn[0].fields.target_alignment_2; 
                     var node = $(".board.enemy .node[name='" + target + "']");
@@ -270,7 +282,7 @@ Fuck ya bitches
 
         function ai_cast(card, node) { 
 
-            if (card.fields.defense) {
+            if (card.defense) {
 
                 //create a summon
                 node.addClass("unit");
@@ -281,9 +293,10 @@ Fuck ya bitches
                 //for lookup of unit behaviour later
                 node.attr("id", card.pk);
 
-                played_cards[card.pk] = card.fields; 
+                played_cards[card.pk] = card; 
+                boards["enemy"][node.attr("name")] = $.extend(true, {}, card);
 
-                var unit = $("<div class='unit' id='" + card.pk + "'>" + card.fields.attack + "/" + card.fields.defense + card.fields.attack_type[0] + "</div>").appendTo(node);
+                var unit = $("<div class='unit' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
 
             }
 
@@ -338,8 +351,8 @@ Fuck ya bitches
                 var next_node_id = board_node_pks[row][x] 
 
                 //is there a guy there?
-                unit = boards[alignment][next_node_id];
-                if (unit) {
+                var collision_unit = boards[alignment][next_node_id];
+                if (collision_unit) {
                     if (alignment == "friendly") { 
 
                         //am i ranged? loop!
@@ -350,19 +363,27 @@ Fuck ya bitches
                     }
                     else {
                         //no? enemy! hit it!
-                        alert("damage unit");
+                        alert("damage unit for: " + card_json.attack);
+                        collision_unit.defense -= card_json.attack;
                         is_searching = false;
                     }
                 }
                 else if (row <= 0) {
                     //is it 0,0? hit the player!
-                    alert("damage player");
                     is_searching = false; 
+
+                    attack = card_json.attack;
+                    damage("enemy", attack); 
                 }
                 else {
                     //not the player and no unit there. loop
                 } 
             } 
+        }
+
+        function damage(alignment, amount) {
+            life[alignment] -= amount;
+            $(".life." + alignment + " h1").text("" + life[alignment]);
         }
 
         function add_card_to_hand(card_json) {
@@ -477,6 +498,7 @@ Fuck ya bitches
 
             //visually remove from hand
             hand_card.remove(); 
+            var card_id = hand_card.attr("id");
 
             if (card.defense) {
                 //create a summon
@@ -486,13 +508,16 @@ Fuck ya bitches
                 node.removeClass("empty");
 
                 //for lookup of unit behaviour later
-                node.attr("id", hand_card.attr("id"));
+                node.attr("id", card_id);
 
-                played_cards[hand_card.attr("id")] = hand_card.fields;
+                alert("setting played cards: " + hand_card.attr("id") + " to " + card);
+                played_cards[hand_card.attr("id")] = card;
 
                 var unit = $("<div class='unit' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
 
-                boards["friendly"][node.attr("name")] = hand_card.attr("id");
+                //deep copy the card json onto the board model for convenient access later
+                boards["friendly"][node.attr("name")] = $.extend(true, {}, card);
+                //boards["friendly"][node.attr("name")] = hand_card.attr("id");
             }
 
             next_phase();
