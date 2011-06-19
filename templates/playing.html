@@ -206,38 +206,7 @@ Fuck ya bitches
             else if (phase == 2) {
                 //begin logic for auto-attacking
                 var i = 1;
-                $(".board.friendly .node.unit").each( 
-                    function () { 
-                        $(this).animate(
-                            {
-                                top:'-=100',
-                            },
-                            500, 
-                            //completed advance
-                            function() { 
-                                //find target
-                                //var attacker_id = $(this).attr("id");
-                                var node_id = $(this).attr("name");
-
-                                var attacker_json = boards["friendly"][node_id];
-
-                                var hit = do_attack(attacker_json, node_id, "friendly");
-
-                                //deal damage 
-
-                                //begin retreat
-                                $(this).animate(
-                                    {
-                                        top:'+=100',
-                                    },
-                                    250, 
-                                    function() {
-                                        //completed retreat
-                                    }
-                                );
-                            });
-                        i ++;
-                });
+                do_attack_phase("friendly");
                 setTimeout(next_phase, 500);
             }
             else if (phase == 3) {
@@ -266,6 +235,7 @@ Fuck ya bitches
             } 
             else if (phase == 6) {
                 //ai attack
+                do_attack_phase("enemy");
                 setTimeout(next_phase, 500);
             }
             else if (phase == 7) {
@@ -281,6 +251,42 @@ Fuck ya bitches
                     ai_cast(ai_play, node);
                 }
             }
+        }
+
+        function do_attack_phase(alignment) { 
+            var i = 0;
+            $(".board." + alignment + " .node.unit").each( 
+                function () { 
+                    var approach_dir = (alignment == "friendly" ? "-":"+");
+                    var retreat_dir = (alignment == "friendly" ? "+":"-");
+                    $(this).animate(
+                        {
+                            top: approach_dir + '=100',
+                        },
+                        500, 
+                        //completed advance
+                        function() { 
+                            //find target
+                            //var attacker_id = $(this).attr("id");
+                            var node_id = $(this).attr("name");
+
+                            var attacker_json = boards[alignment][node_id];
+
+                            var hit = do_attack(attacker_json, node_id, alignment);
+
+                            //begin retreat
+                            $(this).animate(
+                                {
+                                    top: retreat_dir + '=100',
+                                },
+                                250, 
+                                function() {
+                                    //completed retreat
+                                }
+                            );
+                        });
+                    i ++;
+            });
         }
 
         function set_unit_damage(node_pk, alignment, total_damage) {
@@ -344,6 +350,7 @@ Fuck ya bitches
         function do_attack(card_json, node_id, alignment) {
 
             var starting_alignment = alignment;
+            var opponent_alignment = (starting_alignment == "friendly" ? "enemy" : "friendly"); 
 
             var row = board_node_locs[node_id].row;
             var x = board_node_locs[node_id].x;
@@ -387,7 +394,7 @@ Fuck ya bitches
                 //is there a guy there?
                 var collision_unit = boards[alignment][next_node_id];
                 if (collision_unit) {
-                    if (alignment == "friendly") { 
+                    if (alignment == starting_alignment) { 
 
                         //am i ranged? loop!
                         if (card_json.attack_type == "ranged") {
@@ -400,18 +407,16 @@ Fuck ya bitches
                     }
                     else {
                         //no? enemy! hit it!
-                        damage_unit(next_node_id, "enemy", card_json.attack); 
-
-                        var node = $(".board." + alignment + " .node[name='" + next_node_id + "']");
+                        damage_unit(next_node_id, alignment, card_json.attack); 
                         is_searching = false;
                     }
                 }
-                else if (row <= 0) {
+                else if (alignment == opponent_alignment && row <= 0) {
                     //is it 0,0? hit the player!
                     is_searching = false; 
 
                     attack = card_json.attack;
-                    damage_player("enemy", attack); 
+                    damage_player(alignment, attack); 
                 }
                 else {
                     //not the player and no unit there. loop
