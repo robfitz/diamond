@@ -259,32 +259,39 @@ Fuck ya bitches
                 function () { 
                     var approach_dir = (alignment == "friendly" ? "-":"+");
                     var retreat_dir = (alignment == "friendly" ? "+":"-");
-                    $(this).animate(
-                        {
-                            top: approach_dir + '=100',
-                        },
-                        500, 
-                        //completed advance
-                        function() { 
-                            //find target
-                            //var attacker_id = $(this).attr("id");
-                            var node_id = $(this).attr("name");
 
-                            var attacker_json = boards[alignment][node_id];
+                    var to_animate = $(this);
 
-                            var hit = do_attack(attacker_json, node_id, alignment);
+                    setTimeout(function () {
+                        to_animate.animate(
+                            {
+                                top: approach_dir + '=100',
+                            },
+                            500, 
+                            //completed advance
+                            function() { 
+                                //find target
+                                //var attacker_id = to_animate.attr("id");
+                                var node_id = to_animate.attr("name");
 
-                            //begin retreat
-                            $(this).animate(
-                                {
-                                    top: retreat_dir + '=100',
-                                },
-                                250, 
-                                function() {
-                                    //completed retreat
-                                }
-                            );
-                        });
+                                var attacker_json = boards[alignment][node_id];
+
+                                var hit = do_attack(attacker_json, node_id, alignment);
+
+
+                                //begin retreat
+                                to_animate.animate(
+                                    {
+                                        top: retreat_dir + '=100',
+                                    },
+                                    250, 
+                                    function() {
+                                        //completed retreat
+                                    }
+                                );
+                            }
+                        );
+                        }, 500 * i); 
                     i ++;
             });
         }
