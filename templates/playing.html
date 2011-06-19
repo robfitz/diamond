@@ -219,7 +219,7 @@ Fuck ya bitches
 
                                 var attacker_json = boards["friendly"][node_id];
 
-                                var hit = get_attack_target(attacker_json, node_id, "friendly");
+                                var hit = do_attack(attacker_json, node_id, "friendly");
 
                                 //deal damage 
 
@@ -259,8 +259,7 @@ Fuck ya bitches
                     var node = $(".board.enemy .node[name='" + target + "']");
                     ai_cast(ai_play, node);
                 }
-            }
-
+            } 
             else if (phase == 6) {
                 //ai attack
                 setTimeout(next_phase, 500);
@@ -296,14 +295,14 @@ Fuck ya bitches
                 played_cards[card.pk] = card; 
                 boards["enemy"][node.attr("name")] = $.extend(true, {}, card);
 
-                var unit = $("<div class='unit' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
+                var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
 
             }
 
             next_phase();
         }
 
-        function get_attack_target(card_json, node_id, alignment) {
+        function do_attack(card_json, node_id, alignment) {
 
             var starting_alignment = alignment;
 
@@ -356,15 +355,19 @@ Fuck ya bitches
                     if (alignment == "friendly") { 
 
                         //am i ranged? loop!
+                        if (card_json.attack_type == "ranged") {
 
-                        //am i melee? done :*(
-                        alert("am i ranged? bumped into friendly unit");
-                        is_searching = false;
+                        }
+                        else {
+                            //am i melee? done :*(
+                            is_searching = false;
+                        }
                     }
                     else {
                         //no? enemy! hit it!
                         alert("damage unit for: " + card_json.attack);
                         collision_unit.defense -= card_json.attack;
+                        //$(".board." + alignment + " .node[name='" + next_node_id + "'] .unit_piece").html(collision_unit.attack + "/" + collision_unit.defense + collision_unit.attack_type[0]);
                         is_searching = false;
                     }
                 }
@@ -513,7 +516,7 @@ Fuck ya bitches
                 alert("setting played cards: " + hand_card.attr("id") + " to " + card);
                 played_cards[hand_card.attr("id")] = card;
 
-                var unit = $("<div class='unit' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
+                var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
 
                 //deep copy the card json onto the board model for convenient access later
                 boards["friendly"][node.attr("name")] = $.extend(true, {}, card);
