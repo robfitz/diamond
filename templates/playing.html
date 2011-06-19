@@ -15,7 +15,7 @@ Fuck ya bitches
 
     <ul id="phases">
         <li class="active draw">
-            Draw
+            Draw & heal
         </li>
         <li class="play play_1">
             Play (offensive)
@@ -27,7 +27,7 @@ Fuck ya bitches
             Play (strategic)
         </li>
         <li class="active draw">
-            AI Draw
+            AI Draw & heal
         </li>
         <li class="play play_1">
             AI Play (offensive)
@@ -191,6 +191,8 @@ Fuck ya bitches
                             next_phase();
                         }, 500);
                     }, 500); 
+
+                    heal_units("friendly");
                 }
                 else {
                     //special case first turn
@@ -243,7 +245,9 @@ Fuck ya bitches
                 //wait for player to play card
             }
             else if (phase == 4) {
-                //ai draw
+                //ai draw & heal
+                heal_units("enemy");
+
                 end_turn();
             }
             else if (phase == 5) {
@@ -276,6 +280,41 @@ Fuck ya bitches
                     var node = $(".board.enemy .node[name='" + target + "']");
                     ai_cast(ai_play, node);
                 }
+            }
+        }
+
+        function set_unit_damage(node_pk, alignment, total_damage) {
+            var unit = boards[alignment][node_pk];
+
+            if (!unit) return;
+
+            unit.damage = total_damage;
+
+            var node = $(".board." + alignment + " .node[name='" + node_pk + "']");
+            node.children(".unit_piece").html(unit.attack + "/" + (unit.defense - unit.damage) + unit.attack_type[0]); 
+
+            if (unit.damage >= unit.defense) {
+                //killed. remove from board.
+                boards[alignment][node_pk] = null;
+                node.children(".unit_piece").remove(); 
+                node.addClass("empty");
+                node.removeClass("unit");
+            } 
+        }
+        function damage_unit(node_pk, alignment, delta_damage) {
+            var unit = boards[alignment][node_pk];
+
+            if (!unit) return;
+
+            if (!unit.damage) {
+                unit.damage = 0;
+            }
+            set_unit_damage(node_pk, alignment, unit.damage + delta_damage); 
+        }
+        function heal_units(alignment) {
+            for (var node_pk in boards[alignment]) {
+                var node = boards[alignment][node_pk];
+                set_unit_damage(node_pk, alignment, 0);
             }
         }
 
@@ -312,10 +351,6 @@ Fuck ya bitches
             var is_searching = true;
 
             var d_row = 1;
-            if (row == 2) {
-                d_row = 0;
-                alignment = (alignment == "friendly" ? "enemy" : "friendly");
-            }
 
             while (is_searching) {
 
@@ -365,9 +400,9 @@ Fuck ya bitches
                     }
                     else {
                         //no? enemy! hit it!
-                        alert("damage unit for: " + card_json.attack);
-                        collision_unit.defense -= card_json.attack;
-                        //$(".board." + alignment + " .node[name='" + next_node_id + "'] .unit_piece").html(collision_unit.attack + "/" + collision_unit.defense + collision_unit.attack_type[0]);
+                        damage_unit(next_node_id, "enemy", card_json.attack); 
+
+                        var node = $(".board." + alignment + " .node[name='" + next_node_id + "']");
                         is_searching = false;
                     }
                 }
@@ -376,7 +411,7 @@ Fuck ya bitches
                     is_searching = false; 
 
                     attack = card_json.attack;
-                    damage("enemy", attack); 
+                    damage_player("enemy", attack); 
                 }
                 else {
                     //not the player and no unit there. loop
@@ -384,7 +419,7 @@ Fuck ya bitches
             } 
         }
 
-        function damage(alignment, amount) {
+        function damage_player(alignment, amount) {
             life[alignment] -= amount;
             $(".life." + alignment + " h1").text("" + life[alignment]);
         }
@@ -513,7 +548,6 @@ Fuck ya bitches
                 //for lookup of unit behaviour later
                 node.attr("id", card_id);
 
-                alert("setting played cards: " + hand_card.attr("id") + " to " + card);
                 played_cards[hand_card.attr("id")] = card;
 
                 var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
