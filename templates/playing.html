@@ -40,17 +40,17 @@ Fuck ya bitches
         </li>
     </ul>
 
-    <div class="enemy board">
+    <div class="ai board">
         {% for node in board %}
-        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_enemy}}px;top:{{node.board_y_enemy}}px;">
+        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
             </div>
         {% endfor %}
     </div>
 
-    <div id="enemy_tech" class="enemy tech">
+    <div id="ai_tech" class="ai tech" name="tech">
         <h1>T1</h1>
     </div>
-    <div id="enemy_life" class="enemy life">
+    <div id="ai_life" class="ai life">
         <h1>10</h1> 
     </div>
 
@@ -64,7 +64,7 @@ Fuck ya bitches
     <ul id="friendly_hand">
     </ul>
 
-    <div id="friendly_tech" class="tech">
+    <div id="friendly_tech" class="tech" name="tech">
         <h1>T1</h1>
     </div>
     <div id="friendly_life" class="friendly life">
@@ -95,7 +95,7 @@ Fuck ya bitches
         var tech_level = 1;
         var ai_tech_level = 1;
 
-        var life = { 'friendly': 10, 'enemy': 10 };
+        var life = { 'friendly': 10, 'ai': 10 };
 
         var MAX_TECH = 5;
 
@@ -118,7 +118,7 @@ Fuck ya bitches
         
         $(function() {
             boards.friendly = {};
-            boards.enemy = {};
+            boards.ai = {};
 
             {% for node in board %}
                 board_node_locs["{{ node.pk }}"] = { "row": {{ node.row }}, "x": {{ node.x }} }; 
@@ -162,6 +162,7 @@ Fuck ya bitches
             $.post("playing/end_turn/",
                 $("#current_turn").serialize(),
                 function(data) {
+                    alert(data);
                     turn_data = eval('(' + data + ')');
                     next_phase();
                 }
@@ -189,8 +190,8 @@ Fuck ya bitches
                         setTimeout ( function() {
                             add_card_to_hand( turn_data.player_draw[1] );
                             next_phase();
-                        }, 500);
-                    }, 500); 
+                        }, 200);
+                    }, 200); 
 
                     heal_units("friendly");
                 }
@@ -214,7 +215,7 @@ Fuck ya bitches
             }
             else if (phase == 4) {
                 //ai draw & heal
-                heal_units("enemy");
+                heal_units("ai");
 
                 end_turn();
             }
@@ -228,13 +229,13 @@ Fuck ya bitches
                     var target = turn_data.ai_turn[0].fields.target_node_1;
                     var align = turn_data.ai_turn[0].fields.target_alignment_1; 
                     //ai summons
-                    var node = $(".board.enemy .node[name='" + target + "']");
+                    var node = $(".board.ai .node[name='" + target + "']");
                     ai_cast(ai_play, node);
                 }
             } 
             else if (phase == 6) {
                 //ai attack
-                var delay = do_attack_phase("enemy");
+                var delay = do_attack_phase("ai");
                 setTimeout(next_phase, delay);
             }
             else if (phase == 7) {
@@ -246,7 +247,7 @@ Fuck ya bitches
                     var ai_play = turn_data.ai_cards[1].fields;
                     var target = turn_data.ai_turn[0].fields.target_node_2;
                     var align = turn_data.ai_turn[0].fields.target_alignment_2; 
-                    var node = $(".board.enemy .node[name='" + target + "']");
+                    var node = $(".board.ai .node[name='" + target + "']");
                     ai_cast(ai_play, node);
                 }
             }
@@ -271,7 +272,7 @@ Fuck ya bitches
 
                     var attack_path = do_attack(attacker_json, node_id, alignment);
 
-                    var opponent_alignment = (alignment == "friendly" ? "enemy" : "friendly"); 
+                    var opponent_alignment = (alignment == "friendly" ? "ai" : "friendly"); 
 
                     var str = "";
                     var current_animation_step = 0;
@@ -282,14 +283,14 @@ Fuck ya bitches
                             $(this).animate( { top: "+=0" }, { queue: true, duration: animation_ms } );
                         }
 
-                        animation_ms += 500;
+                        animation_ms += 200;
                         $(this).animate(
                             {   top: attack_path[i].drow,
                                 left: attack_path[i].dx,
                             },
                             {
                                 queue: true,
-                                duration: 500,
+                                duration: 200,
                                 complete: function() {
                                     // what Im doing and to who
                                     var action = attack_path[current_animation_step].action;
@@ -373,7 +374,7 @@ Fuck ya bitches
                 node.attr("id", card.pk);
 
                 played_cards[card.pk] = card; 
-                boards["enemy"][node.attr("name")] = $.extend(true, {}, card);
+                boards["ai"][node.attr("name")] = $.extend(true, {}, card);
 
                 var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
 
@@ -389,7 +390,7 @@ Fuck ya bitches
         function do_attack(card_json, node_id, alignment) {
 
             var starting_alignment = alignment;
-            var opponent_alignment = (starting_alignment == "friendly" ? "enemy" : "friendly"); 
+            var opponent_alignment = (starting_alignment == "friendly" ? "ai" : "friendly"); 
 
             var row = board_node_locs[node_id].row;
             var x = board_node_locs[node_id].x;
@@ -403,13 +404,13 @@ Fuck ya bitches
             while (is_searching) {
 
                 if (alignment != starting_alignment) {
-                    //we've entered enemy territory
+                    //we've entered ai territory
                     d_row = -1;
                 }
                 else if (row == 2) {
-                    //breaching enemy territory, from front row to front row
+                    //breaching ai territory, from front row to front row
                     d_row = 0;
-                    alignment = (alignment == "friendly" ? "enemy" : "friendly"); 
+                    alignment = (alignment == "friendly" ? "ai" : "friendly"); 
                 }
                 else {
                     //moving forward from your back[er] row
@@ -434,7 +435,7 @@ Fuck ya bitches
                 var next_node_id = board_node_pks[row][x] 
 
                 var path_node = { node_id: next_node_id };
-                if (starting_alignment == "enemy") {
+                if (starting_alignment == "ai") {
                     path_node.drow = "+=100";
                     path_node.drow_reverse = "-=100";
                 }
@@ -474,7 +475,7 @@ Fuck ya bitches
                         }
                     }
                     else {
-                        //no? enemy! hit it!
+                        //no? ai! hit it!
                         //damage_unit(next_node_id, alignment, card_json.attack); 
                         path_node.action = "damage_unit";
                         is_searching = false;
@@ -556,6 +557,17 @@ Fuck ya bitches
 
             tech_up(1);
 
+            if (phase == 1) {
+                $("input[name='card1']").val(hand_card.attr("id")); 
+                $("input[name='node1']").val('tech'); 
+                $("input[name='align1']").val("friendly"); 
+            }
+            else if (phase == 3) {
+                $("input[name='card2']").val(hand_card.attr("id")); 
+                $("input[name='node2']").val('tech'); 
+                $("input[name='align2']").val("friendly"); 
+            }
+
             next_phase();
         }
 
@@ -566,7 +578,7 @@ Fuck ya bitches
 
             if (ai_tech_level > MAX_TECH) tech_level = MAX_TECH;
 
-            $("#enemy_tech h1").text("T" + ai_tech_level);
+            $("#ai_tech h1").text("T" + ai_tech_level);
         }
         function tech_up(amount) {
 
@@ -596,7 +608,7 @@ Fuck ya bitches
                     $("input[name='align1']").val("friendly"); 
                 }
                 else {
-                    $("input[name='align1']").val("enemy"); 
+                    $("input[name='align1']").val("ai"); 
                 }
             }
             else if (phase == 3) {
@@ -606,7 +618,7 @@ Fuck ya bitches
                     $("input[name='align2']").val("friendly"); 
                 }
                 else {
-                    $("input[name='align2']").val("enemy"); 
+                    $("input[name='align2']").val("ai"); 
                 }
             }
 

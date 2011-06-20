@@ -19,9 +19,9 @@ class Node(models.Model):
         return (self.x + 2) * 100 
     def board_y_friendly(self):
         return (2 - self.row) * 100
-    def board_x_enemy(self):
+    def board_x_ai(self):
         return (self.x + 2) * 100 
-    def board_y_enemy(self):
+    def board_y_ai(self):
         return (self.row) * 100
 
 

@@ -8,28 +8,96 @@ from django.template import RequestContext
 
 from d_board.models import Node
 from d_cards.models import Card
-from d_game.models import Turn
+from d_game.models import Turn, Match, Board, Unit
 
 def playing(request):
 
     board = Node.objects.all()
 
-    # keep current game state in the session.
-    # when the board changes, we'll set
-    # request.session[X_board][row][x] = unit.pk or "rubble"
-
     request.session.flush();
 
-    logging.info("**** wiping session boards")
+    match = Match()
+    match.save()
+    request.session["match"] = match.id
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
+
+
+def cast(match, board, owner_alignment, card_to_play, node_to_target):
+
+    logging.info("** pre-cast(): played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
+
+    unit = Unit(card=card_to_play,
+            match=match,
+            owner_alignment=owner_alignment,
+            row=node_to_target.row,
+            x=node_to_target.x)
+    unit.save()
+
+    board.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
+        'type': "unit",
+        'unit': unit
+    }
+
+    logging.info("** cast(): played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
+
+
+def heal(match, alignment):
+
+    for unit in Unit.objects.filter(match=match).filter(owner_alignment=alignment):
+
+        unit.heal()
 
 
 def end_turn(request):
 
     logging.info("** end_turn()")
 
-    #find any card i'm able to use
+    match = Match.objects.get(id=request.session["match"])
+    logging.info("** got match: %s" % match.id)
+
+    board = Board()
+    board.load_from_session(request.session)
+    board.log()
+
+    # process what the player has just done & update board state
+
+    if request.POST.get("i_win"):
+        logging.info("!! player won game !!")
+
+    # heal player's units
+    heal(match, "friendly")
+
+    # first player cast
+    node = None
+    node_id = id=request.POST.get("node1")
+    if node_id != "tech":
+        node = Node.objects.get(id=node_id)
+
+    card_id = request.POST.get("card1")
+    card = Card.objects.get(id=card_id) 
+    if node:
+        cast(match, board, "friendly", card, node)
+    else:
+        logging.info("!! TODO: tech up friendly 1")
+
+    #attack!
+    board.do_attack_phase("friendly")
+
+    # second player cast
+    node = None
+    node_id = id=request.POST.get("node2")
+    if node_id != "tech":
+        node = Node.objects.get(id=node_id)
+    card_id = request.POST.get("card2")
+    card = Card.objects.get(id=card_id) 
+    if node:
+        cast(match, board, "friendly", card, node)
+    else:
+        logging.info("!! TODO: tech up friendly 2")
+    
+    # ai cast
+    # find any card i'm able to use
     play_1 = Card.objects.filter(tech_level=1)[0]
     play_2 = Card.objects.filter(tech_level=1)[0]
 
@@ -40,35 +108,41 @@ def end_turn(request):
     is_tech_1 = False
     is_tech_2 = False
 
-    for node in Node.objects.all():
-        try:
-            if request.session["ai_board_%s_%s" % (node.row, node.x)] == "":
-                target_node_1 = node
-                break
-        except KeyError:
-            target_node_1 = node
+    # ai play first card
+    for row in range(3):
+        if target_node_1:
             break
+        for x in range(-row, row+1): 
+            if not board.nodes["ai"]["%s_%s" % (row, x)]:
+                target_node_1 = Node.objects.get(row=row,x=x)
+                break
                 
     if not target_node_1:
+        logging.info("** ai 1st cast: teching")
         is_tech_1 = True
+        target_node_1 = None
     else:
-        request.session["ai_board_%s_%s" % (node.row, node.x)] = play_1.pk
-        logging.info("** set node %s %s to: %s" % (target_node_1.row, target_node_1.x, play_1.pk))
+        cast(match, board, "ai", play_1, target_node_1)
 
-    for node in Node.objects.all():
-        try:
-            if request.session["ai_board_%s_%s" % (node.row, node.x)] == "":
-                target_node_2 = node
+    #heal and attack
+    heal(match, "ai")
+    board.do_attack_phase("ai")
+
+    # ai play second card
+    for row in range(3):
+        if target_node_2:
+            break
+        for x in range(-row, row+1): 
+            if not board.nodes["ai"]["%s_%s" % (row, x)]:
+                target_node_2 = Node.objects.get(row=row,x=x)
                 break
-        except KeyError:
-            target_node_2 = node
-            break 
 
     if not target_node_2: 
+        logging.info("** ai 2nd cast: teching")
         is_tech_2 = True
+        target_node_2 = None
     else:
-        request.session["ai_board_%s_%s" % (node.row, node.x)] = play_2.pk
-        logging.info("** set node %s %s to: %s" % (target_node_2.row, target_node_2.x, play_2.pk))
+        cast(match, board, "ai", play_2, target_node_2)
 
     logging.info("** chose targets")
 
@@ -82,6 +156,8 @@ def end_turn(request):
             target_alignment_2="friendly")
 
     logging.info("** did ai turn")
+
+    board.log()
             
     #get 2 new cards for player
     deck = Card.objects.all()
@@ -105,6 +181,7 @@ def end_turn(request):
     logging.info(hand_and_turn_json);
 
     return HttpResponse(hand_and_turn_json, "application/javascript")
+
 
 def draw(request):
 
