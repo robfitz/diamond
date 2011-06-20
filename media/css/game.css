@@ -46,12 +46,13 @@
     height:20px;
     margin:40px;
     color:#fff;
-    background-color:#000;
     position:absolute;
-    border:1px solid white;
+    z-index:1;
+    //background-color:#000;
+    //border:1px solid white;
 }
 .node:hover {
-    background-color:#124;
+    //background-color:#124;
 }
 
 .targettable {
@@ -59,7 +60,7 @@
 }
 
 .node.unit {
-    background-color:#99f;
+    background-color:#66f;
 }
 
 #phases {

@@ -279,13 +279,17 @@ Fuck ya bitches
                         str += attack_path[i].drow + "," + attack_path[i].dx + "   "; 
 
                         if (i == 0) {
-                            $(this).animate( { top: "+=0" }, { queue: true, duration: animation_ms } );
+                            $(this).animate( { top: "+=0" }, { 
+                                queue: true, 
+                                duration: animation_ms,
+                            });
                         }
 
                         animation_ms += 200;
                         $(this).animate(
                             {   top: attack_path[i].drow,
                                 left: attack_path[i].dx,
+                                "z-index": 2,
                             },
                             {
                                 queue: true,
@@ -313,10 +317,12 @@ Fuck ya bitches
                         $(this).animate(
                             {   top: attack_path[i].drow_reverse,
                                 left: attack_path[i].dx_reverse,
+                                "z-index": 2,
                             },
                             {
-                            queue: true,
-                            duration:200,
+                                queue: true,
+                                duration:200,
+                                complete: function() { $(this).css("z-index", 1); }
                             }     
                         ); 
                     }
