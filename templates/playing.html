@@ -162,7 +162,6 @@ Fuck ya bitches
             $.post("playing/end_turn/",
                 $("#current_turn").serialize(),
                 function(data) {
-                    alert(data);
                     turn_data = eval('(' + data + ')');
                     next_phase();
                 }

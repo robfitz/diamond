@@ -58,7 +58,6 @@ class Board():
 
     def log(self):
 
-        logging.info("AI")
         str = ""
         for row in range(3):
             for x in range(-2, row+1): 
@@ -71,8 +70,6 @@ class Board():
             logging.info(str)
             str = ""
 
-        logging.info("")
-
         for inv_row in range(3):
             row = 2 - inv_row
             for x in range(-2, row+1): 
@@ -84,7 +81,6 @@ class Board():
                     str += " - "
             logging.info(str)
             str = ""
-        logging.info("Friendly")
 
     def load_from_session(self, session):
 

@@ -65,8 +65,14 @@ def end_turn(request):
     if request.POST.get("i_win"):
         logging.info("!! player won game !!")
 
+    logging.info("BOARD BEFORE PLAYER HEAL")
+    board.log()
+
     # heal player's units
     heal(match, "friendly")
+
+    logging.info("BOARD AFTER PLAYER HEAL")
+    board.log()
 
     # first player cast
     node = None
@@ -81,8 +87,14 @@ def end_turn(request):
     else:
         logging.info("!! TODO: tech up friendly 1")
 
+    logging.info("BOARD BEFORE PLAYER ATTACK (AFTER CAST 1)")
+    board.log()
+
     #attack!
     board.do_attack_phase("friendly")
+
+    logging.info("BOARD AFTER PLAYER ATTACK")
+    board.log()
 
     # second player cast
     node = None
@@ -96,6 +108,9 @@ def end_turn(request):
     else:
         logging.info("!! TODO: tech up friendly 2")
     
+    logging.info("BOARD AFTER PLAYER CAST 2")
+    board.log()
+
     # ai cast
     # find any card i'm able to use
     play_1 = Card.objects.filter(tech_level=1)[0]
@@ -107,6 +122,15 @@ def end_turn(request):
     target_node_2 = None
     is_tech_1 = False
     is_tech_2 = False
+
+    logging.info("BOARD BEFORE AI HEAL")
+    board.log()
+
+    #heal and attack
+    heal(match, "ai")
+
+    logging.info("BOARD AFTER AI HEAL")
+    board.log()
 
     # ai play first card
     for row in range(3):
@@ -124,9 +148,13 @@ def end_turn(request):
     else:
         cast(match, board, "ai", play_1, target_node_1)
 
-    #heal and attack
-    heal(match, "ai")
+    logging.info("BOARD AFTER AI CAST 1")
+    board.log()
+
     board.do_attack_phase("ai")
+
+    logging.info("BOARD AFTER AI ATTACK")
+    board.log()
 
     # ai play second card
     for row in range(3):
@@ -144,6 +172,9 @@ def end_turn(request):
     else:
         cast(match, board, "ai", play_2, target_node_2)
 
+    logging.info("BOARD AFTER AI CAST 2")
+    board.log()
+
     logging.info("** chose targets")
 
     ai_turn = Turn(play_1=play_1,
@@ -157,8 +188,6 @@ def end_turn(request):
 
     logging.info("** did ai turn")
 
-    board.log()
-            
     #get 2 new cards for player
     deck = Card.objects.all()
     c = deck.count()

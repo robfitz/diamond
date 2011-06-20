@@ -17,10 +17,15 @@
 
 .board {
     float:left;
-    width:540px;
-    height:350px;
+    width:500px;
+    height:300px;
     position:relative;
-    background-color:#ccc;
+}
+.board.friendly {
+    background: #ccc url('../board_friendly.png');
+}
+.board.ai {
+    background: #ccc url('../board_ai.png');
 }
 
 .card {
@@ -37,9 +42,9 @@
 }
 
 .node {
-    width:100px;
-    height:100px;
-    margin:10px;
+    width:20px;
+    height:20px;
+    margin:40px;
     color:#fff;
     background-color:#000;
     position:absolute;
@@ -54,7 +59,7 @@
 }
 
 .node.unit {
-    background-color:#fff;
+    background-color:#99f;
 }
 
 #phases {
