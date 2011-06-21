@@ -253,7 +253,8 @@ class Board():
 
     def do_attack_phase(self, alignment): 
         
-        for row in range(3):
+        for inv_row in range(3):
+            row = 2 - inv_row
             for x in range(-row, row+1): 
                 node = self.nodes[alignment]["%s_%s" % (row, x)]
                 logging.info("%s" % node)

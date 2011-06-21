@@ -18,7 +18,7 @@ def playing(request):
     match = init_match() 
     request.session["match"] = match.id
 
-    board = Node.objects.all()
+    board = Node.objects.all().order_by('-pk')
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
