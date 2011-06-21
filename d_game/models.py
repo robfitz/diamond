@@ -1,4 +1,4 @@
-import logging
+import logging, random
 from django.db import models
 
 from d_cards.models import Card, ShuffledLibrary
@@ -15,6 +15,12 @@ class Match(models.Model):
 
     friendly_library = models.OneToOneField(ShuffledLibrary)
     ai_library = models.OneToOneField(ShuffledLibrary)
+
+    friendly_life = models.IntegerField(default=10)
+    ai_life = models.IntegerField(default=10)
+
+    friendly_tech = models.IntegerField(default=1)
+    ai_tech = models.IntegerField(default=1)
 
 
 
@@ -59,12 +65,127 @@ class Unit(models.Model):
 
 
 
+class AI():
+    """ AI player logic who decides what to play and do """
+    
+    def do_turn(self, match, board):
+
+        # ai draw
+        match.ai_library.draw(2)
+
+        logging.info("^^ ai hand: %s" % match.ai_library.hand_card_ids)
+
+        hand_cards = match.ai_library.hand_cards()
+        play_1 = random.choice(hand_cards)
+        match.ai_library.play(play_1.id)
+
+        hand_cards = match.ai_library.hand_cards()
+        play_2 = random.choice(hand_cards)
+        match.ai_library.play(play_2.id)
+
+        logging.info("** chose cards to play")
+
+        target_node_1 = None
+        target_node_2 = None
+        is_tech_1 = False
+        is_tech_2 = False
+
+        logging.info("BOARD BEFORE AI HEAL")
+        board.log()
+
+        #heal and attack
+        board.heal("ai")
+
+        logging.info("BOARD AFTER AI HEAL")
+        board.log()
+
+        # ai play first card
+        if play_1.tech_level <= match.ai_tech:
+            for row in range(3):
+                if target_node_1:
+                    break
+                for x in range(-row, row+1): 
+                    if not board.nodes["ai"]["%s_%s" % (row, x)]:
+                        target_node_1 = Node.objects.get(row=row,x=x)
+                        break
+                    
+        if not target_node_1:
+            logging.info("** ai 1st cast: teching")
+            is_tech_1 = True
+            target_node_1 = None
+        else:
+            board.cast("ai", play_1, target_node_1)
+
+        logging.info("BOARD AFTER AI CAST 1")
+        board.log()
+
+        board.do_attack_phase("ai")
+
+        logging.info("BOARD AFTER AI ATTACK")
+        board.log()
+
+        # ai play second card
+        if play_2.tech_level <= match.ai_tech:
+            for row in range(3):
+                if target_node_2:
+                    break
+                for x in range(-row, row+1): 
+                    if not board.nodes["ai"]["%s_%s" % (row, x)]:
+                        target_node_2 = Node.objects.get(row=row,x=x)
+                        break
+
+        if not target_node_2: 
+            logging.info("** ai 2nd cast: teching")
+            is_tech_2 = True
+            target_node_2 = None
+        else:
+            board.cast("ai", play_2, target_node_2)
+
+        logging.info("BOARD AFTER AI CAST 2")
+        board.log()
+
+        logging.info("** chose targets")
+
+        ai_turn = Turn(play_1=play_1,
+                target_node_1=target_node_1,
+                is_tech_1=is_tech_1,
+                target_alignment_1="friendly",
+                play_2=play_2,
+                target_node_2=target_node_2,
+                is_tech_2=is_tech_2,
+                target_alignment_2="friendly")
+        return ai_turn
+
+
+
+
 class Board():
     """ A helper data structure which converts the database objects like
         Unit and Match into a handy data structure which knows how to perform
         game logic and then save itself back into the DB and session """
 
     nodes = { 'friendly': { }, 'ai': { } } 
+    match = None
+
+    def cast(self, owner_alignment, card_to_play, node_to_target):
+
+        logging.info("** pre-cast: played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
+
+        unit = Unit(card=card_to_play,
+                match=self.match,
+                owner_alignment=owner_alignment,
+                row=node_to_target.row,
+                x=node_to_target.x)
+        unit.save()
+
+        self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
+            'type': "unit",
+            'unit': unit
+        }
+
+        logging.info("** cast: played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
+
+
 
     def log(self):
 
@@ -100,13 +221,25 @@ class Board():
                 self.nodes['ai']["%s_%s" % (row, x)] = None 
 
         match_id = session["match"]
+        self.match = Match.objects.get(id=match_id)
 
-        units = Unit.objects.filter(match__id=match_id).select_related()
+        units = Unit.objects.filter(match=self.match).select_related()
         for unit in units:
             self.nodes[unit.owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
                 'type': "unit",
                 'unit': unit
             }
+
+    def heal(self, alignment):
+
+        for row in range(3):
+            for x in range(-row, row+1): 
+                node = self.nodes[alignment]["%s_%s" % (row, x)]
+                logging.info("%s" % node)
+                if node and node["type"] == "unit":
+                    unit = node["unit"]
+                    unit.heal()
+
 
 
     def do_attack_phase(self, alignment): 
@@ -174,14 +307,18 @@ class Board():
                     
             elif row == 0 and x == 0:
                 # bumped into enemy player
+
                 logging.info("## damaged player %s for %s" % (alignment, unit.card.attack))
-                return
-    
+
+                if alignment == "ai":
+                    self.match.ai_life -= unit.card.attack
+                else:
+                    self.match.friendly_life -= unit.card.attack
+
+                return 
 
 
 class Turn(models.Model):
-
-    #match = models.ForeignKey(Match)
 
     ALIGNMENT_CHOICES = (
             ("friendly", "Friendly"), 

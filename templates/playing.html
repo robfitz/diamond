@@ -307,7 +307,12 @@ Fuck ya bitches
                                     else if (action == "damage_unit") {
                                         damage_unit(target_node_pk, opponent_alignment, attacker_json.attack); 
                                     } 
+
+                                    // i have no idea if this will work
+                                    attack_path = do_attack(attacker_json, node_id, alignment);
+
                                     current_animation_step ++;
+
                                 },
                             }
                         );
@@ -388,6 +393,10 @@ Fuck ya bitches
             next_phase();
         }
 
+        function get_unit_at(alignment, next_node_id) {
+            return boards[alignment][next_node_id];
+        }
+
         /** 
          * returns a list of node points in format: 
          * { dx:XXX, drow:XXX, [action:damage_unit/damage_player/blocked], node_id:node_pk } 
@@ -465,7 +474,7 @@ Fuck ya bitches
                 path_info.push(path_node);
 
                 //is there a guy there?
-                var collision_unit = boards[alignment][next_node_id];
+                var collision_unit = get_unit_at(alignment, next_node_id)
                 if (collision_unit) {
                     if (alignment == starting_alignment) { 
 
@@ -584,6 +593,8 @@ Fuck ya bitches
             if (ai_tech_level > MAX_TECH) tech_level = MAX_TECH;
 
             $("#ai_tech h1").text("T" + ai_tech_level);
+
+            next_phase();
         }
         function tech_up(amount) {
 

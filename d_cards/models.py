@@ -139,8 +139,8 @@ class ShuffledLibrary(models.Model):
 
         if card_id in self.hand_card_ids:
 
-            index = self.hand_cards.index(card_id)
-            del(self.hand_cards[index])
+            index = self.hand_card_ids.index(card_id)
+            del(self.hand_card_ids[index])
             self.save() 
 
             # successfully removed the card from our hand
@@ -156,7 +156,7 @@ class ShuffledLibrary(models.Model):
         to_draw = self.undrawn_card_ids[:num]
 
         # remove cards from undrawn pile
-        self.card_ids = self.undrawn_card_ids[num:]
+        self.undrawn_card_ids = self.undrawn_card_ids[num:]
 
         # add cards to hand
         for card in to_draw:
