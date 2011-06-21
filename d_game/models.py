@@ -178,10 +178,19 @@ class Board():
                 x=node_to_target.x)
         unit.save()
 
-        self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
-            'type': "unit",
-            'unit': unit
-        }
+        if card_to_play.target_aiming == 'chosen':
+            self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
+                'type': "unit",
+                'unit': unit
+            }
+        elif card_to_play.target_aiming == 'all':
+            for row in range(3):
+                for x in range(-row, row+1): 
+                    if not self.nodes[owner_alignment]["%s_%s" % (row, x)]:
+                        self.nodes[owner_alignment]["%s_%s" % (row, x)] = {
+                            'type': "unit",
+                            'unit': unit
+                        }
 
         logging.info("** cast: played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
 

@@ -371,26 +371,44 @@ Fuck ya bitches
         }
 
         function ai_cast(card, node) { 
+            cast_card("ai", card, node); 
+            next_phase();
+        }
 
-            if (card.defense) {
+        function cast_card(target_alignment, card, node) {
 
-                //create a summon
-                node.addClass("unit");
-                node.addClass("occupied"); 
-
-                node.removeClass("empty");
-
-                //for lookup of unit behaviour later
-                node.attr("id", card.pk);
-
-                played_cards[card.pk] = card; 
-                boards["ai"][node.attr("name")] = $.extend(true, {}, card);
-
-                var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
-
+            if (card.target_aiming == "all") {
+                nodes = node.parent().children(".empty");
+            }
+            else if (card.target_aiming == "chosen") {
+                nodes = node
+            }
+            else {
+                alert(card.target_aiming);
             }
 
-            next_phase();
+            for (var i = 0; i < nodes.length; i ++) {
+                node = nodes.eq(i);
+
+                if (card.defense) { 
+
+                    //create a summon
+                    node.addClass("unit");
+                    node.addClass("occupied"); 
+
+                    node.removeClass("empty");
+
+                    //for lookup of unit behaviour later
+                    node.attr("id", card.pk);
+
+                    played_cards[card.pk] = card; 
+                    boards[target_alignment][node.attr("name")] = $.extend(true, {}, card);
+
+                    node.children(".unit_piece").remove();
+                    var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
+
+                }
+            } 
         }
 
         function get_unit_at(alignment, next_node_id) {
@@ -402,6 +420,14 @@ Fuck ya bitches
          * { dx:XXX, drow:XXX, [action:damage_unit/damage_player/blocked], node_id:node_pk } 
          */ 
         function do_attack(card_json, node_id, alignment) {
+
+            if (card_json.attack == 0
+                || card_json.attack_type == "wall"
+                || card_json.attack_type == "defender") {
+
+                // no attack from this unit 
+                return [];
+            }
 
             var starting_alignment = alignment;
             var opponent_alignment = (starting_alignment == "friendly" ? "ai" : "friendly"); 
@@ -517,6 +543,8 @@ Fuck ya bitches
 
         function add_card_to_hand(card_json) {
             var card = $("<li class='card' id='" + card_json.pk + "'>T" + card_json.fields.tech_level + " " + card_json.fields.name + "</li>").appendTo("#friendly_hand");
+
+            hand_cards[card_json.pk] = card_json.fields;
 
             card.click( function(event) {
 
@@ -642,24 +670,7 @@ Fuck ya bitches
             hand_card.remove(); 
             var card_id = hand_card.attr("id");
 
-            if (card.defense) {
-                //create a summon
-                node.addClass("unit");
-                node.addClass("occupied"); 
-
-                node.removeClass("empty");
-
-                //for lookup of unit behaviour later
-                node.attr("id", card_id);
-
-                played_cards[hand_card.attr("id")] = card;
-
-                var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
-
-                //deep copy the card json onto the board model for convenient access later
-                boards["friendly"][node.attr("name")] = $.extend(true, {}, card);
-                //boards["friendly"][node.attr("name")] = hand_card.attr("id");
-            }
+            cast_card("friendly", card, node);
 
             next_phase();
         }
