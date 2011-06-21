@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block header_title %}
+Deck editor
+{% endblock %}
+
+{% block content %} 
+
+    <p>
+    <strong>All cards</strong>
+    <ul id="library" class="card_list">
+        {% for card in all_cards %}
+        {% endfor %}
+    </ul>
+    </p>
+
+    <p>
+    <strong>Deck</strong>
+    <ul id="deck" class="card_list">
+        {% for card in deck.all_cards %}
+        <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
+        {% endfor %}
+    </ul>
+    </p>
+
+    <script>
+        var card_data = {};
+
+        $(function() {
+            $.ajax({ url: "/deck/get_library_cards/",
+                success: function(card_data_text) {
+                    card_data = eval('(' + card_data_text + ')');
+                    init_library();
+                }
+            });
+        });
+
+        function init_library() {
+            for (var i = 0; i < card_data.length; i ++) {
+                var card_json = card_data[i];
+                $('<li class="library_card"></li>').text(card_json.fields.name).attr('id', "" + card_json.pk).appendTo("#library");
+            }
+
+            $(".library_card").click( function (event) {
+                
+                var num = $("#save_form").children().length + 1;
+                var card_id = $(this).attr("id");
+                var card;
+
+                for (var i = 0; i < card_data.length; i ++) {
+                    if (card_data[i].pk == card_id) {
+                        card = card_data[i];
+                        break;
+                    } 
+                }
+                
+                $("<input name='deck_card_" + num + "' value='" + card_id + "' />").attr('id', card.pk).addClass(card_id).appendTo("#save_form");
+
+                $("<li class='deck_card' name='deck_card_" + num + "'></li>").attr('id', card_id).addClass(card_id).appendTo("#deck").text(card.fields.name).bind( 'click', { 'card': card }, on_deck_card_click );
+
+            });
+
+            $(".deck_card").bind( 'click', on_deck_card_click );
+        }
+        function on_deck_card_click (event) {
+
+            var num = $("#save_form").children().length + 1;
+            var card_id = event.target.id;
+
+            //alert(card_id);
+
+            //alert("#deck #" + card_id);
+            $("#deck .deck_card." + card_id).first().remove();
+            $("#save_form ." + card_id).first().remove();
+        }
+
+    </script>
+
+    <form method="post" action="/deck/save/" id="save_form">
+
+        {% csrf_token %}
+
+        <input type="submit" value="Save">
+
+        {% for card_id in deck.card_ids %}
+
+            <input name="deck_card_{{ forloop.counter }}" value="{{ card_id }}" id="{{ card_id }}" class="{{ card_id }}" />
+
+        {% endfor %} 
+
+    </form>
+
+    <script>
+        $(function() {
+            $("#save_form").submit( function( event) {
+                $.post($(this).attr("action"), $(this).serialize(), function(event) { alert("saved"); });
+                return false;
+           });
+       });
+   </script>
+
+{% endblock content %}

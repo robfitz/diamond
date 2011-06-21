@@ -1,5 +1,8 @@
+from django import forms
 from django.db import models
 from django.contrib import admin
+from djangotoolbox.fields import ListField
+
 
 
 class Card(models.Model):
@@ -110,6 +113,22 @@ class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
     list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming')
     list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming')
+
+
+class Deck(models.Model):
+
+    card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
+
+
+    def all_cards(self):
+        if not self.card_ids:
+            return []
+
+        cards = Card.objects.all()
+        with_duplicates = []
+        for id in self.card_ids:
+            with_duplicates.append(cards.get(id=id))
+        return with_duplicates 
 
     
 admin.site.register(Card, CardAdmin) 
