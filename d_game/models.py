@@ -1,18 +1,26 @@
 import logging
 from django.db import models
 
-from d_cards.models import Card
+from d_cards.models import Card, ShuffledLibrary
 from d_board.models import Node
 
 
+
 class Match(models.Model):
+    """ A battle between 2 players (or a player and AI) """
 
     winner = models.CharField(max_length=20, blank=True)
 
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    friendly_library = models.OneToOneField(ShuffledLibrary)
+    ai_library = models.OneToOneField(ShuffledLibrary)
+
+
 
 class Unit(models.Model):
+    """ A Unit is created when a card is played on the board,
+        and is specific to a single match. """
 
     # card i represent
     card = models.ForeignKey(Card) 
@@ -52,9 +60,11 @@ class Unit(models.Model):
 
 
 class Board():
+    """ A helper data structure which converts the database objects like
+        Unit and Match into a handy data structure which knows how to perform
+        game logic and then save itself back into the DB and session """
 
-    nodes = { 'friendly': { }, 'ai': { } }
-
+    nodes = { 'friendly': { }, 'ai': { } } 
 
     def log(self):
 

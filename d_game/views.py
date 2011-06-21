@@ -7,20 +7,39 @@ from django.core import serializers
 from django.template import RequestContext
 
 from d_board.models import Node
-from d_cards.models import Card
+from d_cards.models import Card, ShuffledLibrary, Deck
 from d_game.models import Turn, Match, Board, Unit
 
-def playing(request):
+
+def playing(request): 
+
+    # init
+    request.session.flush();
+    match = init_match() 
+    request.session["match"] = match.id
 
     board = Node.objects.all()
 
-    request.session.flush();
-
-    match = Match()
-    match.save()
-    request.session["match"] = match.id
-
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
+
+
+def init_match():
+
+    deck = Deck.objects.all()[0]
+
+    friendly_library = ShuffledLibrary().init(deck)
+    friendly_library.save()
+    ai_library = ShuffledLibrary().init(deck)
+    ai_library.save()
+
+    # starting hand, to be filled to 5 on first AI turn
+    ai_library.draw(3)
+
+    match = Match(friendly_library=friendly_library,
+            ai_library=ai_library)
+    match.save()
+
+    return match
 
 
 def cast(match, board, owner_alignment, card_to_play, node_to_target):
@@ -113,6 +132,11 @@ def end_turn(request):
 
     # ai cast
     # find any card i'm able to use
+
+    # ai draw
+    match.ai_library.draw(2)
+    ai_hand = match.ai_library.hand_cards()
+
     play_1 = Card.objects.filter(tech_level=1)[0]
     play_2 = Card.objects.filter(tech_level=1)[0]
 
@@ -189,12 +213,9 @@ def end_turn(request):
     logging.info("** did ai turn")
 
     #get 2 new cards for player
-    deck = Card.objects.all()
-    c = deck.count()
-    i = random() * (deck.count() - 1)
-    draw_1 = deck[int(i)]
-    i = random() * (deck.count() - 1)
-    draw_2 = deck[int(i)]
+    card_ids = match.friendly_library.draw(2)
+    draw_1 = Card.objects.get(id=card_ids[0])
+    draw_2 = Card.objects.get(id=card_ids[1])
 
     logging.info("** drew cards")
 
@@ -213,20 +234,16 @@ def end_turn(request):
 
 
 def draw(request):
-
-    # try getting current game for this user
-
-        # exists and in progress?
-
-            # it's time to draw. send him a filled hand
-
-            # drawing is not a legal move now. send a fail note.
-
-         # exists and have all ended? make one!
-
-         # none exist? make one!  
     
-    hand = Card.objects.select_related().all()[:5]
+    match = Match.objects.get(id=request.session["match"])
+
+    card_ids = match.friendly_library.draw(5)
+    hand = []
+
+    for id in card_ids:
+        card = Card.objects.get(id=id)
+        hand.append(card) 
+
     hand_json = serializers.serialize("json", hand)
 
     return HttpResponse(hand_json, "application/javascript") 

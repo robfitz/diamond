@@ -1,8 +1,9 @@
+import random
+
 from django import forms
 from django.db import models
 from django.contrib import admin
-from djangotoolbox.fields import ListField
-
+from djangotoolbox.fields import ListField 
 
 
 class Card(models.Model):
@@ -113,6 +114,70 @@ class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
     list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming')
     list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming')
+
+
+class ShuffledLibrary(models.Model):
+
+    undrawn_card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True, default=[])
+
+    hand_card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True, default=[])
+
+
+    def hand_cards(self):
+
+        all_cards = Card.objects.all()
+        cards = []
+
+        for card_id in self.hand_card_ids:
+            card = Card.objects.get(id=card_id)
+            cards.append(card)
+
+        return cards
+
+
+    def play(self, card_id):
+
+        if card_id in self.hand_card_ids:
+
+            index = self.hand_cards.index(card_id)
+            del(self.hand_cards[index])
+            self.save() 
+
+            # successfully removed the card from our hand
+            return True
+
+        # the card that was played isn't actually
+        # in our hand, so return failure
+        return False
+
+
+    def draw(self, num):
+
+        to_draw = self.undrawn_card_ids[:num]
+
+        # remove cards from undrawn pile
+        self.card_ids = self.undrawn_card_ids[num:]
+
+        # add cards to hand
+        for card in to_draw:
+            self.hand_card_ids.append(card) 
+
+        self.save()
+
+        return to_draw 
+
+    
+    def init(self, deck):
+
+        # create a clean copy
+        self.undrawn_card_ids = list(deck.card_ids)
+
+        # shuffle
+        random.shuffle(self.undrawn_card_ids)
+
+        self.save()
+
+        return self
 
 
 class Deck(models.Model):
