@@ -77,6 +77,20 @@ class AI():
 
         hand_cards = match.ai_library.hand_cards()
         play_1 = random.choice(hand_cards)
+
+        best_card = None
+        best_target = None
+        best_hval = -1000
+
+        for card in hand_cards: 
+            # TODO: can i play that card? if so, try it
+            #       at each valid loc and check the hval.
+            #       if it's the first cast, check hval
+            #       after also simulating an attack phase.  
+
+            pass
+            # hval = board.get_ai_heuristic_value(hand_cards)
+
         match.ai_library.play(play_1.id)
 
         hand_cards = match.ai_library.hand_cards()
@@ -167,7 +181,79 @@ class Board():
     nodes = { 'friendly': { }, 'ai': { } } 
     match = None
 
+    node_power_levels = { "0_0": 2,
+                "1_-1": 2, "1_0": 3, "1_1": 2,
+                "2_-2": 1, "2_-1": 1, "2_0": 2, "2_1": 1, "2_2": 1 }
+
+
+    def get_node_power(self, row, x):
+        if row == 0 and x == 0:
+            return 2
+    
+    def get_ai_heuristic_value(self, hand_cards): 
+
+        if self.match.friendly_life <= 0:
+            return 1000
+        elif self.match.ai_life <= 0:
+            return -1000
+        
+        hval = 0
+
+        # units
+        for row in range(3):
+            for x in range(-row, row+1): 
+
+                # gain points for having units
+                node = self.nodes['ai']["%s_%s" % (row, x)]
+                if node["type"] == 'unit': 
+                    hval += unit.power_level
+
+                # lose slightly more points for enemy units
+                node = self.nodes['friendly']["%s_%s" % (row, x)]
+                if node["type"] == 'unit': 
+                    hval -= unit.power_level * 1.1 
+
+        # life
+        hval -= self.match.friendly_life * 0.5
+        hval += self.match.ai_life * 0.5
+
+        # hand choices
+        for card in hand_cards:
+
+            # cards you can cast are worth lots
+            if card.tech_level <= self.match.ai_tech:
+                hval += 0.2 * card.tech_level
+
+            # cards you can almost cast are worth a little
+            elif card.tech_level == self.match.ai_tech + 1:
+                hval += 0.1 * card.tech_level
+
+        # board choices
+        for row in range(3):
+            for x in range(-row, row+1): 
+
+                # lose points for having rubble
+                node = self.nodes['ai']["%s_%s" % (row, x)]
+                if node["type"] == 'rubble':
+                    hval -= node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
+
+                # gain points for enemy rubble
+                node = self.nodes['friendly']["%s_%s" % (row, x)]
+                if node["type"] == 'rubble':
+                    hval += node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
+
+        logging.info("@@ got heuristic: %s" % hval) 
+        return hval
+
+
     def cast(self, owner_alignment, card_to_play, node_to_target):
+        # TODO: this shouldn't make any changes to the DB
+        #       and should be easily revertable, while
+        #       also knowing how to save its changes to
+        #       the DB when desired.
+        #
+        #       To revert, we can just re-load it from
+        #       session.
 
         logging.info("** pre-cast: played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
 

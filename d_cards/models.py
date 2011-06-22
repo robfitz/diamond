@@ -10,6 +10,8 @@ from djangotoolbox.fields import ListField
 class Card(models.Model):
 
     name = models.CharField(max_length="20", blank=True)
+    
+    unit_power_level = models.IntegerField(default=0)
 
     ATTACK_CHOICES = (
             ("na", "N/A"),
@@ -116,8 +118,8 @@ class Card(models.Model):
 
 class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
-    list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
-    list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
+    list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
+    list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
 
 
 class ShuffledLibrary(models.Model):
