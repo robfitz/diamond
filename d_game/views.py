@@ -85,7 +85,7 @@ def end_turn(request):
     card_id = request.POST.get("card1")
     card = Card.objects.get(id=card_id) 
     if node:
-        board.cast("friendly", card, node)
+        board.cast("friendly", card, node, True)
     else:
         logging.info("!! TODO: tech up friendly 1")
 
@@ -93,7 +93,7 @@ def end_turn(request):
     board.log()
 
     #attack!
-    board.do_attack_phase("friendly")
+    board.do_attack_phase("friendly", True)
 
     logging.info("BOARD AFTER PLAYER ATTACK")
     board.log()
@@ -106,7 +106,7 @@ def end_turn(request):
     card_id = request.POST.get("card2")
     card = Card.objects.get(id=card_id) 
     if node:
-        board.cast("friendly", card, node)
+        board.cast("friendly", card, node, True)
     else:
         logging.info("!! TODO: tech up friendly 2")
     
