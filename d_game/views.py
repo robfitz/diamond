@@ -14,8 +14,7 @@ from d_game.models import Turn, Match, Board, Unit, AI
 def playing(request): 
 
     # init
-    request.session.flush();
-    match = init_match() 
+    match = init_match(request) 
     request.session["match"] = match.id
 
     board = Node.objects.all().order_by('-pk')
@@ -23,13 +22,23 @@ def playing(request):
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
 
-def init_match():
+def init_match(request):
 
-    deck = Deck.objects.all()[0]
+    try:
+        # get my custom deck progress that i built via the editor
+        deck_id = request.session["deck_id"]
+        deck = Deck.objects.get(id=deck_id)
+    except:
+        # start me a new deck
+        deck = Deck()
+        deck.save()
+        request.session["deck_id"] = deck.id
+
+    ai_deck = Deck.objects.all()[0]
 
     friendly_library = ShuffledLibrary().init(deck)
     friendly_library.save()
-    ai_library = ShuffledLibrary().init(deck)
+    ai_library = ShuffledLibrary().init(ai_deck)
     ai_library.save()
 
     # starting hand, to be filled to 5 on first AI turn

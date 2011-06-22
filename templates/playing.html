@@ -193,8 +193,14 @@ Fuck ya bitches
                                     next_phase();
                                 }, 200);
                             }
+                            else {
+                                next_phase();
+                            }
                         }, 200); 
                     } 
+                    else {
+                        next_phase();
+                    }
                     heal_units("friendly");
                 }
                 else {
@@ -388,7 +394,7 @@ Fuck ya bitches
                 nodes = node
             }
             else {
-                alert(card.target_aiming);
+                alert('unknown card target aiming: ' + card.target_aiming);
             }
 
             for (var i = 0; i < nodes.length; i ++) {
@@ -576,8 +582,25 @@ Fuck ya bitches
                     // find valid targets based on card targetting type
                     // e.g. summoning is: friendly board > empty nodes
 
-                    var align = (card_json.fields.target_alignment == "enemy" ? "ai" : "friendly");
-                    var targets = $(".board." + align + " ." + card_json.fields.target_occupant);
+                    var targets;
+                    var board_selector = ".board"; 
+                    var node_selector = ".node";
+
+                    if (card_json.fields.target_alignment != 'any') {
+                        var align = (card_json.fields.target_alignment == "enemy" ? "ai" : "friendly");
+                        board_selector += "." + align;
+                    }
+
+                    var occ = card_json.fields.target_occupant;
+                    if (occ == "unit" || occ == "occupied") {
+                        node_selector += ".unit"; 
+                    }
+                    else if (occ == "empty") {
+                        node_selector += ".empty";
+                    }
+
+                    targets = $(board_selector + " " + node_selector); 
+                    //alert("selecting: " + board_selector + " " + node_selector);
 
                     // highlight valid targets and allow them to respond to click
                     targets.addClass("targettable").click( function (event) {

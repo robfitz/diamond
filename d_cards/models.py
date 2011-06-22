@@ -1,4 +1,5 @@
 import random
+import logging
 
 from django import forms
 from django.db import models
@@ -171,6 +172,8 @@ class ShuffledLibrary(models.Model):
 
     
     def init(self, deck):
+
+        logging.info("init'ing shuffled lib on deck %s" % deck.id)
 
         # create a clean copy
         self.undrawn_card_ids = list(deck.card_ids)

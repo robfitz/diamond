@@ -1,3 +1,5 @@
+import logging
+
 from django.template import RequestContext
 from django.core import serializers
 from django.shortcuts import render_to_response
@@ -8,11 +10,19 @@ from d_cards.models import Deck, Card
 
 def edit_deck(request):
 
-    try:
+    if request.GET.get("ai"):
+        # ai deck is just the first one
         deck = Deck.objects.all()[0]
-    except:
-        deck = Deck()
-        deck.save()
+    else: 
+        try:
+            # get my deck-in-progress that i built via the editor
+            deck_id = request.session["deck_id"]
+            deck = Deck.objects.get(id=deck_id)
+        except:
+            # start me a new deck
+            deck = Deck()
+            deck.save()
+            request.session["deck_id"] = deck.id
 
     return render_to_response("edit_deck.html", locals(), context_instance=RequestContext(request))
 
@@ -36,7 +46,9 @@ def save_deck(request):
             card_id = request.POST.get(key)
             card_ids.append(card_id)
 
-    deck = Deck.objects.all()[0]
+    deck_id = request.POST.get("deck_id")
+    deck = Deck.objects.get(id=deck_id)
+
     deck.card_ids = card_ids
     deck.save()
 
