@@ -55,12 +55,15 @@
     //background-color:#124;
 }
 
+.node.unit {
+    background-color:#66f;
+}
+
 .targettable {
    background-color:#0f0; 
 }
-
-.node.unit {
-    background-color:#66f;
+.unit.targettable {
+    background-color:#f00;
 }
 
 #phases {

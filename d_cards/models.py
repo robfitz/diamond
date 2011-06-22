@@ -79,6 +79,9 @@ class Card(models.Model):
     # locations only apply to valid targets according to 'alignment' and 'occupant',
     target_aiming = models.CharField(max_length=10, choices=LOCATION_CHOICES, default="chosen")
 
+    # how much damage to do (or heal) a unit for
+    direct_damage = models.IntegerField(default=0)
+
     def __unicode__(self):
 
         if self.name:
@@ -112,8 +115,8 @@ class Card(models.Model):
 
 class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
-    list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming')
-    list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming')
+    list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
+    list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
 
 
 class ShuffledLibrary(models.Model):

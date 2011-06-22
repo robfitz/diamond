@@ -184,14 +184,17 @@ Fuck ya bitches
             if (phase == 0) {
                 if (turn_data) {
                     //draw cards
-                    setTimeout( function () {
-                        add_card_to_hand( turn_data.player_draw[0] );
-                        setTimeout ( function() {
-                            add_card_to_hand( turn_data.player_draw[1] );
-                            next_phase();
-                        }, 200);
-                    }, 200); 
-
+                    if (turn_data.player_draw.length >= 1) {
+                        setTimeout( function () {
+                            add_card_to_hand( turn_data.player_draw[0] );
+                            if (turn_data.player_draw.length >= 2) {
+                                setTimeout ( function() {
+                                    add_card_to_hand( turn_data.player_draw[1] );
+                                    next_phase();
+                                }, 200);
+                            }
+                        }, 200); 
+                    } 
                     heal_units("friendly");
                 }
                 else {
@@ -371,7 +374,8 @@ Fuck ya bitches
         }
 
         function ai_cast(card, node) { 
-            cast_card("ai", card, node); 
+            var align = (card.target_alignment == "enemy" ? "friendly" : "ai"); 
+            cast_card(align, card, node); 
             next_phase();
         }
 
@@ -390,6 +394,9 @@ Fuck ya bitches
             for (var i = 0; i < nodes.length; i ++) {
                 node = nodes.eq(i);
 
+                if (card.direct_damage) {
+                    damage_unit(node.attr('name'), target_alignment, card.direct_damage); 
+                }
                 if (card.defense) { 
 
                     //create a summon
@@ -516,7 +523,6 @@ Fuck ya bitches
                     }
                     else {
                         //no? ai! hit it!
-                        //damage_unit(next_node_id, alignment, card_json.attack); 
                         path_node.action = "damage_unit";
                         is_searching = false;
                     }
@@ -569,7 +575,9 @@ Fuck ya bitches
                 if (tech_level >= card_json.fields.tech_level) {
                     // find valid targets based on card targetting type
                     // e.g. summoning is: friendly board > empty nodes
-                    var targets = $(".board." + card_json.fields.target_alignment + " ." + card_json.fields.target_occupant);
+
+                    var align = (card_json.fields.target_alignment == "enemy" ? "ai" : "friendly");
+                    var targets = $(".board." + align + " ." + card_json.fields.target_occupant);
 
                     // highlight valid targets and allow them to respond to click
                     targets.addClass("targettable").click( function (event) {
@@ -643,6 +651,7 @@ Fuck ya bitches
 
             //convert jquery element into json w/ game logic
             var card = hand_cards[hand_card.attr("id")];
+            var align = "";
 
             //record it for sending to server
             if (phase == 1) {
@@ -650,9 +659,11 @@ Fuck ya bitches
                 $("input[name='node1']").val(node.attr("name")); 
                 if (node.parent().hasClass("friendly")) {
                     $("input[name='align1']").val("friendly"); 
+                    align="friendly";
                 }
                 else {
                     $("input[name='align1']").val("ai"); 
+                    align="ai";
                 }
             }
             else if (phase == 3) {
@@ -660,9 +671,11 @@ Fuck ya bitches
                 $("input[name='node2']").val(node.attr("name")); 
                 if (node.parent().hasClass("friendly")) {
                     $("input[name='align2']").val("friendly"); 
+                    align = "friendly";
                 }
                 else {
                     $("input[name='align2']").val("ai"); 
+                    align = "ai";
                 }
             }
 
@@ -670,7 +683,7 @@ Fuck ya bitches
             hand_card.remove(); 
             var card_id = hand_card.attr("id");
 
-            cast_card("friendly", card, node);
+            cast_card(align, card, node);
 
             next_phase();
         }
