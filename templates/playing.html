@@ -102,6 +102,13 @@ AI mode
                 }
                 board_node_pks["{{ node.row }}"]["{{ node.x }}"] = "{{ node.pk }}";
             {% endfor %} 
+
+
+            {% if puzzle %}
+                set_player_life("friendly", {{ puzzle.player_life }} ); 
+            {% endif %}
+
+
             draw_starting_hand();
         });
 

@@ -1,6 +1,9 @@
 var match = {
     tech: { friendly: 1, ai: 1 },
-    life: { 'friendly': 10, 'ai': 10 },
+    life: { 
+        'friendly': 10, 
+        'ai': 10 
+    },
     phase: -1,
 
     //hand_cards[card_pk] = card.fields
@@ -105,16 +108,12 @@ var match = {
             end_turn();
         }
         if (match.phase == 5 || is_first_turn) {
-            alert('first turn andt hinking about AI play');
             if (match.turn_data.ai_turn[0]) {
-                alert('got ai_turn[0]');
                 //ai play 1
                 if (match.turn_data.ai_turn[0].fields.is_tech_1) {
-                    alert("teching!");
                     ai_tech_up(1); 
                 }
                 else if (match.turn_data.ai_cards[0]) {
-                    alert("not teching and has card!");
                     var ai_play = match.turn_data.ai_cards[0].fields;
                     var target = match.turn_data.ai_turn[0].fields.target_node_1;
                     var align = match.turn_data.ai_turn[0].fields.target_alignment_1; 
@@ -123,7 +122,6 @@ var match = {
                     ai_cast(ai_play, node);
                 }
                 else {
-                    alert("nothing to do :(");
                     //nothing to cast or tech up
                 }
             }
@@ -438,6 +436,11 @@ var match = {
             } 
         } 
         return path_info;
+    }
+
+    function set_player_life(alignment, amount) { 
+        match.life[alignment] = amount;
+        $(".life." + alignment + " h1").text("" + match.life[alignment]);
     }
 
     function damage_player(alignment, amount) {

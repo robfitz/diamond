@@ -16,6 +16,7 @@ def puzzle(request):
     # init
 
     puzzle = Puzzle.objects.get(id=request.GET.get('p'))
+    logging.info("** got puzzle w/ life: %s" % puzzle.player_life)
     request.session["puzzle"] = puzzle.id
 
     match = init_puzzle_match(puzzle) 
@@ -32,6 +33,7 @@ def playing(request):
     request.session["match"] = match.id
 
     board = Node.objects.all().order_by('-pk')
+
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
