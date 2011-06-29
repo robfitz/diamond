@@ -13,6 +13,12 @@ def edit_deck(request):
     if request.GET.get("ai"):
         # ai deck is just the first one
         deck = Deck.objects.all()[0]
+    elif request.GET.get("new"):
+        # make a new deck instead of checking the session
+        deck = Deck()
+        deck.save() 
+    elif request.GET.get("id"):
+        deck = Deck.objects.get(id=request.GET.get("id")) 
     else: 
         try:
             # get my deck-in-progress that i built via the editor
@@ -50,6 +56,9 @@ def save_deck(request):
     deck = Deck.objects.get(id=deck_id)
 
     deck.card_ids = card_ids
+    deck.nickname = request.POST.get("nickname", "")
     deck.save()
+
+    logging.info("*** saved deck: %s" % deck.id)
 
     return HttpResponse("ok") 

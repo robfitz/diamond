@@ -15,12 +15,14 @@ urlpatterns = patterns('',
     ('^deck/get_library_cards/$', 'd_cards.views.get_library_cards'),
     ('^deck/save/$', 'd_cards.views.save_deck'),
 
-    ('^playing/draw/$', 'd_game.views.draw'),
+    ('^playing/first_turn/$', 'd_game.views.first_turn'),
     ('^playing/end_turn/$', 'd_game.views.end_turn'),
     ('^$', 'd_game.views.playing'),
 
-    ('', 'django.views.generic.simple.direct_to_template',
-     {'template': 'home.html'}),
+    ('^puzzle/$', 'd_game.views.puzzle'),
+
+    #('', 'django.views.generic.simple.direct_to_template',
+     #{'template': 'home.html'}),
 
     #static assets (should be local-only)                   
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',

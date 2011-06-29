@@ -92,6 +92,7 @@ INSTALLED_APPS = (
 
     'd_cards',
     'd_board',
+    'd_game',
 
     'django.contrib.admin',
     'django.contrib.admindocs',

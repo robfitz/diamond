@@ -80,6 +80,8 @@ Deck editor
 
         {% csrf_token %}
 
+        Nickname: <input name="nickname" />
+
         <input type="hidden" name="deck_id" value="{{ deck.id }}" />
 
         <input type="submit" value="Save">

@@ -1,7 +1,8 @@
 import logging, random
 from django.db import models
+from django.contrib import admin
 
-from d_cards.models import Card, ShuffledLibrary
+from d_cards.models import Card, ShuffledLibrary, Deck
 from d_board.models import Node
 
 
@@ -9,12 +10,20 @@ from d_board.models import Node
 class Match(models.Model):
     """ A battle between 2 players (or a player and AI) """
 
+    MATCH_TYPES = (
+            ("puzzle", "Puzzle"), 
+            ("ai", "P vs AI"),
+            ("pvp", "P vs P"),
+        )
+
+    type = models.CharField(max_length=10, choices=MATCH_TYPES)
+
     winner = models.CharField(max_length=20, blank=True)
 
     timestamp = models.DateTimeField(auto_now_add=True)
 
     friendly_library = models.OneToOneField(ShuffledLibrary)
-    ai_library = models.OneToOneField(ShuffledLibrary)
+    ai_library = models.OneToOneField(ShuffledLibrary, null=True)
 
     friendly_life = models.IntegerField(default=10)
     ai_life = models.IntegerField(default=10)
@@ -22,6 +31,71 @@ class Match(models.Model):
     friendly_tech = models.IntegerField(default=1)
     ai_tech = models.IntegerField(default=1)
 
+
+
+class Puzzle(models.Model):
+
+    name = models.CharField(max_length=50, default="", blank=True)
+
+    order = models.DecimalField(max_digits=6, decimal_places=3)
+
+    # starting positions
+
+    # starting life
+    player_life = models.IntegerField(default=1)
+
+    # goal: destroy all units
+
+    player_deck = models.ForeignKey(Deck, blank=True, null=True)
+
+
+    def get_setup_turn(self):
+
+        starting_units = PuzzleStartingUnit.objects.filter(puzzle=self)
+
+        turn = Turn()
+
+        if len(starting_units) > 0:
+            u = starting_units[0]
+            turn.play_1 = u.unit_card
+            turn.target_alignment_1 = "ai"
+            turn.target_node_1 = u.location
+
+            if len(starting_units) > 1:
+                u = starting_units[1]
+                turn.play_2 = u.unit_card
+                turn.target_alignment_2 = "ai"
+                turn.target_node_2 = u.location 
+
+        return turn
+
+
+    def __unicode__(self):
+
+        return "%d: %s" % (self.order, self.name)
+
+
+class PuzzleStartingUnit(models.Model):
+
+    OWNER_CHOICES = (
+            ("player", "Player"), 
+            ("ai", "AI"),
+        )
+
+    puzzle = models.ForeignKey(Puzzle)
+
+    owner = models.CharField(max_length=10, default="ai")
+
+    unit_card = models.ForeignKey(Card)
+    location = models.ForeignKey(Node) 
+
+    # TODO: not implemented
+    must_be_killed_for_victory = models.BooleanField(default=True)
+
+
+    def __unicode__(self):
+
+        return "%s for %s" % (self.unit_card, self.puzzle)
 
 
 class Unit(models.Model):
@@ -82,6 +156,13 @@ class AI():
         best_target = None
         best_hval = -1000
 
+        test_militia = Card(attack=1,
+                defense=1,
+                attack_type="melee",
+                target_alignment="friendly",
+                target_occupant="empty",
+                target_aiming="all") 
+
         test_board = Board()
         for card in hand_cards: 
             remaining_hand_cards = list(hand_cards)
@@ -105,6 +186,7 @@ class AI():
                     # 
                     # TODO: make this even more conservative
                     #       by adding a 1/1 to each blank node
+                    test_board.cast("friendly", test_militia, None, False)
                     test_board.do_attack_phase("friendly", False) 
 
                 hval = test_board.get_ai_heuristic_value(hand_cards)
@@ -130,7 +212,9 @@ class AI():
                 'target': best_target }
 
 
-    def do_turn(self, match, board):
+    def do_turn(self, board):
+
+        match = board.match
 
         is_tech_1 = False
         is_tech_2 = False
@@ -229,10 +313,10 @@ class Board():
     
     def get_ai_heuristic_value(self, hand_cards): 
 
-        if self.match.friendly_life <= 0:
-            return 1000
-        elif self.match.ai_life <= 0:
-            return -1000
+        #if self.match.friendly_life <= 0:
+            #return 1000
+        #elif self.match.ai_life <= 0:
+            #return -1000
         
         hval = 0
 
@@ -247,14 +331,12 @@ class Board():
                 node = self.nodes['ai']["%s_%s" % (row, x)]
 
                 if node and node["type"] == 'unit': 
-                    logging.info("found an AI unit worth: %s" % node["unit"].card.unit_power_level)
                     hval += node["unit"].card.unit_power_level 
                     my_units += node["unit"].card.unit_power_level
 
                 # lose slightly more points for enemy units
                 node = self.nodes['friendly']["%s_%s" % (row, x)]
                 if node and node["type"] == 'unit': 
-                    logging.info("found a player unit worth: %s" % node["unit"].card.unit_power_level)
                     hval -= node["unit"].card.unit_power_level * 1.1 
                     their_units -= node["unit"].card.unit_power_level * 1.1 
 
@@ -298,30 +380,22 @@ class Board():
                     hval += node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
                     my_board += node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
 
-        logging.info("@@ got heuristic: %s from life=%s/%s, hand=%s, units=%s/%s, board=%s/%s" % (hval, my_life, their_life, my_hand, my_units, their_units, my_board, their_board))
+        #logging.info("@@ got heuristic: %s from life=%s/%s, hand=%s, units=%s/%s, board=%s/%s" % (hval, my_life, their_life, my_hand, my_units, their_units, my_board, their_board))
         return hval
 
 
     def cast(self, owner_alignment, card_to_play, node_to_target, save_to_db):
-        # TODO: this shouldn't make any changes to the DB
-        #       and should be easily revertable, while
-        #       also knowing how to save its changes to
-        #       the DB when desired.
-        #
-        #       To revert, we can just re-load it from
-        #       session.
-
-        logging.info("** pre-cast: played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
-
-        unit = Unit(card=card_to_play,
-                match=self.match,
-                owner_alignment=owner_alignment,
-                row=node_to_target.row,
-                x=node_to_target.x)
-        if save_to_db:
-            unit.save()
 
         if card_to_play.target_aiming == 'chosen':
+
+            unit = Unit(card=card_to_play,
+                    match=self.match,
+                    owner_alignment=owner_alignment,
+                    row=node_to_target.row,
+                    x=node_to_target.x)
+            if save_to_db:
+                unit.save()
+
             self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
                 'type': "unit",
                 'unit': unit
@@ -330,13 +404,18 @@ class Board():
             for row in range(3):
                 for x in range(-row, row+1): 
                     if not self.nodes[owner_alignment]["%s_%s" % (row, x)]:
+                        unit = Unit(card=card_to_play,
+                                match=self.match,
+                                owner_alignment=owner_alignment,
+                                row=row,
+                                x=x)
+                        if save_to_db:
+                            unit.save()
+
                         self.nodes[owner_alignment]["%s_%s" % (row, x)] = {
                             'type': "unit",
                             'unit': unit
-                        }
-
-        logging.info("** cast: played card node %s %s to: %s" % (node_to_target.row, node_to_target.x, card_to_play.pk))
-
+                        } 
 
 
     def log(self):
@@ -470,8 +549,6 @@ class Board():
             elif row == 0 and x == 0:
                 # bumped into enemy player
 
-                logging.info("## damaged player %s for %s" % (alignment, unit.card.attack))
-
                 if alignment == "ai":
                     self.match.ai_life -= unit.card.attack
                 else:
@@ -513,4 +590,7 @@ class Turn(models.Model):
 
 
 
+
+admin.site.register(Puzzle)
+admin.site.register(PuzzleStartingUnit)
     

@@ -8,8 +8,22 @@ from django.template import RequestContext
 
 from d_board.models import Node
 from d_cards.models import Card, ShuffledLibrary, Deck
-from d_game.models import Turn, Match, Board, Unit, AI
+from d_game.models import Turn, Match, Board, Unit, AI, Puzzle
 
+
+def puzzle(request):
+
+    # init
+
+    puzzle = Puzzle.objects.get(id=request.GET.get('p'))
+    request.session["puzzle"] = puzzle.id
+
+    match = init_puzzle_match(puzzle) 
+    request.session["match"] = match.id
+
+    board = Node.objects.all().order_by('-pk')
+
+    return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
 def playing(request): 
 
@@ -22,17 +36,36 @@ def playing(request):
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
 
+def init_puzzle_match(puzzle):
+
+    deck = puzzle.player_deck 
+    ai_deck = None
+
+    # don't shuffle that library! card order can be
+    # important to the puzzles
+    friendly_library = ShuffledLibrary().init(deck, False)
+    friendly_library.save()
+
+    #ai doesn't get a hand or library...  
+
+    match = Match(type="puzzle",
+            friendly_library=friendly_library,
+            ai_library=None)
+    match.save()
+
+    return match 
+
+
 def init_match(request):
 
     try:
         # get my custom deck progress that i built via the editor
-        deck_id = request.session["deck_id"]
+        deck_id = request.session.get("deck_id")
         deck = Deck.objects.get(id=deck_id)
     except:
         # start me a new deck
         deck = Deck()
         deck.save()
-        request.session["deck_id"] = deck.id
 
     ai_deck = Deck.objects.all()[0]
 
@@ -45,36 +78,20 @@ def init_match(request):
     ai_library.draw(3)
 
     match = Match(friendly_library=friendly_library,
-            ai_library=ai_library)
+            ai_library=ai_library,
+            type="ai")
     match.save()
 
     return match 
 
 
-def end_turn(request):
-
-    logging.info("** end_turn()")
-
-    match = Match.objects.get(id=request.session["match"])
-    logging.info("** got match: %s" % match.id)
-
-    board = Board()
-    board.load_from_session(request.session)
-    board.log()
-
-    # process what the player has just done & update board state
+def process_player_turn(request, board):
 
     if request.POST.get("i_win"):
         logging.info("!! player won game !!")
 
-    logging.info("BOARD BEFORE PLAYER HEAL")
-    board.log()
-
     # heal player's units
     board.heal("friendly")
-
-    logging.info("BOARD AFTER PLAYER HEAL")
-    board.log()
 
     # first player cast
     node = None
@@ -89,14 +106,8 @@ def end_turn(request):
     else:
         logging.info("!! TODO: tech up friendly 1")
 
-    logging.info("BOARD BEFORE PLAYER ATTACK (AFTER CAST 1)")
-    board.log()
-
     #attack!
     board.do_attack_phase("friendly", True)
-
-    logging.info("BOARD AFTER PLAYER ATTACK")
-    board.log()
 
     # second player cast
     node = None
@@ -109,32 +120,27 @@ def end_turn(request):
         board.cast("friendly", card, node, True)
     else:
         logging.info("!! TODO: tech up friendly 2")
+
+
+def end_turn(request):
+
+    board = Board()
+    board.load_from_session(request.session)
+
+    # process what the player has just done & update board state 
+    process_player_turn(request, board)
     
-    logging.info("BOARD AFTER PLAYER CAST 2")
-    board.log()
-
-    ai_turn = AI().do_turn(match, board)
-
-    logging.info("** did ai turn")
-
-    draw_cards = []
+    ai_turn = AI().do_turn(board)
 
     #get 2 new cards for player
-    card_ids = match.friendly_library.draw(2)
-    if len(card_ids) > 0:
-        draw_cards.append( Card.objects.get( id=card_ids[0] ) )
-
-        if len(card_ids) > 1:
-            draw_cards.append( Card.objects.get( id=card_ids[1] ) )
+    draw_cards = board.match.friendly_library.draw_as_json(2)
      
-    logging.info("** drew cards")
-
     #serialize and ship it
     hand_and_turn_json = """{
             'player_draw': %s,
             'ai_turn': %s,
             'ai_cards': %s,
-            }""" % (serializers.serialize("json", draw_cards),
+            }""" % (draw_cards,
                     serializers.serialize("json", [ai_turn]),
                     serializers.serialize("json", [ai_turn.play_1, ai_turn.play_2]))
 
@@ -143,17 +149,56 @@ def end_turn(request):
     return HttpResponse(hand_and_turn_json, "application/javascript")
 
 
-def draw(request):
+def begin_puzzle_game(request):
+
+    match = Match.objects.get(id=request.session["match"])
+
+    hand_json = match.friendly_library.draw_as_json(5)
+
+    puzzle = Puzzle.objects.get(id=request.session["puzzle"])
+
+    ai_turn = puzzle.get_setup_turn()
+
+    play_cards = []
+    if ai_turn.play_1:
+        play_cards.append(ai_turn.play_1)
+    if ai_turn.play_2:
+        play_cards.append(ai_turn.play_2)
+
+    hand_and_turn_json = """{
+            'player_draw': %s,
+            'ai_turn': %s,
+            'ai_cards': %s,
+            }""" % (hand_json,
+                    serializers.serialize("json", [ai_turn]),
+                    serializers.serialize("json", play_cards))
+
+    return HttpResponse(hand_and_turn_json, "application/javascript")
+
+
+def first_turn(request):
+
+    match = Match.objects.get(id=request.session["match"])
+
+    if match.type == "ai":
+        return begin_ai_game(request)
+
+    elif match.type == "puzzle":
+        return begin_puzzle_game(request) 
+
+
+def begin_ai_game(request):
     
     match = Match.objects.get(id=request.session["match"])
 
-    card_ids = match.friendly_library.draw(5)
-    hand = []
+    hand_json = match.friendly_library.draw_as_json(5)
 
-    for id in card_ids:
-        card = Card.objects.get(id=id)
-        hand.append(card) 
+    hand_and_turn_json = """{
+            'player_draw': %s,
+            'ai_turn': { },
+            'ai_cards': { },
+            }""" % hand_json
 
-    hand_json = serializers.serialize("json", hand)
+    logging.info(hand_and_turn_json);
 
-    return HttpResponse(hand_json, "application/javascript") 
+    return HttpResponse(hand_and_turn_json, "application/javascript")

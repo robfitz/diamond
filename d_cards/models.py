@@ -3,6 +3,7 @@ import logging
 
 from django import forms
 from django.db import models
+from django.core import serializers
 from django.contrib import admin
 from djangotoolbox.fields import ListField 
 
@@ -157,6 +158,21 @@ class ShuffledLibrary(models.Model):
         return False
 
 
+    def draw_as_json(self, num):
+
+        card_ids = self.draw(num)
+
+        hand = []
+
+        for id in card_ids:
+            card = Card.objects.get(id=id)
+            hand.append(card) 
+
+        hand_json = serializers.serialize("json", hand)
+
+        return hand_json
+        
+
     def draw(self, num):
 
         to_draw = self.undrawn_card_ids[:num]
@@ -173,15 +189,17 @@ class ShuffledLibrary(models.Model):
         return to_draw 
 
     
-    def init(self, deck):
-
-        logging.info("init'ing shuffled lib on deck %s" % deck.id)
+    def init(self, deck, is_shuffled=True):
 
         # create a clean copy
-        self.undrawn_card_ids = list(deck.card_ids)
+        if deck:
+            self.undrawn_card_ids = list(deck.card_ids) 
+        else:
+            self.undrawn_card_ids = []
 
-        # shuffle
-        random.shuffle(self.undrawn_card_ids)
+        if is_shuffled:
+            # shuffle
+            random.shuffle(self.undrawn_card_ids)
 
         self.save()
 
@@ -189,6 +207,8 @@ class ShuffledLibrary(models.Model):
 
 
 class Deck(models.Model):
+
+    nickname = models.CharField(max_length=50)
 
     card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
 
@@ -203,5 +223,10 @@ class Deck(models.Model):
             with_duplicates.append(cards.get(id=id))
         return with_duplicates 
 
+    def __unicode__(self):
+
+        return "%s %s" % (self.id, self.nickname)
+
     
 admin.site.register(Card, CardAdmin) 
+admin.site.register(Deck)
