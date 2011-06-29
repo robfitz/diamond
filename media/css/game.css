@@ -1,3 +1,13 @@
+.gameplay_container {
+    
+}
+.game_container {
+    border:1px solid gray;
+    position: relative;
+    width:800px;
+    height:650px;
+}
+
 #friendly_hand {
     float:left;
     border:1px solid gray;

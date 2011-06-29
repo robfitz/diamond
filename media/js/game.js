@@ -437,7 +437,6 @@ var match = {
 
                 attack = card_json.attack;
                 path_node.action = "damage_player";
-                //damage_player(alignment, attack); 
             }
             else {
                 //not the player and no unit there. loop
@@ -454,6 +453,14 @@ var match = {
     function damage_player(alignment, amount) {
         match.life[alignment] -= amount;
         $(".life." + alignment + " h1").text("" + match.life[alignment]);
+        if (match.life[alignment] <= 0) {
+            if (alignment == "ai") {
+                $("#win_screen").show();
+            }
+            else {
+                $("#lose_screen").show();
+            } 
+        }
     }
 
     function add_card_to_hand(card_json) {

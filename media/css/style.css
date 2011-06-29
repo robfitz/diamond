@@ -617,3 +617,12 @@ img.learn_more {
     float:left;
 }
 
+.modal {
+    z-index:1000;
+    background: url(/media/diagonals.gif);
+    width:100%;
+    height:100%;
+    position:absolute; 
+    top:0;
+    left:0;
+}

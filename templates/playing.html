@@ -16,66 +16,82 @@ AI mode
 
 {% block content %}
 
-    <ul id="phases">
-        <li class="active draw">
-            Draw & heal
-        </li>
-        <li class="play play_1">
-            Play (offensive)
-        </li>
-        <li class="attack">
-            Attack
-        </li>
-        <li class="play play_2">
-            Play (strategic)
-        </li>
-        <li class="active draw">
-            AI Draw & heal
-        </li>
-        <li class="play play_1">
-            AI Play (offensive)
-        </li>
-        <li class="attack">
-            AI Attack
-        </li>
-        <li class="play play_2">
-            AI Play (strategic)
-        </li>
-    </ul>
+    <div id="game_container" class="game_container">
 
-    <div class="ai board">
-        {% block ai_nodes %}
-            {% for node in board %}
-            <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
-                </div>
-            {% endfor %}
-        {% endblock ai_nodes %}
-    </div>
+        <div class="gameplay_container"> 
 
-    <div id="ai_tech" class="ai tech" name="tech">
-        <h1>T1</h1>
-    </div>
-    <div id="ai_life" class="ai life">
-        <h1>10</h1> 
-    </div>
+            <ul id="phases">
+                <li class="active draw">
+                    Draw
+                </li>
+                <li class="play play_1">
+                    Play
+                </li>
+                <li class="attack">
+                    Attack
+                </li>
+                <li class="play play_2">
+                    Play
+                </li>
+                <li class="active draw">
+                    AI Draw
+                </li>
+                <li class="play play_1">
+                    AI Play
+                </li>
+                <li class="attack">
+                    AI Attack
+                </li>
+                <li class="play play_2">
+                    AI Play
+                </li>
+            </ul>
 
-    <div class="friendly board">
-        {% block friendly_nodes %}
-            {% for node in board %}
-            <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
-                </div>
-            {% endfor %}
-        {% endblock friendly_nodes %}
-    </div>
+            <div class="ai board">
+                {% block ai_nodes %}
+                    {% for node in board %}
+                    <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
+                        </div>
+                    {% endfor %}
+                {% endblock ai_nodes %}
+            </div>
 
-    <ul id="friendly_hand">
-    </ul>
+            <div id="ai_tech" class="ai tech" name="tech">
+                <h1>T1</h1>
+            </div>
+            <div id="ai_life" class="ai life">
+                <h1>10</h1> 
+            </div>
 
-    <div id="friendly_tech" class="tech" name="tech">
-        <h1>T1</h1>
-    </div>
-    <div id="friendly_life" class="friendly life">
-        <h1>10</h1> 
+            <div class="friendly board">
+                {% block friendly_nodes %}
+                    {% for node in board %}
+                    <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+                        </div>
+                    {% endfor %}
+                {% endblock friendly_nodes %}
+            </div>
+
+            <ul id="friendly_hand">
+            </ul>
+
+            <div id="friendly_tech" class="tech" name="tech">
+                <h1>T1</h1>
+            </div>
+            <div id="friendly_life" class="friendly life">
+                <h1>10</h1> 
+            </div>
+
+        </div>
+
+        <div id="win_screen" class="modal hidden">
+            {% include 'menus/win.html' %} 
+        </div>
+
+        <div id="lose_screen" class="modal hidden">
+            {% include 'menus/lose.html' %} 
+        </div> 
+
     </div>
 
     <form id="current_turn" method="post" action="/playing/end_turn/">
