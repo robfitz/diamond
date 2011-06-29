@@ -161,6 +161,7 @@ class ShuffledLibrary(models.Model):
     def draw_as_json(self, num):
 
         card_ids = self.draw(num)
+        logging.info("** library.draw json: %s" % card_ids)
 
         hand = []
 

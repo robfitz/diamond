@@ -45,7 +45,7 @@ var match = {
     }
 
     function end_turn() {
-        $.post("playing/end_turn/",
+        $.post("/playing/end_turn/",
             $("#current_turn").serialize(),
             function(data) {
                 match.turn_data = eval('(' + data + ')');
@@ -62,6 +62,8 @@ var match = {
 
         match.phase ++;
         cancel_cast();
+
+        //alert("phase: " + match.phase);
 
         if (match.phase >= phases.length) {
             match.phase = 0;
@@ -86,6 +88,9 @@ var match = {
                     heal_units("friendly");
                     next_phase();
                 }, 200 * i); 
+            }
+            else {
+                next_phase();
             }
         }
         if (match.phase == 1) {
@@ -112,6 +117,7 @@ var match = {
                 //ai play 1
                 if (match.turn_data.ai_turn[0].fields.is_tech_1) {
                     ai_tech_up(1); 
+                    if (!is_first_turn) next_phase();
                 }
                 else if (match.turn_data.ai_cards[0]) {
                     var ai_play = match.turn_data.ai_cards[0].fields;
@@ -120,6 +126,7 @@ var match = {
                     //ai summons
                     var node = $(".board.ai .node[name='" + target + "']");
                     ai_cast(ai_play, node);
+                    if (!is_first_turn) next_phase();
                 }
                 else {
                     //nothing to cast or tech up
@@ -136,6 +143,7 @@ var match = {
                 //ai play 2
                 if (match.turn_data.ai_turn[0].fields.is_tech_2) {
                     ai_tech_up(1); 
+                    if (!is_first_turn) next_phase();
                 }
                 else if (match.turn_data.ai_cards[1]) {
                     var ai_play = match.turn_data.ai_cards[1].fields;
@@ -143,6 +151,7 @@ var match = {
                     var align = match.turn_data.ai_turn[0].fields.target_alignment_2; 
                     var node = $(".board.ai .node[name='" + target + "']");
                     ai_cast(ai_play, node);
+                    if (!is_first_turn) next_phase();
                 }
                 else {
                     //nothing to cast or tech up
@@ -272,7 +281,6 @@ var match = {
     function ai_cast(card, node) { 
         var align = (card.target_alignment == "enemy" ? "friendly" : "ai"); 
         cast_card(align, card, node); 
-        next_phase();
     }
 
     function cast_card(target_alignment, card, node) {
@@ -546,8 +554,6 @@ var match = {
         if (match["tech"]["ai"] > MAX_TECH) tech_level = MAX_TECH;
 
         $("#ai_tech h1").text("T" + match["tech"]["ai"]);
-
-        next_phase();
     }
     function tech_up(amount) {
 

@@ -95,33 +95,43 @@ def process_player_turn(request, board):
     # heal player's units
     board.heal("friendly")
 
-    # first player cast
+    card = None
     node = None
+
+    # first player cast
     node_id = id=request.POST.get("node1")
-    if node_id != "tech":
+    if node_id and node_id != "tech":
         node = Node.objects.get(id=node_id)
 
     card_id = request.POST.get("card1")
-    card = Card.objects.get(id=card_id) 
-    if node:
+    if card_id:
+        card = Card.objects.get(id=card_id) 
+    if card and node:
         board.cast("friendly", card, node, True)
-    else:
+    elif node_id == "tech":
         logging.info("!! TODO: tech up friendly 1")
+    else:
+        logging.info("No player action 1")
 
     #attack!
     board.do_attack_phase("friendly", True)
 
     # second player cast
     node = None
+    card = None
+
     node_id = id=request.POST.get("node2")
-    if node_id != "tech":
+    if node_id and node_id != "tech":
         node = Node.objects.get(id=node_id)
     card_id = request.POST.get("card2")
-    card = Card.objects.get(id=card_id) 
-    if node:
+    if card_id:
+        card = Card.objects.get(id=card_id) 
+    if card and node:
         board.cast("friendly", card, node, True)
-    else:
+    elif node_id == "tech":
         logging.info("!! TODO: tech up friendly 2")
+    else:
+        logging.info("No player action 2")
 
 
 def end_turn(request):
@@ -137,6 +147,12 @@ def end_turn(request):
     #get 2 new cards for player
     draw_cards = board.match.friendly_library.draw_as_json(2)
      
+    play_cards = []
+    if ai_turn.play_1:
+        play_cards.append(ai_turn.play_1)
+    if ai_turn.play_2:
+        play_cards.append(ai_turn.play_2)
+
     #serialize and ship it
     hand_and_turn_json = """{
             'player_draw': %s,
@@ -144,7 +160,7 @@ def end_turn(request):
             'ai_cards': %s,
             }""" % (draw_cards,
                     serializers.serialize("json", [ai_turn]),
-                    serializers.serialize("json", [ai_turn.play_1, ai_turn.play_2]))
+                    serializers.serialize("json", play_cards))
 
     logging.info(hand_and_turn_json);
 
@@ -156,6 +172,7 @@ def begin_puzzle_game(request):
     match = Match.objects.get(id=request.session["match"])
 
     hand_json = match.friendly_library.draw_as_json(5)
+    logging.info("** beginnign puzzle game, got hand: %s" % hand_json)
 
     puzzle = Puzzle.objects.get(id=request.session["puzzle"])
 

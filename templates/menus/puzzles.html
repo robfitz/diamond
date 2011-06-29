@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<link rel="stylesheet" type="text/css" href="/media/css/menus.css" type="text/css" />
+{% endblock meta %}
+
+{% block content %}
+
+    {% for puzzle in puzzles %}
+        <a href="/puzzle/?p={{ puzzle.id }}">
+            <div class="puzzle_thumb">
+                {{ puzzle.name }}
+            </div> 
+        </a>
+    {% endfor %}    
+
+{% endblock %}

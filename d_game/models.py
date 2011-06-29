@@ -148,7 +148,13 @@ class AI():
     """ AI player logic who decides what to play and do """
     
 
-    def get_play(self, match, is_before_attack):
+    def get_play(self, match, is_before_attack): 
+
+        if not match.ai_library:
+            # AI has no library in puzzle mode
+            # when the initial board state is
+            # all that matters for them
+            return None
 
         hand_cards = match.ai_library.hand_cards()
 
@@ -218,14 +224,20 @@ class AI():
 
         is_tech_1 = False
         is_tech_2 = False
+        target_node_1 = None
+        target_node_2 = None
+        play_1 = None
+        play_2 = None
 
         # ai draw
-        match.ai_library.draw(2)
+        if match.ai_library:
+            match.ai_library.draw(2)
 
         first = self.get_play(match, True)
-        play_1 = first["play"]
-        target_node_1 = first["target"] 
-        match.ai_library.play(play_1.id)
+        if first:
+            play_1 = first["play"]
+            target_node_1 = first["target"] 
+            match.ai_library.play(play_1.id)
 
         logging.info("** chose first cards to play") 
 
@@ -250,9 +262,10 @@ class AI():
         board.log()
 
         second = self.get_play(match, False)
-        play_2 = second["play"]
-        target_node_2 = second["target"]
-        match.ai_library.play(play_2.id)
+        if second:
+            play_2 = second["play"]
+            target_node_2 = second["target"]
+            match.ai_library.play(play_2.id)
 
         # ai play second card 
         if not target_node_2 or target_node_2 == "tech": 
@@ -566,7 +579,7 @@ class Turn(models.Model):
 
     i_win = models.BooleanField(default=False)
 
-    play_1 = models.ForeignKey(Card)
+    play_1 = models.ForeignKey(Card, null=True)
 
     #this might be ignored, e.g. in the case of "all" targetting
     target_node_1 = models.ForeignKey(Node, null=True)

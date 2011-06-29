@@ -1,0 +1,8 @@
+.puzzle_thumb {
+    width:90px;
+    height:90px;
+    float:left;
+    margin:10px;
+    border: 1px solid gray;
+    background-color: #ccc;
+}
