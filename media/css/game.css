@@ -5,7 +5,7 @@
     border:1px solid gray;
     position: relative;
     width:800px;
-    height:650px;
+    height:600px;
 }
 
 #friendly_hand {
@@ -52,21 +52,25 @@
 }
 
 .node {
-    width:20px;
-    height:20px;
-    margin:40px;
+    width:60px;
+    height:60px;
+    margin:20px;
     color:#fff;
     position:absolute;
     z-index:1;
-    //background-color:#000;
-    //border:1px solid white;
+
+    background-color:#fff;
+    border:1px solid black;
+
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
 }
 .node:hover {
     //background-color:#124;
 }
 
 .node.unit {
-    background-color:#66f;
+    background-color:#66f; 
 }
 
 .targettable {

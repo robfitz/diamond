@@ -243,40 +243,77 @@ var match = {
         return animation_ms;
     }
 
-    function set_unit_damage(node_pk, alignment, total_damage) {
-        var unit = boards[alignment][node_pk];
+function Unit(json_model, location_node_pk, alignment) {
 
-        if (!unit) return;
+    // full details of this unit just in case
+    this.model_fields = json_model;
 
-        unit.damage = total_damage;
+    this.alignment = alignment;
 
-        var node = $(".board." + alignment + " .node[name='" + node_pk + "']");
-        node.children(".unit_piece").html(unit.attack + "/" + (unit.defense - unit.damage) + unit.attack_type[0]); 
+    // move some common fields out of the json and
+    // to make them more easily accessible
+    this.remaining_life = this.model_fields.defense;
+    this.total_life = this.model_fields.defense;
+    this.attack = this.model_fields.attack; 
 
-        if (unit.damage >= unit.defense) {
-            //killed. remove from board.
-            boards[alignment][node_pk] = null;
-            node.children(".unit_piece").remove(); 
-            node.addClass("empty");
-            node.removeClass("unit");
-        } 
+
+    //init and add to board
+    this.node = $(".board." + alignment + " .node[name='" + location_node_pk + "']");
+    this.node.addClass("unit");
+    this.node.addClass("occupied"); 
+    this.node.removeClass("empty"); 
+    this.node.attr("id", this.model_fields.pk);
+
+    this.node.children(".unit_piece").remove();
+    
+    var unit_piece = $("<div class='unit_piece' id='" + this.model_fields.pk + "'>" + this.model_fields.attack + "/" + this.model_fields.defense + this.model_fields.attack_type[0] + "</div>").appendTo(this.node);
+
+    this.heal = function(total_damage) { 
+        this.remaining_life = this.total_life;
     }
-    function damage_unit(node_pk, alignment, delta_damage) {
-        var unit = boards[alignment][node_pk];
 
-        if (!unit) return;
+    this.suffer_damage = function(delta_damage) { 
+        this.remaining_life -= delta_damage;
 
-        if (!unit.damage) {
-            unit.damage = 0;
+        if (this.remaining_life <= 0) {
+            this.die();
         }
-        set_unit_damage(node_pk, alignment, unit.damage + delta_damage); 
-    }
-    function heal_units(alignment) {
-        for (var node_pk in boards[alignment]) {
-            var node = boards[alignment][node_pk];
-            set_unit_damage(node_pk, alignment, 0);
+        else {
+            this.redraw();
         }
+    } 
+
+    this.die = function() { 
+        //killed. remove from board.
+        boards[this.alignment][this.node.attr('name')] = null;
+        this.node.children(".unit_piece").remove(); 
+        this.node.addClass("empty");
+        this.node.removeClass("unit"); 
     }
+
+    this.redraw = function() { 
+        this.node.children(".unit_piece").html(this.attack + "/" + this.remaining_life + this.model_fields.attack_type[0]); 
+    }
+}
+
+function set_unit_damage(node_pk, alignment, total_damage) {
+    var unit = boards[alignment][node_pk]; 
+    if (!unit) return; 
+    unit.set_damage(total_damage);
+}
+
+function damage_unit(node_pk, alignment, delta_damage) {
+    var unit = boards[alignment][node_pk]; 
+    if (!unit) return; 
+    unit.suffer_damage(delta_damage);
+}
+
+function heal_units(alignment) {
+    for (var node_pk in boards[alignment]) {
+        var unit = boards[alignment][node_pk]; 
+        unit.heal();
+    }
+}
 
     function ai_cast(card, node) { 
         var align = (card.target_alignment == "enemy" ? "friendly" : "ai"); 
@@ -303,21 +340,12 @@ var match = {
             }
             if (card.defense) { 
 
-                //create a summon
-                node.addClass("unit");
-                node.addClass("occupied"); 
+                var unit = new Unit(card, node.attr('name'), target_alignment);
 
-                node.removeClass("empty");
-
-                //for lookup of unit behaviour later
-                node.attr("id", card.pk);
 
                 match.played_cards[card.pk] = card; 
-                boards[target_alignment][node.attr("name")] = $.extend(true, {}, card);
-
-                node.children(".unit_piece").remove();
-                var unit = $("<div class='unit_piece' id='" + card.pk + "'>" + card.attack + "/" + card.defense + card.attack_type[0] + "</div>").appendTo(node);
-
+//                boards[target_alignment][node.attr("name")] = $.extend(true, {}, card);
+                boards[target_alignment][node.attr("name")] = unit; 
             }
         } 
     }
