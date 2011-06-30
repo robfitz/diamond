@@ -7,11 +7,16 @@
 {% block content %}
 
     {% for puzzle in puzzles %}
-        <a href="/puzzle/?p={{ puzzle.id }}">
             <div class="puzzle_thumb">
+                <p>
+                <a href="/puzzle/?p={{ puzzle.id }}">
                 {{ puzzle.name }}
+                </a>
+                </p>
+                
+                <a href="/deck/?p={{ puzzle.id }}">Edit deck</a>
+                <a href="/admin/d_game/puzzle/{{ puzzle.id }}/">Edit puzzle</a>
             </div> 
-        </a>
     {% endfor %}    
 
 {% endblock %}

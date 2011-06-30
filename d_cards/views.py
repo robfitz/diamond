@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
 from d_cards.models import Deck, Card
+from d_game.models import Puzzle
 
 
 def edit_deck(request):
@@ -19,6 +20,12 @@ def edit_deck(request):
         deck.save() 
     elif request.GET.get("id"):
         deck = Deck.objects.get(id=request.GET.get("id")) 
+    elif request.GET.get("p"):
+        puzzle = Puzzle.objects.get(id=request.GET.get("p"))
+        if not puzzle.player_deck:
+            puzzle.player_deck = Deck()
+            puzzle.player_deck.save()
+        deck = puzzle.player_deck 
     else: 
         try:
             # get my deck-in-progress that i built via the editor
