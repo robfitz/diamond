@@ -60,6 +60,11 @@ var match = {
 
     function next_phase(is_first_turn) {
 
+        if (is_first_turn) {
+            do_ai_play_1();
+            do_ai_play_2(); 
+        }
+
         match.phase ++;
         cancel_cast();
 
@@ -73,7 +78,7 @@ var match = {
             $("#phases li.active").removeClass("active").parent().children().eq(match.phase).addClass("active");
         }
 
-        if (match.phase == 0 || is_first_turn) {
+        if (match.phase == 0 ) {
             if (match.turn_data) {
                 //draw cards
                 var i = 0;
@@ -93,72 +98,78 @@ var match = {
                 next_phase();
             }
         }
-        if (match.phase == 1) {
+        else if (match.phase == 1) {
             //do nothing.
             //wait for player to play card
         }
-        if (match.phase == 2) {
+        else if (match.phase == 2) {
             //begin logic for auto-attacking
             var delay = do_attack_phase("friendly");
             setTimeout(next_phase, delay);
         }
-        if (match.phase == 3) {
+        else if (match.phase == 3) {
             //do nothing.
             //wait for player to play card
         }
-        if (match.phase == 4) {
+        else if (match.phase == 4) {
             //ai draw & heal
             heal_units("ai");
 
             end_turn();
         }
-        if (match.phase == 5 || is_first_turn) {
-            if (match.turn_data.ai_turn[0]) {
-                //ai play 1
-                if (match.turn_data.ai_turn[0].fields.is_tech_1) {
-                    ai_tech_up(1); 
-                    if (!is_first_turn) next_phase();
-                }
-                else if (match.turn_data.ai_cards[0]) {
-                    var ai_play = match.turn_data.ai_cards[0].fields;
-                    var target = match.turn_data.ai_turn[0].fields.target_node_1;
-                    var align = match.turn_data.ai_turn[0].fields.target_alignment_1; 
-                    //ai summons
-                    var node = $(".board.ai .node[name='" + target + "']");
-                    ai_cast(ai_play, node);
-                    if (!is_first_turn) next_phase();
-                }
-                else {
-                    //nothing to cast or tech up
-                }
-            }
+        else if (match.phase == 5 ) {
+            do_ai_play_1();
+            next_phase();
         } 
-        if (match.phase == 6) {
+        else if (match.phase == 6) {
             //ai attack
             var delay = do_attack_phase("ai");
             setTimeout(next_phase, delay);
         }
-        if (match.phase == 7 || is_first_turn) {
-            if (match.turn_data.ai_turn[0]) {
-                //ai play 2
-                if (match.turn_data.ai_turn[0].fields.is_tech_2) {
-                    ai_tech_up(1); 
-                    if (!is_first_turn) next_phase();
-                }
-                else if (match.turn_data.ai_cards[1]) {
-                    var ai_play = match.turn_data.ai_cards[1].fields;
-                    var target = match.turn_data.ai_turn[0].fields.target_node_2;
-                    var align = match.turn_data.ai_turn[0].fields.target_alignment_2; 
-                    var node = $(".board.ai .node[name='" + target + "']");
-                    ai_cast(ai_play, node);
-                    if (!is_first_turn) next_phase();
-                }
-                else {
-                    //nothing to cast or tech up
-                }
+        else if (match.phase == 7 ) {
+            do_ai_play_2();
+            next_phase();
+        }
+    }
+
+    function do_ai_play_1() { 
+        if (match.turn_data.ai_turn[0]) {
+            //ai play 1
+            if (match.turn_data.ai_turn[0].fields.is_tech_1) {
+                ai_tech_up(1); 
+            }
+            else if (match.turn_data.ai_cards[0]) {
+                var ai_play = match.turn_data.ai_cards[0].fields;
+                var target = match.turn_data.ai_turn[0].fields.target_node_1;
+                var align = match.turn_data.ai_turn[0].fields.target_alignment_1; 
+                //ai summons
+                var node = $(".board.ai .node[name='" + target + "']");
+                ai_cast(ai_play, node);
+            }
+            else {
+                //nothing to cast or tech up
             }
         }
     }
+
+    function do_ai_play_2() {
+        if (match.turn_data.ai_turn[0]) {
+            //ai play 2
+            if (match.turn_data.ai_turn[0].fields.is_tech_2) {
+                ai_tech_up(1); 
+            }
+            else if (match.turn_data.ai_cards[1]) {
+                var ai_play = match.turn_data.ai_cards[1].fields;
+                var target = match.turn_data.ai_turn[0].fields.target_node_2;
+                var align = match.turn_data.ai_turn[0].fields.target_alignment_2; 
+                var node = $(".board.ai .node[name='" + target + "']");
+                ai_cast(ai_play, node);
+            }
+            else {
+                //nothing to cast or tech up
+            }
+        }
+    } 
 
     /** returns the number of milliseconds this attack phase will require to animate */
     function do_attack_phase(alignment) { 
@@ -270,6 +281,7 @@ function Unit(json_model, location_node_pk, alignment) {
 
     this.heal = function(total_damage) { 
         this.remaining_life = this.total_life;
+        this.redraw();
     }
 
     this.suffer_damage = function(delta_damage) { 
@@ -311,7 +323,9 @@ function damage_unit(node_pk, alignment, delta_damage) {
 function heal_units(alignment) {
     for (var node_pk in boards[alignment]) {
         var unit = boards[alignment][node_pk]; 
-        unit.heal();
+        if (unit) {
+            unit.heal();
+        }
     }
 }
 
