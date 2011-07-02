@@ -68,15 +68,13 @@ var match = {
         match.phase ++;
         cancel_cast();
 
-        //alert("phase: " + match.phase);
-
         if (match.phase >= phases.length) {
             match.phase = 0;
-            $("#phases li.active").removeClass("active").siblings().first().addClass("active");
+            
         }
-        else {
-            $("#phases li.active").removeClass("active").parent().children().eq(match.phase).addClass("active");
-        }
+
+        $("#phases").find("li.active").removeClass("active");
+        $("#phases").find("#" + match.phase).addClass("active");
 
         if (match.phase == 0 ) {
             if (match.turn_data) {
@@ -119,7 +117,9 @@ var match = {
         }
         else if (match.phase == 5 ) {
             do_ai_play_1();
-            next_phase();
+            setTimeout ( function() {
+                next_phase();
+            }, 400); 
         } 
         else if (match.phase == 6) {
             //ai attack
@@ -128,7 +128,9 @@ var match = {
         }
         else if (match.phase == 7 ) {
             do_ai_play_2();
-            next_phase();
+            setTimeout ( function() {
+                next_phase();
+            }, 400); 
         }
     }
 
@@ -175,7 +177,7 @@ var match = {
     function do_attack_phase(alignment) { 
         var i = 0;
         var animation_ms = 0;
-        $(".board." + alignment + " .node.unit").each( 
+        $(".board." + alignment + " .node.unit .unit_piece").each( 
             function () { 
                 var approach_dir = (alignment == "friendly" ? "-":"+");
                 var retreat_dir = (alignment == "friendly" ? "+":"-");
@@ -183,8 +185,7 @@ var match = {
                 var to_animate = $(this);
 
                 //find target
-                //var attacker_id = to_animate.attr("id");
-                var node_id = to_animate.attr("name");
+                var node_id = to_animate.parent().attr("name");
 
                 var attacker_json = boards[alignment][node_id];
 
@@ -277,15 +278,47 @@ function Unit(json_model, location_node_pk, alignment) {
 
     this.node.children(".unit_piece").remove();
     
-    var unit_piece = $("<div class='unit_piece' id='" + this.model_fields.pk + "'>" + this.model_fields.attack + "/" + this.model_fields.defense + this.model_fields.attack_type[0] + "</div>").appendTo(this.node);
+    var unit_piece = $("<div class='unit_piece attack_" + this.model_fields.attack + "' id='" + this.model_fields.pk + "'></div>").appendTo(this.node);
 
-    this.heal = function(total_damage) { 
+    for (var i = 0; i < this.model_fields.attack; i ++) {
+        $("<img src='/media/units/" + this.model_fields.attack_type + ".png' />").appendTo(unit_piece); 
+    }
+    $("<div class='defense'></div>").appendTo(unit_piece);
+
+    var w = parseInt(unit_piece.css('width'));
+    var h = parseInt(unit_piece.css('height'));
+
+    var node_w = parseInt(this.node.css('width'));
+    var node_h = parseInt(this.node.css('height'));
+
+    unit_piece.css('width', 0);
+    unit_piece.css('height', 0);
+    unit_piece.css('left', node_w/2 + "px");
+    unit_piece.css('top', node_h/2 + "px");
+    unit_piece.animate( 
+            { 
+                width: w, 
+                height: h,
+                left: "-=" + w / 2,
+                top: "-=" + h / 2,
+            },
+            {
+                duration: 400,
+            });
+
+    show_message(this.node, this.model_fields.name);
+
+    this.heal = function() { 
+        if (this.total_life - this.remaining_life != 0) {
+            show_number(this.node, this.total_life - this.remaining_life);
+        }
         this.remaining_life = this.total_life;
         this.redraw();
     }
 
     this.suffer_damage = function(delta_damage) { 
         this.remaining_life -= delta_damage;
+        show_number(this.node, -1 * delta_damage);
 
         if (this.remaining_life <= 0) {
             this.die();
@@ -301,11 +334,14 @@ function Unit(json_model, location_node_pk, alignment) {
         this.node.children(".unit_piece").remove(); 
         this.node.addClass("empty");
         this.node.removeClass("unit"); 
+        this.node.removeClass("occupied");
     }
 
     this.redraw = function() { 
-        this.node.children(".unit_piece").html(this.attack + "/" + this.remaining_life + this.model_fields.attack_type[0]); 
+        this.node.find(".defense").html(this.remaining_life); 
     }
+
+    this.redraw();
 }
 
 function set_unit_damage(node_pk, alignment, total_damage) {
@@ -332,6 +368,8 @@ function heal_units(alignment) {
     function ai_cast(card, node) { 
         var align = (card.target_alignment == "enemy" ? "friendly" : "ai"); 
         cast_card(align, card, node); 
+
+        action_indicator(node, "AI cast " + card.name);
     }
 
     function cast_card(target_alignment, card, node) {
@@ -489,12 +527,20 @@ function heal_units(alignment) {
 
     function set_player_life(alignment, amount) { 
         match.life[alignment] = amount;
-        $(".life." + alignment + " h1").text("" + match.life[alignment]);
+        var str = "" + amount;
+        if (amount < 10) str = " " + str;
+        $(".life." + alignment + " h1").text(str);
     }
 
     function damage_player(alignment, amount) {
         match.life[alignment] -= amount;
-        $(".life." + alignment + " h1").text("" + match.life[alignment]);
+
+        var str = "" + match.life[alignment];
+        if (amount < 10) str = " " + str;
+        $(".life." + alignment + " h1").text(str);
+
+        show_number($(".life." + alignment), -1 * amount);
+
         if (match.life[alignment] <= 0) {
             if (alignment == "ai") {
                 $("#win_screen").show();
@@ -506,7 +552,11 @@ function heal_units(alignment) {
     }
 
     function add_card_to_hand(card_json) {
-        var card = $("<li class='card' id='" + card_json.pk + "'>T" + card_json.fields.tech_level + " " + card_json.fields.name + "</li>").appendTo("#friendly_hand");
+        var card = $("<li class='card' id='" + card_json.pk + "'></li>").appendTo("#friendly_hand");
+
+        var f = card_json.fields;
+        card_str = "T" + f.tech_level + ": " + f.name + " (" + f.attack + "/" + f.defense + " " + f.attack_type + ")";
+        card.text(card_str);
 
         match.hand_cards[card_json.pk] = card_json.fields;
 
@@ -603,7 +653,11 @@ function heal_units(alignment) {
         if (match["tech"]["ai"] > MAX_TECH) tech_level = MAX_TECH;
 
         $("#ai_tech h1").text("T" + match["tech"]["ai"]);
+
+        action_indicator($("#ai_tech"), "AI teched by " + amount);
+        show_number($("#ai_tech"), amount);
     }
+
     function tech_up(amount) {
 
         //tech up one notch
@@ -612,6 +666,8 @@ function heal_units(alignment) {
         if (match['tech']['friendly'] > MAX_TECH) tech_level = MAX_TECH;
 
         $("#friendly_tech h1").text("T" + match['tech']['friendly']);
+
+        show_number($("#friendly_tech"), amount);
     }
 
     function cast(hand_card, node) { 

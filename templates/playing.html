@@ -21,65 +21,95 @@ AI mode
         <div class="gameplay_container"> 
 
             <ul id="phases">
-                <li class="active draw">
-                    Draw
-                </li>
-                <li class="play play_1">
-                    Play
-                </li>
-                <li class="attack">
-                    Attack
-                </li>
-                <li class="play play_2">
-                    Play
-                </li>
-                <li class="active draw">
-                    AI Draw
-                </li>
-                <li class="play play_1">
-                    AI Play
-                </li>
-                <li class="attack">
-                    AI Attack
-                </li>
-                <li class="play play_2">
-                    AI Play
-                </li>
+                <div class="clear">&nbsp;</div>
+
+                <div class="fl" style="margin-top:10px;">
+                    <h3>Your turn:</h3>
+                        <li class="active draw" id="0">
+                            Draw
+                        </li>
+                        <li class="play play_1" id="1">
+                            Play
+                        </li>
+                        <li class="attack" id="2">
+                            Attack
+                        </li>
+                        <li class="play play_2" id="3">
+                            Play
+                        </li>
+                </div>
+
+                <div class="fr" style="margin-top:10px;">
+                    <h3>The opponent's turn:</h3>
+                        <li class="active draw" id="4">
+                            Draw
+                        </li>
+                        <li class="play play_1" id="5">
+                            Play
+                        </li>
+                        <li class="attack" id="6">
+                            Attack
+                        </li>
+                        <li class="play play_2" id="7">
+                            Play
+                        </li>
+                </div>
+
             </ul>
 
-            <div class="ai board">
-                {% block ai_nodes %}
-                    {% for node in board %}
-                    <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
-                        </div>
-                    {% endfor %}
-                {% endblock ai_nodes %}
+            <div class="left_column">
+
+                <div class="ribbon_gui">
+                    <div id="ai_life" class="top ai life">
+                        <h1>10</h1> 
+                    </div>
+
+
+                    <div id="friendly_life" class="bottom friendly life">
+                        <h1>10</h1> 
+                    </div>
+
+                    <h2 class="ribbon">Life</h2>
+                    <div class="triangle-ribbon"></div>
+                </div>
+
+                <ul id="friendly_hand">
+                </ul>
+
             </div>
 
-            <div id="ai_tech" class="ai tech" name="tech">
-                <h1>T1</h1>
-            </div>
-            <div id="ai_life" class="ai life">
-                <h1>10</h1> 
+            <div class="board_area">
+                <div class="ai board">
+                    {% block ai_nodes %}
+                        {% for node in board %}
+                        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
+                            </div>
+                        {% endfor %}
+                    {% endblock ai_nodes %}
+                </div>
+                <div class="friendly board">
+                    {% block friendly_nodes %}
+                        {% for node in board %}
+                        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+                            </div>
+                        {% endfor %}
+                    {% endblock friendly_nodes %}
+                </div>
             </div>
 
-            <div class="friendly board">
-                {% block friendly_nodes %}
-                    {% for node in board %}
-                    <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
-                        </div>
-                    {% endfor %}
-                {% endblock friendly_nodes %}
-            </div>
+            <div class="right_column">
+                <div class="ribbon_gui">
+                    <div id="ai_tech" class="top ai tech" name="tech">
+                        <h1>T1</h1>
+                    </div> 
 
-            <ul id="friendly_hand">
-            </ul>
+                    <div id="friendly_tech" class="bottom tech" name="tech">
+                        <h1>T1</h1>
+                    </div>
 
-            <div id="friendly_tech" class="tech" name="tech">
-                <h1>T1</h1>
-            </div>
-            <div id="friendly_life" class="friendly life">
-                <h1>10</h1> 
+                    <h2 class="ribbon">Tech</h2>
+                    <div class="triangle-ribbon"></div>
+                </div>
             </div>
 
         </div>
@@ -108,6 +138,11 @@ AI mode
         <input name="i_win" type="checkbox" />
     </form>
 
+    <div class="cast_info">
+        <div class="tick"></div>
+        <h1 class="msg">X cast Y!</h1>
+    </div>
+
     <script>
 
         $(function() {
@@ -124,9 +159,50 @@ AI mode
                 set_player_life("friendly", {{ puzzle.player_life }} ); 
             {% endif %}
 
-
             draw_starting_hand();
+
+
+            //$(".cast_info").hide(); 
+            $(".cast_info").slideUp();
         });
+
+        function action_indicator(target, message) {
+
+            var x = $(".cast_info");
+            target.append($(".cast_info"));
+
+            $(".cast_info .msg").text(message); 
+            $(".cast_info").slideDown(function() {
+                x.animate({ x:"+=0" }, { duration: 2000,
+                    complete: function() {
+                        x.slideUp();
+                    }
+                });
+            }); 
+        }
+
+        function show_number(target, amount) {
+            if (amount < 0) {
+                show_message(target, amount, "red");
+            }
+            else  {
+                show_message(target, "+" + amount, "green");
+            }
+        }
+
+        function show_message(target, message) {
+            show_message(target, message, "");
+        }
+
+        function show_message(target, message, color) {
+            var x = $("<h1 class='feedback'></h1>").appendTo(target);
+            x.addClass(color);
+            x.text(message); 
+
+            x.animate({ top:"-=40" },
+                { duration: 1000 });
+            x.fadeOut(1000);
+        }
 
     </script>
 {% endblock content %}
