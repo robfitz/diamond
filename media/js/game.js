@@ -111,6 +111,7 @@ var match = {
         }
         else if (match.phase == 4) {
             //ai draw & heal
+            remove_one_rubble("friendly");
             heal_units("ai");
 
             end_turn();
@@ -131,6 +132,7 @@ var match = {
             setTimeout ( function() {
                 next_phase();
             }, 400); 
+            remove_one_rubble("ai");
         }
     }
 
@@ -335,6 +337,8 @@ function Unit(json_model, location_node_pk, alignment) {
         this.node.addClass("empty");
         this.node.removeClass("unit"); 
         this.node.removeClass("occupied");
+
+        add_rubble(this.alignment, this.node, 1);
     }
 
     this.redraw = function() { 
@@ -372,6 +376,29 @@ function heal_units(alignment) {
         action_indicator(node, "AI cast " + card.name);
     }
 
+
+    function remove_one_rubble(alignment) {
+        $(".board." + alignment + " .rubble").each( function() {
+            show_message($(this).parent(), "-1");
+            $(this).children("img").first().remove();
+
+            if ( $(this).children("img").size() == 0) {
+                $(this).parent().removeClass("occupied");
+                $(this).parent().addClass("empty"); 
+                $(this).remove();
+            } 
+        });
+    }
+    function add_rubble(alignment, node, quantity) { 
+        var rubble = $("<div class='rubble r_" + quantity + "'></div>").appendTo(node);
+
+        for (var i = 0; i < quantity; i ++) {
+            $("<img src='/media/units/rubble.png' />").appendTo(rubble); 
+        } 
+        node.addClass("occupied");
+        node.removeClass("empty"); 
+    }
+
     function cast_card(target_alignment, card, node) {
 
         if (card.target_aiming == "all") {
@@ -396,7 +423,6 @@ function heal_units(alignment) {
 
 
                 match.played_cards[card.pk] = card; 
-//                boards[target_alignment][node.attr("name")] = $.extend(true, {}, card);
                 boards[target_alignment][node.attr("name")] = unit; 
             }
         } 
