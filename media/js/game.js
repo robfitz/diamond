@@ -187,9 +187,9 @@ var match = {
                 //find target
                 var node_id = to_animate.parent().attr("name");
 
-                var attacker_json = boards[alignment][node_id];
+                var unit = boards[alignment][node_id];
 
-                var attack_path = do_attack(attacker_json, node_id, alignment);
+                var attack_path = do_attack(unit, node_id, alignment);
 
                 var opponent_alignment = (alignment == "friendly" ? "ai" : "friendly"); 
 
@@ -222,14 +222,14 @@ var match = {
                                 //perform whatever action is relevant for this
                                 //path step
                                 if (action == "damage_player") {
-                                    damage_player(opponent_alignment, attacker_json.attack);
+                                    damage_player(opponent_alignment, unit.attack);
                                 }
                                 else if (action == "damage_unit") {
-                                    damage_unit(target_node_pk, opponent_alignment, attacker_json.attack); 
+                                    damage_unit(target_node_pk, opponent_alignment, unit.attack); 
                                 } 
 
                                 // i have no idea if this will work
-                                attack_path = do_attack(attacker_json, node_id, alignment);
+                                attack_path = do_attack(unit, node_id, alignment);
 
                                 current_animation_step ++;
 
@@ -410,11 +410,11 @@ function heal_units(alignment) {
      * returns a list of node points in format: 
      * { dx:XXX, drow:XXX, [action:damage_unit/damage_player/blocked], node_id:node_pk } 
      */ 
-    function do_attack(card_json, node_id, alignment) {
+    function do_attack(unit, node_id, alignment) {
 
-        if (card_json.attack == 0
-            || card_json.attack_type == "wall"
-            || card_json.attack_type == "defender") {
+        if (unit.attack == 0
+            || unit.attack_type == "wall"
+            || unit.attack_type == "defender") {
 
             // no attack from this unit 
             return [];
@@ -496,7 +496,7 @@ function heal_units(alignment) {
                 if (alignment == starting_alignment) { 
 
                     //am i ranged? loop!
-                    if (card_json.attack_type == "ranged") {
+                    if (unit.model_fields.attack_type == "ranged") {
                         continue;
                     }
                     else {
@@ -515,7 +515,7 @@ function heal_units(alignment) {
                 //is it 0,0? hit the player!
                 is_searching = false; 
 
-                attack = card_json.attack;
+                attack = unit.attack;
                 path_node.action = "damage_player";
             }
             else {
