@@ -99,7 +99,7 @@ def process_player_turn(request, board):
     node = None
 
     # first player cast
-    node_id = id=request.POST.get("node1")
+    node_id = request.POST.get("node1")
     if node_id and node_id != "tech":
         node = Node.objects.get(id=node_id)
 
@@ -107,9 +107,10 @@ def process_player_turn(request, board):
     if card_id:
         card = Card.objects.get(id=card_id) 
     if card and node:
-        board.cast("friendly", card, node, True)
+        board.cast(request.POST.get("align1", "friendly"), card, node, True)
     elif node_id == "tech":
-        logging.info("!! TODO: tech up friendly 1")
+        board.match.friendly_tech += 1
+        board.match.save()
     else:
         logging.info("No player action 1")
 
@@ -120,18 +121,22 @@ def process_player_turn(request, board):
     node = None
     card = None
 
-    node_id = id=request.POST.get("node2")
+    node_id = request.POST.get("node2")
     if node_id and node_id != "tech":
         node = Node.objects.get(id=node_id)
     card_id = request.POST.get("card2")
     if card_id:
         card = Card.objects.get(id=card_id) 
     if card and node:
-        board.cast("friendly", card, node, True)
+        board.cast(request.POST.get("align2", "friendly"), card, node, True)
     elif node_id == "tech":
-        logging.info("!! TODO: tech up friendly 2")
+        board.match.friendly_tech += 1
+        board.match.save()
     else:
         logging.info("No player action 2")
+
+    # remove player rubble
+    board.remove_one_rubble("friendly")
 
 
 def end_turn(request):

@@ -120,18 +120,35 @@ class Unit(models.Model):
     # how much damage i've suffered
     damage = models.IntegerField(default=0)
 
+    # once i'm dead, how much rubble i'll leave
+    rubble_duration = models.IntegerField(default=1)
+
+
+    TYPE_CHOICES = (
+            ("unit", "Unit"), 
+            ("rubble", "Rubble"),
+            ("empty", "Empty"),
+        )
+
+    type = models.CharField(max_length=10, default="unit", choices=TYPE_CHOICES)
 
     def heal(self):
         self.damage = 0
+        self.save() 
 
 
     # returns true if the damage was fatal
-    def suffer_damage(self, amount, save_to_db):
+    def suffer_damage(self, amount, save_to_db=True):
+        if save_to_db: 
+            logging.info("*** unit is suffering damage: %s %s" % (amount, save_to_db))
+
+        if self.type != "unit":
+            return False
+
         self.damage += amount
 
         if self.damage >= self.card.defense: 
-            if save_to_db:
-                self.die()
+            self.die(save_to_db)
 
             return True
         else:
@@ -141,9 +158,38 @@ class Unit(models.Model):
         return False
 
 
-    def die(self):
-        self.delete()
+    def remove_rubble(self, amount=1):
+        logging.info("**** node removing rubble from %s" % self.rubble_duration)
 
+        if self.type != "rubble":
+            return
+
+        self.rubble_duration -= amount
+        if self.rubble_duration <= 0:
+            logging.info("**** node removing rubble: no more left")
+            self.die()
+        else:
+            self.save()
+
+
+    def die(self, save_to_db=True):
+
+        if save_to_db:
+            logging.info('*** unit has died')
+
+        if self.type == "unit" and self.rubble_duration > 0:
+            # when unit dies, it becomes rubble
+            self.type = "rubble"
+            if save_to_db:
+                logging.info('*** unit turned to rubble: %s' % self.type)
+                self.save()
+
+        else:
+            logging.info("*** unit disappeared into empty on death")
+            self.type = "empty"
+            if save_to_db:
+                self.save()
+                self.delete() 
 
 
 class AI():
@@ -162,6 +208,7 @@ class AI():
 
         best_card = None
         best_target = None
+        best_target_align = None
         best_hval = -1000
 
         test_militia = Card(attack=1,
@@ -182,7 +229,7 @@ class AI():
             valid_targets = test_board.get_valid_targets_for(card, "ai")
             for target in valid_targets:
                 test_board.load_from_match_id(match.id)
-                test_board.cast("ai", card, target, False) 
+                test_board.cast(target.temp_alignment, card, target, False) 
 
                 if is_before_attack:
                     # promote offensive play by simulating
@@ -191,9 +238,6 @@ class AI():
                 else:
                     # promote more defensive play by
                     # simulating the player's attack.
-                    # 
-                    # TODO: make this even more conservative
-                    #       by adding a 1/1 to each blank node
                     test_board.cast("friendly", test_militia, None, False)
                     test_board.do_attack_phase("friendly", False) 
 
@@ -203,6 +247,7 @@ class AI():
                     best_hval = hval
                     best_card = card
                     best_target = target
+                    best_target_align = target.temp_alignment
 
             # test teching
             test_board.load_from_match_id(match.id)
@@ -213,11 +258,15 @@ class AI():
                 best_hval = hval
                 best_card = card
                 best_target = "tech"
+                best_target_align = "N/A"
 
             match.ai_tech -= 1
 
-        return { 'play': best_card,
-                'target': best_target }
+        return { 
+                'play': best_card,
+                'target': best_target,
+                'target_align': best_target_align
+                }
 
 
     def do_turn(self, board):
@@ -230,18 +279,21 @@ class AI():
         target_node_2 = None
         play_1 = None
         play_2 = None
+        align_1 = None
+        align_2 = None
 
         # ai draw
         if match.ai_library:
             match.ai_library.draw(2)
 
         first = self.get_play(match, True)
+        logging.info("** 1st play: %s" % first)
         if first:
             play_1 = first["play"]
             target_node_1 = first["target"] 
+            align_1 = first["target_align"]
             match.ai_library.play(play_1.id)
 
-        logging.info("** chose first cards to play") 
 
         #heal and attack
         board.heal("ai")
@@ -253,44 +305,39 @@ class AI():
             match.ai_tech += 1
             match.save()
         else:
-            board.cast("ai", play_1, target_node_1, True)
-
-        logging.info("BOARD AFTER AI CAST 1")
-        board.log()
+            board.cast(align_1, play_1, target_node_1, True)
 
         board.do_attack_phase("ai", True)
 
-        logging.info("BOARD AFTER AI ATTACK")
-        board.log()
-
         second = self.get_play(match, False)
+        logging.info("** 2nd play: %s" % second)
         if second:
             play_2 = second["play"]
             target_node_2 = second["target"]
+            align_2 = second["target_align"]
             match.ai_library.play(play_2.id)
 
         # ai play second card 
         if not target_node_2 or target_node_2 == "tech": 
-            logging.info("** ai 2nd cast: teching")
             is_tech_2 = True
             target_node_2 = None
 
             match.ai_tech += 1
             match.save()
         else:
-            board.cast("ai", play_2, target_node_2, True)
+            board.cast(align_2, play_2, target_node_2, True)
 
-        logging.info("BOARD AFTER AI CAST 2")
-        board.log()
+        # remove ai rubble
+        board.remove_one_rubble("ai")
 
         ai_turn = Turn(play_1=play_1,
                 target_node_1=target_node_1,
                 is_tech_1=is_tech_1,
-                target_alignment_1="friendly",
+                target_alignment_1=align_1,
                 play_2=play_2,
                 target_node_2=target_node_2,
                 is_tech_2=is_tech_2,
-                target_alignment_2="friendly")
+                target_alignment_2=align_2)
 
         return ai_turn 
 
@@ -308,6 +355,19 @@ class Board():
                 "2_-2": 1, "2_-1": 1, "2_0": 2, "2_1": 1, "2_2": 1 }
 
 
+    def remove_one_rubble(self, alignment):
+        logging.info("board.remove one rubble: %s" % alignment)
+
+        for row in range(3):
+            for x in range(-row, row+1): 
+
+                # gain points for having units
+                node = self.nodes[alignment]["%s_%s" % (row, x)]
+
+                if node and node.type == "rubble":
+                    node.remove_rubble()
+
+
     def to_simple_json(self):
 
         simple_board = { 'friendly': { }, 'ai': { } } 
@@ -323,22 +383,29 @@ class Board():
                 'boards': simple_board
             }; 
 
-        for align in simple_board:
-            for key in self.nodes[align]:
+        for board_node in Node.objects.all():
+            for align in simple_board:
+
+                key = "%s_%s" % (board_node.row, board_node.x) 
                 node = self.nodes[align][key]
 
                 if not node:
-                    continue
-                elif node["type"] == "unit":
+                    simple_board[align][key] = {
+                            'type': 'empty',
+                            'node': board_node.pk,
+                        }
+                elif node.type == "unit":
                     simple_board[align][key] = {
                             'type': "unit",
-                            'card': node["unit"].card.pk,
-                            'damage': node["unit"].damage
+                            'card': node.card.pk,
+                            'damage': node.damage,
+                            'node': board_node.pk,
                         }
-                elif node["type"] == "rubble":
+                elif node.type == "rubble":
                     simple_board[align][key] = {
                             'type': "rubble",
-                            'amount': node.amount
+                            'amount': node.rubble_duration,
+                            'node': board_node.pk,
                         } 
 
         return simplejson.dumps(simple_match) 
@@ -348,26 +415,53 @@ class Board():
 
         valid_targets = []
 
-        for row in range(3):
-            for x in range(-row, row+1): 
+        enemy_alignment = "ai"
+        if owner_alignment == "friendly":
+            enemy_alignment = "ai"
 
-                # gain points for having units
-                node = self.nodes[owner_alignment]["%s_%s" % (row, x)]
-                if not node:
-                    valid_targets.append(Node.objects.get(row=row, x=x))
+        alignments = []
+        if card.target_alignment == "any":
+            alignments = ["friendly", "ai"]
+        elif card.target_alignment == "friendly":
+            alignments = [owner_alignment]
+        elif card.target_alignment == "enemy":
+            alignments = [enemy_alignment]
+
+        for alignment in alignments:
+            for node_model in Node.objects.all():
+                row = node_model.row
+                x = node_model.x 
+
+                node = self.nodes[alignment]["%s_%s" % (row, x)]
+
+                node_model.temp_alignment = alignment
+
+                if card.target_occupant == "any":
+                    valid_targets.append(node_model)
+                elif card.target_occupant == "empty": 
+                    if not node or node.type == "empty":
+                        valid_targets.append(node_model)
+                elif card.target_occupant == "rubble":
+                    if node and node.type == "rubble":
+                        valid_targets.append(node_model)
+
+                elif card.target_occupant == "unit":
+                    if node and node.type == "unit":
+                        valid_targets.append(node_model) 
 
         return valid_targets
 
+
     def get_node_power(self, row, x):
-        if row == 0 and x == 0:
-            return 2
+        return self.node_power_levels["%s_%s" % (row, x)]
+
     
     def get_ai_heuristic_value(self, hand_cards): 
 
-        #if self.match.friendly_life <= 0:
-            #return 1000
-        #elif self.match.ai_life <= 0:
-            #return -1000
+        if self.match.friendly_life <= 0:
+            return 1000
+        elif self.match.ai_life <= 0:
+            return -1000
         
         hval = 0
 
@@ -381,15 +475,15 @@ class Board():
                 # gain points for having units
                 node = self.nodes['ai']["%s_%s" % (row, x)]
 
-                if node and node["type"] == 'unit': 
-                    hval += node["unit"].card.unit_power_level 
-                    my_units += node["unit"].card.unit_power_level
+                if node and node.type == 'unit': 
+                    hval += node.card.unit_power_level 
+                    # my_units += node.card.unit_power_level
 
                 # lose slightly more points for enemy units
                 node = self.nodes['friendly']["%s_%s" % (row, x)]
-                if node and node["type"] == 'unit': 
-                    hval -= node["unit"].card.unit_power_level * 1.1 
-                    their_units -= node["unit"].card.unit_power_level * 1.1 
+                if node and node.type == 'unit': 
+                    hval -= node.card.unit_power_level * 1.1 
+                    # their_units -= node.card.unit_power_level * 1.1 
 
         # life
         their_life = - self.match.friendly_life * 0.4
@@ -405,12 +499,12 @@ class Board():
             # cards you can cast are worth lots
             if card.tech_level <= self.match.ai_tech:
                 hval += 0.2 * card.tech_level
-                my_hand+= 0.2 * card.tech_level
+                # my_hand+= 0.2 * card.tech_level
 
             # cards you can almost cast are worth a little
             elif card.tech_level == self.match.ai_tech + 1:
                 hval += 0.1 * card.tech_level
-                my_hand += 0.1 * card.tech_level
+                # my_hand += 0.1 * card.tech_level
 
         my_board = 0
         their_board = 0
@@ -421,15 +515,15 @@ class Board():
 
                 # lose points for having rubble
                 node = self.nodes['ai']["%s_%s" % (row, x)]
-                if node and node["type"] == 'rubble':
-                    hval -= node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
-                    their_board -= node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
+                if node and node.type == 'rubble':
+                    hval -= node.rubble_duration * self.node_power_levels["%s_%s" % (row, x)] * 0.33
+                    # their_board -= node.rubble_duration * self.node_power_levels["%s_%s" % (row, x)] * 0.33
 
                 # gain points for enemy rubble
                 node = self.nodes['friendly']["%s_%s" % (row, x)]
-                if node and node["type"] == 'rubble':
-                    hval += node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
-                    my_board += node["rubble"] * self.node_power_levels["%s_%s" % (row, x)] * 0.33
+                if node and node.type == 'rubble':
+                    hval += node.rubble_duration * self.node_power_levels["%s_%s" % (row, x)] * 0.33
+                    # my_board += node.rubble_duration * self.node_power_levels["%s_%s" % (row, x)] * 0.33
 
         #logging.info("@@ got heuristic: %s from life=%s/%s, hand=%s, units=%s/%s, board=%s/%s" % (hval, my_life, their_life, my_hand, my_units, their_units, my_board, their_board))
         return hval
@@ -461,21 +555,9 @@ class Board():
 
             if card_to_play.direct_damage:
                 # direct damage BOOOIOIY!!!
-                node = self.nodes[owner_alignment]["%s_%s" % (node.row, node.x)]
-                if node and node.type == "unit":
-                    node.unit.suffer_damage(card_to_play.direct_damage)
-
-            if card_to_play.rubble_duration:
-
-                node = self.nodes[owner_alignment]["%s_%s" % (node.row, node.x)]
-            
-                if not node:
-                    # add new rubble to node
-                    self.nodes[owner_alignment]["%s_%s" % (node.row, node.x)] = { type: "rubble", amount: card_to_play.rubble_duration }
-                    pass
-                elif node.type == "rubble":
-                    # increase existing rubble (how annoying!)
-                    node.amount += card_to_play.rubble_duration 
+                target = self.nodes[owner_alignment]["%s_%s" % (node["row"], node['x'])]
+                if target and target.type == "unit":
+                    target.suffer_damage(card_to_play.direct_damage, save_to_db)
 
             if card_to_play.defense: 
                 # it's a freaking summon!
@@ -489,11 +571,7 @@ class Board():
                 if save_to_db:
                     unit.save()
 
-                self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
-                    'type': "unit",
-                    'unit': unit
-                }
-
+                self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = unit
 
 
 
@@ -508,7 +586,7 @@ class Board():
                 if x < -row:
                     str += "   "
                 elif self.nodes['ai']['%s_%s' % (row, x)]:
-                    str += " %s " % self.nodes['ai']['%s_%s' % (row, x)]["unit"].damage
+                    str += " %s " % self.nodes['ai']['%s_%s' % (row, x)].damage
                 else:
                     str += " - "
             logging.info(str)
@@ -520,7 +598,7 @@ class Board():
                 if x < -row:
                     str += "   "
                 elif self.nodes['friendly']['%s_%s' % (row, x)]:
-                    str += " %s " % self.nodes['friendly']['%s_%s' % (row, x)]["unit"].damage
+                    str += " %s " % self.nodes['friendly']['%s_%s' % (row, x)].damage
                 else:
                     str += " - "
             logging.info(str)
@@ -543,18 +621,15 @@ class Board():
 
         units = Unit.objects.filter(match=self.match).select_related()
         for unit in units:
-            self.nodes[unit.owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
-                'type': "unit",
-                'unit': unit
-            }
+            self.nodes[unit.owner_alignment]["%s_%s" % (unit.row, unit.x)] = unit
 
     def heal(self, alignment):
 
         for row in range(3):
             for x in range(-row, row+1): 
                 node = self.nodes[alignment]["%s_%s" % (row, x)]
-                if node and node["type"] == "unit":
-                    unit = node["unit"]
+                if node and node.type == "unit":
+                    unit = node
                     unit.heal()
                 else:
                     # rubble or empty
@@ -568,8 +643,8 @@ class Board():
             row = 2 - inv_row
             for x in range(-row, row+1): 
                 node = self.nodes[alignment]["%s_%s" % (row, x)]
-                if node and node["type"] == "unit":
-                    self.do_attack(node["unit"], save_to_db)
+                if node and node.type == "unit":
+                    self.do_attack(node, save_to_db)
                 else:
                     # rubble or empty
                     continue
@@ -610,19 +685,13 @@ class Board():
             except KeyError:
                 next_node = None
 
-            if next_node and next_node["type"] == "unit":
+            if next_node and next_node.type == "unit":
                 if alignment == starting_alignment:
                     # bumped into friendly
                     return
-                elif next_node and next_node["type"] == "unit":
+                elif next_node and next_node.type == "unit":
                     # bumped into enemy unit
-                    is_dead = next_node["unit"].suffer_damage(unit.card.attack, save_to_db)
-                    if is_dead: 
-                        # although the DB object has already been removed,
-                        # we also need to remove it from the temporary
-                        # data structure so we don't collide against it
-                        # later in this attack phase
-                        self.nodes[alignment]["%s_%s" % (row, x)] = None
+                    is_dead = next_node.suffer_damage(unit.card.attack, save_to_db)
                     return
                     
             elif row == 0 and x == 0:
@@ -630,8 +699,12 @@ class Board():
 
                 if alignment == "ai":
                     self.match.ai_life -= unit.card.attack
+                    if save_to_db:
+                        self.match.save()
                 else:
                     self.match.friendly_life -= unit.card.attack
+                    if save_to_db:
+                        self.match.save()
 
                 return 
 

@@ -40,7 +40,7 @@ p {
     -webkit-margin-end: 0px;
     line-height: 1.6;
     margin-bottom: 20px;
-    font-family: "Droid Sans";
+    //font-family: "Droid Sans";
 }
 @font-face {
     font-family: 'Droid Sans';

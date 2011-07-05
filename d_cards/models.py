@@ -44,19 +44,12 @@ class Card(models.Model):
     # how much playing this card changes your current tech level (usually ranging from -2 to +2)
     tech_change = models.IntegerField(default=0, help_text="If non-zero, it will change the player's current tech level by that positive or negative amount.")
 
-    # rubble decays over time. if positive, and if there is no unit on the affected node
-    # after the effect ends, rubble of this quantity will be placed there.
-    # in this case of a rubble collision, they do not add, but instead the node is set to the 
-    # value of the larger rubble.
-    rubble_duration = models.IntegerField(default=0, help_text="How many turns to leave rubble in the targetted spaces, but ONLY IF the space is empty after other effects have triggered (e.g. a summon plus a rubble would perform the summon but not the rubble. A damage 3 plus rubble will only add the rubble if the unit dies.")
-
     ALIGNMENT_CHOICES = (
             ("friendly", "Friendly"), 
             ("enemy", "Enemy"),
             ("any", "Any")
         )
     OCCUPANT_CHOICES = (
-            ("occupied", "Occupied"), 
             ("unit", "Unit"),
             ("rubble", "Rubble"),
             ("empty", "Empty"),
@@ -107,9 +100,6 @@ class Card(models.Model):
             str += "Damage %s. " % -self.health_change
         elif self.health_change > 0:
             str += "Heal %s. " % self.health_change
-
-        if self.rubble_duration:
-            str += "Rubble %s." % self.rubble_duration 
 
         return str
 

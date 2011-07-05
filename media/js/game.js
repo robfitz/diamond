@@ -55,6 +55,10 @@ var match = {
                 match.turn_data = eval('(' + data + ')');
 
                 verify_board_state(match["turn_data"]["verify_board_state_before_ai"]);
+
+                // TODO: this probably shouldn't be here. clean up
+                // the end of my turn/beginning of their turn ordering
+                heal_units("ai");
                 next_phase();
             }
         );
@@ -88,36 +92,44 @@ var match = {
         for (node_key in board) { 
             
             var s_node = board[node_key];
-            var node = boards[align][node_key];
+            var node = boards[align]["" + s_node.node];
 
             if (!s_node && !node) {
                 //both are null, that's okay
             }
-            else if ((!s_node && node) || (s_node && !node)) {
-                alert("either server,local node is null: " + s_node + "," + node);
+            else if ((!s_node || s_node["type"] == "empty") && (!node || node['type'] == "empty")) {
+                //both are null (or empty), that's okay
             } 
+            else if (!s_node || !node) {
+                alert("either server,local node is null: " + s_node + "," + node + ". stype=" + s_node["type"] + " at key: " + node_key + "," + align);
+            }
             else if (s_node['type'] != node['type']) {
                 alert("board states don't match, different types on node=" + node_key + " " + align + ". server expected " + s_node.type);
 
             }
             else {
+
                 // types match, check contents 
-                if (node.type == "unit") {
+
+                if (node.type == "empty") {
+                    // pass
+                }
+                else if (node.type == "unit") {
                     // same card PK?
-                    if (node.fields.pk != s_node.card) {
-                        alert("server (" + s_node.card + ") and local (" + node.fields.pk + ") unit card PKs don't match");
+                    if (node.model.pk != s_node.card) {
+                        alert("server (" + s_node.card + ") and local (" + node.model.pk + ") unit card PKs don't match");
 
                     }
                     
                     // same damage?
-                    if (s_node.damage != node.damage) {
-                        alert("server (" + s_node.damage + ") and local (" + node.damage + ") unit damages don't match"); 
+                    if (s_node.damage != node.damage()) {
+                        alert("server (" + s_node.damage + ") and local (" + node.damage() + ") unit damages don't match on " + node_key + "," + align);
                     }
                 }
                 else if (node.type == "rubble") {
                     // same rubble amount?
                     if (s_node.amount != node.amount) {
-                        alert("server (" + s_node.amount + ") and local (" + node.amount + ") rubble amounts don't match"); 
+                        alert("server (" + s_node.amount + ") and local (" + node.amount + ") rubble amounts don't match on " + node_key + "," + align);
                     } 
                 }
             } 
@@ -173,7 +185,7 @@ var match = {
         else if (match.phase == 2) {
             //begin logic for auto-attacking
             var delay = do_attack_phase("friendly");
-            setTimeout(next_phase, delay);
+            setTimeout(next_phase, delay + 1000);
         }
         else if (match.phase == 3) {
             //do nothing.
@@ -181,10 +193,9 @@ var match = {
         }
         else if (match.phase == 4) {
             //ai draw & heal
-            remove_one_rubble("friendly");
-            heal_units("ai");
-
+            remove_one_rubble("friendly"); 
             end_turn();
+
         }
         else if (match.phase == 5 ) {
             do_ai_play_1();
@@ -195,7 +206,7 @@ var match = {
         else if (match.phase == 6) {
             //ai attack
             var delay = do_attack_phase("ai");
-            setTimeout(next_phase, delay);
+            setTimeout(next_phase, delay + 1000);
         }
         else if (match.phase == 7 ) {
             do_ai_play_2();
@@ -219,8 +230,8 @@ var match = {
                 var target = match.turn_data.ai_turn[0].fields.target_node_1;
                 var align = match.turn_data.ai_turn[0].fields.target_alignment_1; 
                 //ai summons
-                var node = $(".board.ai .node[name='" + target + "']");
-                ai_cast(match.turn_data.ai_cards[0], node);
+                var node = $(".board." + align + " .node[name='" + target + "']");
+                ai_cast(match.turn_data.ai_cards[0], node, align);
             }
             else {
                 //nothing to cast or tech up
@@ -237,8 +248,8 @@ var match = {
             else if (match.turn_data.ai_cards[1]) {
                 var target = match.turn_data.ai_turn[0].fields.target_node_2;
                 var align = match.turn_data.ai_turn[0].fields.target_alignment_2; 
-                var node = $(".board.ai .node[name='" + target + "']");
-                ai_cast(match.turn_data.ai_cards[1], node);
+                var node = $(".board." + align + " .node[name='" + target + "']");
+                ai_cast(match.turn_data.ai_cards[1], node, align);
             }
             else {
                 //nothing to cast or tech up
@@ -342,8 +353,7 @@ function Unit(json_model, location_node_pk, alignment) {
     this.total_life = this.model_fields.defense;
     this.attack = this.model_fields.attack; 
 
-    this.type = "unit";
-
+    this.type = "unit"; 
 
     //init and add to board
     this.node = $(".board." + alignment + " .node[name='" + location_node_pk + "']");
@@ -384,6 +394,10 @@ function Unit(json_model, location_node_pk, alignment) {
 
     show_message(this.node, this.model_fields.name);
 
+    this.damage = function() {
+        return this.total_life - this.remaining_life;
+    }
+
     this.heal = function() { 
         if (this.total_life - this.remaining_life != 0) {
             show_number(this.node, this.total_life - this.remaining_life);
@@ -407,6 +421,7 @@ function Unit(json_model, location_node_pk, alignment) {
     this.die = function() { 
         //killed. remove from board.
         boards[this.alignment][this.node.attr('name')] = null;
+
         this.node.children(".unit_piece").remove(); 
         this.node.addClass("empty");
         this.node.removeClass("unit"); 
@@ -437,15 +452,14 @@ function damage_unit(node_pk, alignment, delta_damage) {
 function heal_units(alignment) {
     for (var node_pk in boards[alignment]) {
         var unit = boards[alignment][node_pk]; 
-        if (unit) {
+        if (unit && unit['type'] == 'unit') {
             unit.heal();
         }
     }
 }
 
-    function ai_cast(card, node) { 
-        var align = (card.target_alignment == "enemy" ? "friendly" : "ai"); 
-        cast_card(align, card, node); 
+    function ai_cast(card, node, alignment) { 
+        cast_card(alignment, card, node); 
 
         action_indicator(node, "AI cast " + card.fields.name);
     }
@@ -457,12 +471,16 @@ function heal_units(alignment) {
             $(this).children("img").first().remove();
 
             if ( $(this).children("img").size() == 0) {
+
+                boards[alignment][$(this).parent().attr('name')] = null;
+
                 $(this).parent().removeClass("occupied");
                 $(this).parent().addClass("empty"); 
-                $(this).remove();
+                $(this).remove(); 
             } 
         });
     }
+
     function add_rubble(alignment, node, quantity) { 
         var rubble = $("<div class='rubble r_" + quantity + "'></div>").appendTo(node);
 
@@ -471,6 +489,11 @@ function heal_units(alignment) {
         } 
         node.addClass("occupied");
         node.removeClass("empty"); 
+
+        boards[alignment][node.attr('name')] = { 
+                "type": "rubble",
+                "amount": quantity
+            };
     }
 
     function cast_card(target_alignment, card, node) {
@@ -479,7 +502,7 @@ function heal_units(alignment) {
             nodes = node.parent().children(".empty");
         }
         else if (card.fields.target_aiming == "chosen") {
-            nodes = node
+            nodes = node;
         }
         else {
             alert('unknown card target aiming: ' + card.fields.target_aiming);

@@ -13,6 +13,8 @@ class Node(models.Model):
     # positive or negative from +-2
     x = models.IntegerField(default = 0)
 
+    temp_alignment = "temp"
+
 
     # layout helper functions
     def board_x_friendly(self):
