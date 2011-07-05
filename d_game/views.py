@@ -141,7 +141,9 @@ def end_turn(request):
 
     # process what the player has just done & update board state 
     process_player_turn(request, board)
-    
+
+    before_ai_board_simple_json = board.to_simple_json()
+
     ai_turn = AI().do_turn(board)
 
     #get 2 new cards for player
@@ -158,9 +160,13 @@ def end_turn(request):
             'player_draw': %s,
             'ai_turn': %s,
             'ai_cards': %s,
+            'verify_board_state_before_ai': %s,
+            'verify_board_state_after_ai': %s,
             }""" % (draw_cards,
                     serializers.serialize("json", [ai_turn]),
-                    serializers.serialize("json", play_cards))
+                    serializers.serialize("json", play_cards),
+                    before_ai_board_simple_json,
+                    board.to_simple_json())
 
     logging.info(hand_and_turn_json);
 

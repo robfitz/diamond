@@ -44,9 +44,6 @@ class Card(models.Model):
     # how much playing this card changes your current tech level (usually ranging from -2 to +2)
     tech_change = models.IntegerField(default=0, help_text="If non-zero, it will change the player's current tech level by that positive or negative amount.")
 
-    #if it hits a unit, how much should it change the thing's health (positive heals, negative damages)
-    health_change = models.IntegerField(default=0, help_text="How much damage you want to do to any units on the targetted spaces. Positive values heal, negative ones hurt. Large negative values will insta-kill.")
-
     # rubble decays over time. if positive, and if there is no unit on the affected node
     # after the effect ends, rubble of this quantity will be placed there.
     # in this case of a rubble collision, they do not add, but instead the node is set to the 

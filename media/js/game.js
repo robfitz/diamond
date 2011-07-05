@@ -1,5 +1,9 @@
 var match = {
-    tech: { friendly: 1, ai: 1 },
+
+    tech: { 
+        'friendly': 1, 
+        'ai': 1 
+    },
     life: { 
         'friendly': 10, 
         'ai': 10 
@@ -49,9 +53,75 @@ var match = {
             $("#current_turn").serialize(),
             function(data) {
                 match.turn_data = eval('(' + data + ')');
+
+                verify_board_state(match["turn_data"]["verify_board_state_before_ai"]);
                 next_phase();
             }
         );
+    }
+
+    function verify_board_state(server_board) {
+
+        //alert('verify board state, friendly life/tech: ' + server_board["life"]["friendly"] + "/" + server_board["tech"]["friendly"]); 
+
+        if (server_board["life"]["friendly"] != match["life"]["friendly"]) {
+            alert("different life totals, friendly (server v local): " + server_board['life']['friendly'] + "," + match['life']['friendly']);
+        } 
+        if (server_board["life"]["ai"] != match["life"]["ai"]) {
+            alert("different life totals, ai (server v local): " + server_board['life']['ai'] + "," + match['life']['ai']);
+        }
+
+
+        if (server_board["tech"]["friendly"] != match["tech"]["friendly"]) {
+            alert("different tech totals, friendly (server v local): " + server_board['tech']['friendly'] + "," + match['tech']['friendly']);
+        } 
+        if (server_board["tech"]["ai"] != match["tech"]["ai"]) {
+            alert("different tech totals, ai (server v local): " + server_board['tech']['ai'] + "," + match['tech']['ai']);
+        }
+
+        verify_board_state_for(server_board, "ai");
+        verify_board_state_for(server_board, "friendly");
+    }
+    function verify_board_state_for(server_board, align) {
+
+        var board = server_board['boards'][align];
+        for (node_key in board) { 
+            
+            var s_node = board[node_key];
+            var node = boards[align][node_key];
+
+            if (!s_node && !node) {
+                //both are null, that's okay
+            }
+            else if ((!s_node && node) || (s_node && !node)) {
+                alert("either server,local node is null: " + s_node + "," + node);
+            } 
+            else if (s_node['type'] != node['type']) {
+                alert("board states don't match, different types on node=" + node_key + " " + align + ". server expected " + s_node.type);
+
+            }
+            else {
+                // types match, check contents 
+                if (node.type == "unit") {
+                    // same card PK?
+                    if (node.fields.pk != s_node.card) {
+                        alert("server (" + s_node.card + ") and local (" + node.fields.pk + ") unit card PKs don't match");
+
+                    }
+                    
+                    // same damage?
+                    if (s_node.damage != node.damage) {
+                        alert("server (" + s_node.damage + ") and local (" + node.damage + ") unit damages don't match"); 
+                    }
+                }
+                else if (node.type == "rubble") {
+                    // same rubble amount?
+                    if (s_node.amount != node.amount) {
+                        alert("server (" + s_node.amount + ") and local (" + node.amount + ") rubble amounts don't match"); 
+                    } 
+                }
+            } 
+        }
     }
 
     function next_phase() {
@@ -129,10 +199,13 @@ var match = {
         }
         else if (match.phase == 7 ) {
             do_ai_play_2();
+
             setTimeout ( function() {
                 next_phase();
             }, 400); 
             remove_one_rubble("ai");
+
+            verify_board_state(match.turn_data["verify_board_state_after_ai"]);
         }
     }
 
@@ -143,12 +216,11 @@ var match = {
                 ai_tech_up(1); 
             }
             else if (match.turn_data.ai_cards[0]) {
-                var ai_play = match.turn_data.ai_cards[0].fields;
                 var target = match.turn_data.ai_turn[0].fields.target_node_1;
                 var align = match.turn_data.ai_turn[0].fields.target_alignment_1; 
                 //ai summons
                 var node = $(".board.ai .node[name='" + target + "']");
-                ai_cast(ai_play, node);
+                ai_cast(match.turn_data.ai_cards[0], node);
             }
             else {
                 //nothing to cast or tech up
@@ -163,11 +235,10 @@ var match = {
                 ai_tech_up(1); 
             }
             else if (match.turn_data.ai_cards[1]) {
-                var ai_play = match.turn_data.ai_cards[1].fields;
                 var target = match.turn_data.ai_turn[0].fields.target_node_2;
                 var align = match.turn_data.ai_turn[0].fields.target_alignment_2; 
                 var node = $(".board.ai .node[name='" + target + "']");
-                ai_cast(ai_play, node);
+                ai_cast(match.turn_data.ai_cards[1], node);
             }
             else {
                 //nothing to cast or tech up
@@ -260,7 +331,8 @@ var match = {
 function Unit(json_model, location_node_pk, alignment) {
 
     // full details of this unit just in case
-    this.model_fields = json_model;
+    this.model = json_model;
+    this.model_fields = this.model.fields;
 
     this.alignment = alignment;
 
@@ -270,17 +342,19 @@ function Unit(json_model, location_node_pk, alignment) {
     this.total_life = this.model_fields.defense;
     this.attack = this.model_fields.attack; 
 
+    this.type = "unit";
+
 
     //init and add to board
     this.node = $(".board." + alignment + " .node[name='" + location_node_pk + "']");
     this.node.addClass("unit");
     this.node.addClass("occupied"); 
     this.node.removeClass("empty"); 
-    this.node.attr("id", this.model_fields.pk);
+    this.node.attr("id", this.model.pk);
 
     this.node.children(".unit_piece").remove();
     
-    var unit_piece = $("<div class='unit_piece attack_" + this.model_fields.attack + "' id='" + this.model_fields.pk + "'></div>").appendTo(this.node);
+    var unit_piece = $("<div class='unit_piece attack_" + this.model_fields.attack + "' id='" + this.model.pk + "'></div>").appendTo(this.node);
 
     for (var i = 0; i < this.model_fields.attack; i ++) {
         $("<img src='/media/units/" + this.model_fields.attack_type + ".png' />").appendTo(unit_piece); 
@@ -373,7 +447,7 @@ function heal_units(alignment) {
         var align = (card.target_alignment == "enemy" ? "friendly" : "ai"); 
         cast_card(align, card, node); 
 
-        action_indicator(node, "AI cast " + card.name);
+        action_indicator(node, "AI cast " + card.fields.name);
     }
 
 
@@ -401,28 +475,28 @@ function heal_units(alignment) {
 
     function cast_card(target_alignment, card, node) {
 
-        if (card.target_aiming == "all") {
+        if (card.fields.target_aiming == "all") {
             nodes = node.parent().children(".empty");
         }
-        else if (card.target_aiming == "chosen") {
+        else if (card.fields.target_aiming == "chosen") {
             nodes = node
         }
         else {
-            alert('unknown card target aiming: ' + card.target_aiming);
+            alert('unknown card target aiming: ' + card.fields.target_aiming);
         }
 
         for (var i = 0; i < nodes.length; i ++) {
             node = nodes.eq(i);
 
-            if (card.direct_damage) {
-                damage_unit(node.attr('name'), target_alignment, card.direct_damage); 
+            if (card.fields.direct_damage) {
+                damage_unit(node.attr('name'), target_alignment, card.fields.direct_damage); 
             }
-            if (card.defense) { 
+            if (card.fields.defense) { 
 
                 var unit = new Unit(card, node.attr('name'), target_alignment);
 
 
-                match.played_cards[card.pk] = card; 
+                match.played_cards[card.pk] = card.fields; 
                 boards[target_alignment][node.attr("name")] = unit; 
             }
         } 
@@ -520,6 +594,7 @@ function heal_units(alignment) {
             var collision_unit = get_unit_at(alignment, next_node_id)
             if (collision_unit) {
                 if (alignment == starting_alignment) { 
+                    //alert('hit friendly collision unit: ' + collision_unit);
 
                     //am i ranged? loop!
                     if (unit.model_fields.attack_type == "ranged") {
@@ -584,7 +659,7 @@ function heal_units(alignment) {
         card_str = "T" + f.tech_level + ": " + f.name + " (" + f.attack + "/" + f.defense + " " + f.attack_type + ")";
         card.text(card_str);
 
-        match.hand_cards[card_json.pk] = card_json.fields;
+        match.hand_cards[card_json.pk] = card_json;
 
         card.click( function(event) {
 

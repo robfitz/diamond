@@ -1,6 +1,8 @@
 import logging, random
+
 from django.db import models
 from django.contrib import admin
+import simplejson
 
 from d_cards.models import Card, ShuffledLibrary, Deck
 from d_board.models import Node
@@ -39,7 +41,7 @@ class Puzzle(models.Model):
 
     order = models.DecimalField(max_digits=6, decimal_places=3)
 
-    # starting positions
+    # starting positions defined by PuzzleStartingUnit set
 
     # starting life
     player_life = models.IntegerField(default=1)
@@ -306,6 +308,42 @@ class Board():
                 "2_-2": 1, "2_-1": 1, "2_0": 2, "2_1": 1, "2_2": 1 }
 
 
+    def to_simple_json(self):
+
+        simple_board = { 'friendly': { }, 'ai': { } } 
+        simple_match = { 
+                'tech': {
+                    'friendly': self.match.friendly_tech,
+                    'ai': self.match.ai_tech
+                },
+                'life': {
+                    'friendly': self.match.friendly_life,
+                    'ai': self.match.ai_life
+                },
+                'boards': simple_board
+            }; 
+
+        for align in simple_board:
+            for key in self.nodes[align]:
+                node = self.nodes[align][key]
+
+                if not node:
+                    continue
+                elif node["type"] == "unit":
+                    simple_board[align][key] = {
+                            'type': "unit",
+                            'card': node["unit"].card.pk,
+                            'damage': node["unit"].damage
+                        }
+                elif node["type"] == "rubble":
+                    simple_board[align][key] = {
+                            'type': "rubble",
+                            'amount': node.amount
+                        } 
+
+        return simplejson.dumps(simple_match) 
+
+
     def get_valid_targets_for(self, card, owner_alignment):
 
         valid_targets = []
@@ -399,36 +437,64 @@ class Board():
 
     def cast(self, owner_alignment, card_to_play, node_to_target, save_to_db):
 
-        if card_to_play.target_aiming == 'chosen':
+        nodes = []
+        if card_to_play.target_aiming == 'chosen': 
+            nodes.append({ 'row': node_to_target.row, 'x': node_to_target.x})
 
-            unit = Unit(card=card_to_play,
-                    match=self.match,
-                    owner_alignment=owner_alignment,
-                    row=node_to_target.row,
-                    x=node_to_target.x)
-            if save_to_db:
-                unit.save()
-
-            self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
-                'type': "unit",
-                'unit': unit
-            }
         elif card_to_play.target_aiming == 'all':
+
             for row in range(3):
                 for x in range(-row, row+1): 
-                    if not self.nodes[owner_alignment]["%s_%s" % (row, x)]:
-                        unit = Unit(card=card_to_play,
-                                match=self.match,
-                                owner_alignment=owner_alignment,
-                                row=row,
-                                x=x)
-                        if save_to_db:
-                            unit.save()
 
-                        self.nodes[owner_alignment]["%s_%s" % (row, x)] = {
-                            'type': "unit",
-                            'unit': unit
-                        } 
+                    if not self.nodes[owner_alignment]["%s_%s" % (row, x)]: 
+                        nodes.append({ 'row': row, 'x': x });
+
+
+        for node in nodes:
+
+            if card_to_play.tech_change:
+                # tech up SUUUUUN!
+                if owner_alignment == "ai": 
+                    self.match.ai_tech += card_to_play.tech_change
+                else:
+                    self.match.friendly_tech += card_to_play.tech_change
+
+            if card_to_play.direct_damage:
+                # direct damage BOOOIOIY!!!
+                node = self.nodes[owner_alignment]["%s_%s" % (node.row, node.x)]
+                if node and node.type == "unit":
+                    node.unit.suffer_damage(card_to_play.direct_damage)
+
+            if card_to_play.rubble_duration:
+
+                node = self.nodes[owner_alignment]["%s_%s" % (node.row, node.x)]
+            
+                if not node:
+                    # add new rubble to node
+                    self.nodes[owner_alignment]["%s_%s" % (node.row, node.x)] = { type: "rubble", amount: card_to_play.rubble_duration }
+                    pass
+                elif node.type == "rubble":
+                    # increase existing rubble (how annoying!)
+                    node.amount += card_to_play.rubble_duration 
+
+            if card_to_play.defense: 
+                # it's a freaking summon!
+
+                unit = Unit(card=card_to_play,
+                        match=self.match,
+                        owner_alignment=owner_alignment,
+                        row=node["row"],
+                        x=node["x"])
+
+                if save_to_db:
+                    unit.save()
+
+                self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = {
+                    'type': "unit",
+                    'unit': unit
+                }
+
+
 
 
     def log(self):
