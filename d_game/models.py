@@ -240,7 +240,6 @@ class AI():
                 best_target_align = "N/A"
 
             # tech back down to compensate for trying out teching
-            # and avoid reloading the match from scratch
             match.ai_tech -= 1
 
             if card.tech_level > match.ai_tech:

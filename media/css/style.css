@@ -420,6 +420,13 @@ h1, h2, h3, h4, h5, h6 {
 .video_info p {
     margin:5px 0;
 }
+.account {
+    font-size:10px; 
+    height:0;
+    text-align:right;
+    width:100%;
+    padding: 6px 10px 0 0;
+}
 .header {
     padding:20px 0 10px 0;
     float:left;

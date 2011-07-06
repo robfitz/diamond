@@ -93,6 +93,8 @@ INSTALLED_APPS = (
     'd_cards',
     'd_board',
     'd_game',
+    'd_menus',
+    'd_users',
 
     'django.contrib.admin',
     'django.contrib.admindocs',
@@ -107,3 +109,5 @@ INSTALLED_APPS = (
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
+
+LOGIN_REDIRECT_URL = "/"

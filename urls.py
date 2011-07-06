@@ -8,6 +8,12 @@ urlpatterns = patterns('',
 
     ('^ah/warmup$', 'djangoappengine.views.warmup'),
 
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    (r'^accounts/logout/$', 
+        'django.contrib.auth.views.logout',
+        { 'next_page': '/' }),
+    (r'^accounts/register/$', 'd_users.views.register'),
+
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
@@ -17,10 +23,14 @@ urlpatterns = patterns('',
 
     ('^playing/first_turn/$', 'd_game.views.first_turn'),
     ('^playing/end_turn/$', 'd_game.views.end_turn'),
-    ('^$', 'd_game.views.playing'),
+    ('^play/$', 'd_game.views.playing'),
 
     ('^puzzle/$', 'd_game.views.puzzle'),
     ('^puzzles/$', 'd_menus.views.puzzle_navigator'),
+
+    ('^$', 
+        'django.views.generic.simple.direct_to_template',
+        {'template': 'index.html'}),
 
     #('', 'django.views.generic.simple.direct_to_template',
      #{'template': 'home.html'}),

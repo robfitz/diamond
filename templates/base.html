@@ -89,6 +89,14 @@
 
         <div id="body">
 
+            <div class="account">
+                {% if request.user.is_authenticated %}
+                <a href="/accounts/logout/">Log out</a>
+                {% else %}
+                <a href="/accounts/login/">Log in</a> or <a href="/accounts/register/">Register</a>
+                {% endif %} 
+            </div>
+
             {% block header %}
 
                 <div class="header">
@@ -100,7 +108,7 @@
                             <a href="/puzzles/">Puzzles!</a>
                         </li>
                         <li>
-                            <a href="/">Play vs. the AI</a>
+                            <a href="/play/">Play vs. the AI</a>
                             <!--
                             <ul>
                                 <li><a>Choice</a></li>
