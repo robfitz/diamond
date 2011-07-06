@@ -37,16 +37,22 @@ class Match(models.Model):
 
 class Puzzle(models.Model):
 
+    PUZZLE_GOALS = (
+            ("kill units", "Kill units"), 
+            ("kill player", "Kill player"),
+        )
+
+    # naming is mostly for admin convenience
     name = models.CharField(max_length=50, default="", blank=True)
 
+    # sequence of puzzles you play through & progressively unlock
     order = models.DecimalField(max_digits=6, decimal_places=3)
-
-    # starting positions defined by PuzzleStartingUnit set
 
     # starting life
     player_life = models.IntegerField(default=1)
 
     # goal: destroy all units
+    goal = models.CharField(max_length=20, choices=PUZZLE_GOALS, default="kill units")
 
     player_deck = models.ForeignKey(Deck, blank=True, null=True)
 
@@ -91,7 +97,6 @@ class PuzzleStartingUnit(models.Model):
     unit_card = models.ForeignKey(Card)
     location = models.ForeignKey(Node) 
 
-    # TODO: not implemented
     must_be_killed_for_victory = models.BooleanField(default=True)
 
 
@@ -209,7 +214,7 @@ class AI():
         best_card = None
         best_target = None
         best_target_align = None
-        best_hval = -1000
+        best_hval = -10000
 
         test_militia = Card(attack=1,
                 defense=1,
@@ -222,6 +227,21 @@ class AI():
         for card in hand_cards: 
             remaining_hand_cards = list(hand_cards)
             remaining_hand_cards.remove(card)
+
+            # test teching
+            test_board.load_from_match_id(match.id)
+            match.ai_tech += 1
+
+            hval = test_board.get_ai_heuristic_value(hand_cards) 
+            if hval > best_hval:
+                best_hval = hval
+                best_card = card
+                best_target = "tech"
+                best_target_align = "N/A"
+
+            # tech back down to compensate for trying out teching
+            # and avoid reloading the match from scratch
+            match.ai_tech -= 1
 
             if card.tech_level > match.ai_tech:
                 continue
@@ -249,18 +269,6 @@ class AI():
                     best_target = target
                     best_target_align = target.temp_alignment
 
-            # test teching
-            test_board.load_from_match_id(match.id)
-            match.ai_tech += 1
-
-            hval = test_board.get_ai_heuristic_value(hand_cards) 
-            if hval > best_hval:
-                best_hval = hval
-                best_card = card
-                best_target = "tech"
-                best_target_align = "N/A"
-
-            match.ai_tech -= 1
 
         return { 
                 'play': best_card,

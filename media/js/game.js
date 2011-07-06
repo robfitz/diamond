@@ -615,9 +615,8 @@ function heal_units(alignment) {
 
             //is there a guy there?
             var collision_unit = get_unit_at(alignment, next_node_id)
-            if (collision_unit) {
+            if (collision_unit && collision_unit.type == "unit") {
                 if (alignment == starting_alignment) { 
-                    //alert('hit friendly collision unit: ' + collision_unit);
 
                     //am i ranged? loop!
                     if (unit.model_fields.attack_type == "ranged") {
