@@ -95,7 +95,16 @@ def process_player_turn(request, board):
 
     # first player cast
     node_id = request.POST.get("node1")
-    if node_id and node_id != "tech":
+
+    if node_id == "surrender":
+        logging.info("TODO: player surrender")
+        pass
+
+    elif node_id == "pass":
+        # do nothing. player has passed this phase
+        return
+
+    elif node_id and node_id != "tech":
         node = Node.objects.get(id=node_id)
 
     card_id = request.POST.get("card1")
@@ -117,7 +126,16 @@ def process_player_turn(request, board):
     card = None
 
     node_id = request.POST.get("node2")
-    if node_id and node_id != "tech":
+
+    if node_id == "surrender":
+        logging.info("TODO: player surrender 2")
+        pass
+
+    elif node_id == "pass":
+        # do nothing. player has passed this phase
+        return
+
+    elif node_id and node_id != "tech":
         node = Node.objects.get(id=node_id)
     card_id = request.POST.get("card2")
     if card_id:

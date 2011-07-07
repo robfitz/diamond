@@ -114,8 +114,8 @@ AI mode
                 <div id="game_controls">
                     <h3>Game controls</h3>
                     <a class="button green">Help!</a>
-                    <a id="pass_button" class="button yellow confirm" href="javascript:void(0);" onclick="pass_turn()">Skip turn</a> 
-                    <a class="button red confirm" href="javascript:void(0);" onclick="surrender()">Surrender</a>
+                    <a id="pass_button" class="button yellow" href="javascript:void(0);" onclick="pass_turn()">Skip phase</a> 
+                    <a id="surrender_button" class="button red" href="javascript:void(0);" onclick="surrender();">Surrender</a>
                 </div>
             </div>
 
@@ -145,7 +145,7 @@ AI mode
         <input name="i_win" type="checkbox" />
     </form>
 
-    <div class="cast_info">
+    <div class="cast_info hidden">
         <div class="tick"></div>
         <h1 class="msg">X cast Y!</h1>
     </div>
@@ -167,10 +167,6 @@ AI mode
             {% endif %}
 
             draw_starting_hand();
-
-
-            //$(".cast_info").hide(); 
-            $(".cast_info").slideUp();
         });
 
         function action_indicator(target, message) {

@@ -22,6 +22,7 @@ def puzzle_navigator(request):
             # go back to the new ones or pick up from
             # where they left off at the later levels.
             unlock_next_unbeaten = True
+
         else:
             if unlock_next_unbeaten:
                 puzzle.player_state = 'current'

@@ -1,3 +1,39 @@
+function surrender() { 
+    if (match.phase == 1) {
+        $("input[name='card1']").val('surrender');
+        $("input[name='node1']").val('surrender'); 
+        $("input[name='align1']").val('surrender'); 
+
+        // jump to 0 life
+        damage_player("friendly", match.life['friendly']);
+    }
+    else if (match.phase == 3) {
+        $("input[name='card2']").val('surrender');
+        $("input[name='node2']").val('surrender'); 
+        $("input[name='align2']").val('surrender'); 
+
+        // jump to 0 life
+        damage_player("friendly", match.life['friendly']);
+    }
+}
+
+function pass_turn() {
+    if (match.phase == 1) {
+        $("input[name='card1']").val('pass');
+        $("input[name='node1']").val('pass'); 
+        $("input[name='align1']").val('pass'); 
+
+        next_phase(); 
+    }
+    else if (match.phase == 3) {
+        $("input[name='card2']").val('pass');
+        $("input[name='node2']").val('pass'); 
+        $("input[name='align2']").val('pass'); 
+
+        next_phase();
+    }
+}
+
 var match = {
 
     tech: { 

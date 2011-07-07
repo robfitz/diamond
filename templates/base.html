@@ -37,7 +37,29 @@
                     $("#feedbackDialog").load('/ajax/feedback_form.html');
                     $('#feedbackDialog').jqmShow();
                 });
+
+
+
             } );
+
+            /** buggy
+              *
+            function confirm(button_id, to_call) {
+                var target = $("#" + button_id);
+                offset = target.offset();
+
+                $("#button_confirm").offset({ top: 0, left: 0 } );
+                //$("#button_confirm").offset({ top: offset.top, left: offset.left } );
+                $("#button_confirm").slideDown();
+
+                $("#button_confirm .confirm").unbind();
+                $("#button_confirm .confirm").click(function(e) {
+                    to_call();
+                    $("#button_confirm").slideUp();
+                }); 
+            }
+            *
+            **/
 
             function popup(url) {
 
@@ -141,6 +163,13 @@
                 </p>
             </div>
 
+        </div>
+
+        <div id="button_confirm" class="hidden">
+            <div class="tick"></div>
+            <h1 class="msg">X cast Y!</h1>
+            <a class="button" onclick="$('#button_confirm').hide();">Cancel</a>
+            <a class="button yellow confirm">Proceed</a> 
         </div>
 
         <!--

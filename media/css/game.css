@@ -40,8 +40,7 @@ h1.green {
     height: 0;
     position: relative;
     width: 0;
-    border-color: transparent transparent transparent #191919;
-
+    border-color: transparent transparent transparent #191919; 
 }
 
 .cast_info h1.msg {
