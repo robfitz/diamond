@@ -1,4 +1,5 @@
 import logging
+import simplejson
 from random import random
 
 from django.http import HttpResponse
@@ -21,7 +22,7 @@ def puzzle(request):
     logging.info("** got puzzle w/ life: %s" % puzzle.player_life)
     request.session["puzzle"] = puzzle.id
 
-    match = init_puzzle_match(puzzle) 
+    match = init_puzzle_match(request, puzzle) 
     request.session["match"] = match.id
 
     board = Node.objects.all().order_by('-pk')
@@ -40,7 +41,7 @@ def playing(request):
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
 
-def init_puzzle_match(puzzle):
+def init_puzzle_match(request, puzzle):
 
     deck = puzzle.player_deck 
     ai_deck = None
@@ -53,6 +54,7 @@ def init_puzzle_match(puzzle):
     #ai doesn't get a hand or library...  
 
     match = Match(type="puzzle",
+            player=request.user,
             friendly_library=friendly_library,
             ai_library=None)
     match.save()
@@ -75,6 +77,7 @@ def init_match(request):
     ai_library.draw(3)
 
     match = Match(friendly_library=friendly_library,
+            player=request.user,
             ai_library=ai_library,
             type="ai")
     match.save()
@@ -83,9 +86,6 @@ def init_match(request):
 
 
 def process_player_turn(request, board):
-
-    if request.POST.get("i_win"):
-        logging.info("!! player won game !!")
 
     # heal player's units
     board.heal("friendly")
@@ -217,24 +217,22 @@ def begin_puzzle_game(request):
     match = Match.objects.get(id=request.session["match"])
 
     hand_json = match.friendly_library.draw_as_json(5)
-    logging.info("** beginnign puzzle game, got hand: %s" % hand_json)
 
     puzzle = Puzzle.objects.get(id=request.session["puzzle"])
+    puzzle.init(match)
 
-    ai_turn = puzzle.get_setup_turn()
+    ai_turn = puzzle.get_setup_turn() 
 
     play_cards = []
-    if ai_turn.play_1:
-        play_cards.append(ai_turn.play_1)
-    if ai_turn.play_2:
-        play_cards.append(ai_turn.play_2)
+    for play in ai_turn:
+        play_cards.append(Card.objects.get(id=play['card']))
 
     hand_and_turn_json = """{
             'player_draw': %s,
-            'ai_turn': %s,
+            'ai_starting_units': %s,
             'ai_cards': %s,
             }""" % (hand_json,
-                    serializers.serialize("json", [ai_turn]),
+                    simplejson.dumps(ai_turn),
                     serializers.serialize("json", play_cards))
 
     return HttpResponse(hand_and_turn_json, "application/javascript")

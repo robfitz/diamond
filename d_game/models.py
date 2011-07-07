@@ -1,38 +1,13 @@
+import simplejson
 import logging, random
 
 from django.db import models
 from django.contrib import admin
-import simplejson
+from django.contrib.auth.models import User
+from django.db.models.signals import pre_save
 
 from d_cards.models import Card, ShuffledLibrary, Deck
 from d_board.models import Node
-
-
-
-class Match(models.Model):
-    """ A battle between 2 players (or a player and AI) """
-
-    MATCH_TYPES = (
-            ("puzzle", "Puzzle"), 
-            ("ai", "P vs AI"),
-            ("pvp", "P vs P"),
-        )
-
-    type = models.CharField(max_length=10, choices=MATCH_TYPES)
-
-    winner = models.CharField(max_length=20, blank=True)
-
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    friendly_library = models.OneToOneField(ShuffledLibrary)
-    ai_library = models.OneToOneField(ShuffledLibrary, null=True)
-
-    friendly_life = models.IntegerField(default=10)
-    ai_life = models.IntegerField(default=10)
-
-    friendly_tech = models.IntegerField(default=1)
-    ai_tech = models.IntegerField(default=1)
-
 
 
 class Puzzle(models.Model):
@@ -57,23 +32,26 @@ class Puzzle(models.Model):
     player_deck = models.ForeignKey(Deck, blank=True, null=True)
 
 
-    def get_setup_turn(self):
+    def init(self, match):
 
         starting_units = PuzzleStartingUnit.objects.filter(puzzle=self)
 
-        turn = Turn()
+        match.friendly_life = self.player_life;
+        match.save()
 
-        if len(starting_units) > 0:
-            u = starting_units[0]
-            turn.play_1 = u.unit_card
-            turn.target_alignment_1 = "ai"
-            turn.target_node_1 = u.location
+        for starting_unit in starting_units:
+            unit = starting_unit.create_unit(match)
 
-            if len(starting_units) > 1:
-                u = starting_units[1]
-                turn.play_2 = u.unit_card
-                turn.target_alignment_2 = "ai"
-                turn.target_node_2 = u.location 
+
+    def get_setup_turn(self):
+
+        turn = []
+
+        for starting_unit in PuzzleStartingUnit.objects.filter(puzzle=self):
+            turn.append( { 
+                'card': starting_unit.unit_card.id,
+                'node': starting_unit.location.id
+                })
 
         return turn
 
@@ -81,6 +59,74 @@ class Puzzle(models.Model):
     def __unicode__(self):
 
         return "%d: %s" % (self.order, self.name)
+
+
+class Match(models.Model):
+    """ A battle between 2 players (or a player and AI) """
+
+    MATCH_TYPES = (
+            ("puzzle", "Puzzle"), 
+            ("ai", "P vs AI"),
+            ("pvp", "P vs P"),
+        )
+
+    type = models.CharField(max_length=10, choices=MATCH_TYPES)
+
+    # human who is playing in this match
+    player = models.ForeignKey(User)
+
+    # if the match type is "puzzle" this will point at it
+    puzzle = models.ForeignKey(Puzzle, blank=True, null=True)
+
+    # "ai" or "friendly"
+    winner = models.CharField(max_length=20, blank=True)
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    friendly_library = models.OneToOneField(ShuffledLibrary)
+    ai_library = models.OneToOneField(ShuffledLibrary, null=True)
+
+    friendly_life = models.IntegerField(default=10)
+    ai_life = models.IntegerField(default=10)
+
+    friendly_tech = models.IntegerField(default=1)
+    ai_tech = models.IntegerField(default=1)
+
+
+# auto-called whenever match is saved, to tell us if someone
+# has won based on current life totals
+def check_for_winner(sender, instance, raw, **kwargs):
+
+    # only set winner if winner isn't already declared
+    if not instance.winner:
+
+        if instance.friendly_life <= instance.ai_life and instance.friendly_life <= 0: 
+            instance.winner = "ai"
+
+        elif instance.ai_life < instance.friendly_life and instance.ai_life <= 0: 
+            instance.winner = "friendly" 
+
+    # however winner is set (either from this function after
+    # damage or directly from an alternate win condition,
+    # ensure that we remember the win)
+    if instance.winner == "friendly":
+
+        if instance.type == "puzzle":
+
+            # if we haven't already beaten this puzzle, mark that we have
+            if instance.puzzle.id not in instance.player.get_profile().beaten_puzzle_ids:
+                instance.player.get_profile().beaten_puzzle_ids.push(instance.puzzle.id)
+                instance.player.get_profile().save()
+
+                logging.info("$$$ saved that user beat puzzle")
+
+
+pre_save.connect(check_for_winner, sender=Match)
+
+
+
+
+
 
 
 class PuzzleStartingUnit(models.Model):
@@ -98,6 +144,17 @@ class PuzzleStartingUnit(models.Model):
     location = models.ForeignKey(Node) 
 
     must_be_killed_for_victory = models.BooleanField(default=True)
+
+
+    def create_unit(self, match):
+
+        unit = Unit(card=self.unit_card,
+                match=match,
+                owner_alignment=self.owner,
+                row=self.location.row,
+                x=self.location.x)
+        unit.save()
+        return unit
 
 
     def __unicode__(self):
@@ -127,6 +184,8 @@ class Unit(models.Model):
 
     # once i'm dead, how much rubble i'll leave
     rubble_duration = models.IntegerField(default=1)
+
+    must_be_killed_for_puzzle_victory = models.BooleanField(default=False)
 
 
     TYPE_CHOICES = (
@@ -181,6 +240,7 @@ class Unit(models.Model):
 
         if save_to_db:
             logging.info('*** unit has died')
+
 
         if self.type == "unit" and self.rubble_duration > 0:
             # when unit dies, it becomes rubble
@@ -268,6 +328,8 @@ class AI():
                     best_target = target
                     best_target_align = target.temp_alignment
 
+
+        test_board.load_from_match_id(match.id)
 
         return { 
                 'play': best_card,
@@ -578,14 +640,10 @@ class Board():
                 if save_to_db:
                     unit.save()
 
-                self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = unit
-
+                self.nodes[owner_alignment]["%s_%s" % (unit.row, unit.x)] = unit 
 
 
     def log(self):
-
-        # TEMPORARY
-        return
 
         str = ""
         for row in range(3):
@@ -610,6 +668,7 @@ class Board():
                     str += " - "
             logging.info(str)
             str = ""
+
 
     def load_from_session(self, session):
 
@@ -722,8 +781,6 @@ class Turn(models.Model):
             ("friendly", "Friendly"), 
             ("ai", "AI"),
         )
-
-    i_win = models.BooleanField(default=False)
 
     play_1 = models.ForeignKey(Card, null=True)
 

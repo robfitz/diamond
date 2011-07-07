@@ -179,8 +179,16 @@ var match = {
     function next_phase(is_first_turn) {
 
         if (is_first_turn) {
-            do_ai_play_1();
-            do_ai_play_2(); 
+            var units = match.turn_data.ai_starting_units;
+            if (units) {
+                for (i = 0; i < units.length; i ++) {
+                    var card = match.turn_data.ai_cards[i];
+                    var node = $(".board.ai [name='" + units[i].node + "']");
+                    ai_cast(card,
+                            node,
+                            'ai'); 
+                } 
+            }
         }
 
         match.phase ++;
