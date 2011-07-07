@@ -98,25 +98,34 @@ def process_player_turn(request, board):
 
     if node_id == "surrender":
         logging.info("TODO: player surrender")
-        pass
+        return
 
     elif node_id == "pass":
         # do nothing. player has passed this phase
-        return
+        pass
 
-    elif node_id and node_id != "tech":
+    try:
         node = Node.objects.get(id=node_id)
+    except:
+        # node_id could be 'pass' or 'surrender' or 'tech'...
+        pass
 
     card_id = request.POST.get("card1")
-    if card_id:
+    try:
         card = Card.objects.get(id=card_id) 
+    except:
+        pass
+
     if card and node:
         board.cast(request.POST.get("align1", "friendly"), card, node, True)
+        board.match.friendly_library.play(card.id)
     elif node_id == "tech":
         board.match.friendly_tech += 1
+        board.match.friendly_library.play(card.id)
         board.match.save()
     else:
-        logging.info("No player action 1")
+        # no player action
+        pass
 
     #attack!
     board.do_attack_phase("friendly", True)
@@ -129,24 +138,34 @@ def process_player_turn(request, board):
 
     if node_id == "surrender":
         logging.info("TODO: player surrender 2")
-        pass
+        return
 
     elif node_id == "pass":
         # do nothing. player has passed this phase
-        return
+        pass
 
-    elif node_id and node_id != "tech":
+    try:
         node = Node.objects.get(id=node_id)
+    except:
+        # node_id could be 'pass' or 'surrender' or 'tech'...
+        pass
+
     card_id = request.POST.get("card2")
-    if card_id:
+    try:
         card = Card.objects.get(id=card_id) 
+    except:
+        pass
+
     if card and node:
         board.cast(request.POST.get("align2", "friendly"), card, node, True)
+        board.match.friendly_library.play(card.id)
     elif node_id == "tech":
         board.match.friendly_tech += 1
+        board.match.friendly_library.play(card.id)
         board.match.save()
     else:
-        logging.info("No player action 2")
+        # no player action
+        pass
 
     # remove player rubble
     board.remove_one_rubble("friendly")
@@ -165,7 +184,9 @@ def end_turn(request):
     ai_turn = AI().do_turn(board)
 
     #get 2 new cards for player
-    draw_cards = board.match.friendly_library.draw_as_json(2)
+    logging.info("*** player hand: %s" % board.match.friendly_library.hand_card_ids)
+    num_to_draw = 5 - len(board.match.friendly_library.hand_card_ids)
+    draw_cards = board.match.friendly_library.draw_as_json(num_to_draw)
      
     play_cards = []
     if ai_turn.play_1:

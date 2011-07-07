@@ -131,10 +131,14 @@ class ShuffledLibrary(models.Model):
 
     def play(self, card_id):
 
+        logging.info("$$$ lib.play() %s, %s" % (card_id, self.hand_card_ids))
+
         if card_id in self.hand_card_ids:
 
             index = self.hand_card_ids.index(card_id)
+            logging.info("$$$ %s" % index)
             del(self.hand_card_ids[index])
+            logging.info("$$$ after del: %s" % self.hand_card_ids)
             self.save() 
 
             # successfully removed the card from our hand
@@ -162,6 +166,9 @@ class ShuffledLibrary(models.Model):
         
 
     def draw(self, num):
+
+        if num <= 0:
+            return []
 
         to_draw = self.undrawn_card_ids[:num]
 
