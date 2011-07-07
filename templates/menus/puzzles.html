@@ -7,16 +7,29 @@
 {% block content %}
 
     {% for puzzle in puzzles %}
-            <div class="puzzle_thumb">
-                <p>
-                <a href="/puzzle/?p={{ puzzle.id }}">
-                {{ puzzle.name }}
-                </a>
+
+        <div class="puzzle_thumb {{ puzzle.player_state }}">
+            {% if puzzle.player_state == "locked" %}
+                <div class="lock_icon">
+                    <p>
+                    {{ puzzle.name }}
+                    </p>
+                </div>
+            {% else %}
+                <p> 
+                    <a href="/puzzle/?p={{ puzzle.id }}">
+                    {{ puzzle.name }}
+                    </a>
                 </p>
-                
+            {% endif %}
+            
+            {% if request.user.is_staff %}
                 <a href="/deck/?p={{ puzzle.id }}">Edit deck</a>
-                <a href="/admin/d_game/puzzle/{{ puzzle.id }}/">Edit puzzle</a>
-            </div> 
+                <a href="/admin/d_game/puzzle/{{ puzzle.id }}/">Edit puzzle</a> 
+            {% endif %}
+
+        </div> 
+
     {% endfor %}    
 
 {% endblock %}

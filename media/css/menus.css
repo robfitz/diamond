@@ -1,8 +1,31 @@
 .puzzle_thumb {
     width:90px;
     height:90px;
-    float:left;
     margin:10px;
-    border: 1px solid gray;
+    border: 3px solid gray;
     background-color: #ccc;
+
+    border-radius: 9px 9px 9px 9px !important;
+    -moz-border-radius: 9px 9px 9px 9px !important;
+    -webkit-border-radius: 9px 9px 9px 9px !important; 
+
+    position:relative; 
+    float:left;
 }
+.puzzle_thumb.locked {
+    background:url(grad-grey.gif) repeat-x center top #166890;
+}
+.puzzle_thumb.current {
+    background:url(grad-yellow.gif) repeat-x center top #166890; 
+}
+.puzzle_thumb.beaten {
+    background:url(grad-green.gif) repeat-x center top #166890; 
+}
+
+.lock_icon {
+    background:url(lock.gif) center center #166890;
+    position:absolute;
+    width:90px;
+    height:90px;
+}
+
