@@ -176,8 +176,16 @@ def end_turn(request):
     board = Board()
     board.load_from_session(request.session)
 
+    if board.match.winner:
+        # someone has won. yaaaaay!!
+        return HttpResponse("")
+
     # process what the player has just done & update board state 
     process_player_turn(request, board)
+
+    if board.match.winner:
+        # player has won. yaaaaay!!
+        return HttpResponse("") 
 
     before_ai_board_simple_json = board.to_simple_json()
 

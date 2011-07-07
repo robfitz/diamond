@@ -195,6 +195,7 @@ var match = {
                     ai_cast(card,
                             node,
                             'ai'); 
+                    boards['ai'][units[i].node].must_be_killed = units[i].must_be_killed; 
                 } 
             }
         }
@@ -405,6 +406,8 @@ function Unit(json_model, location_node_pk, alignment) {
     this.total_life = this.model_fields.defense;
     this.attack = this.model_fields.attack; 
 
+    this.must_be_killed = false;
+
     this.type = "unit"; 
 
     //init and add to board
@@ -480,6 +483,18 @@ function Unit(json_model, location_node_pk, alignment) {
         this.node.removeClass("occupied");
 
         add_rubble(this.alignment, this.node, 1);
+
+        if (this.alignment == 'ai' && match.type == 'puzzle') {
+            for (var node_pk in boards['ai']) { 
+                var unit = boards['ai'][node_pk]; 
+                if (unit && unit['type'] == 'unit') {
+                    return;
+                }
+            }
+            // all required units are dead, player won puzzle
+            $("#win_screen").show(); 
+            end_turn();
+        }
     }
 
     this.redraw = function() { 
@@ -725,6 +740,7 @@ function heal_units(alignment) {
         if (match.life[alignment] <= 0) {
             if (alignment == "ai") {
                 $("#win_screen").show();
+                end_turn();
             }
             else {
                 $("#lose_screen").show();

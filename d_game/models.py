@@ -29,6 +29,7 @@ class Puzzle(models.Model):
         starting_units = PuzzleStartingUnit.objects.filter(puzzle=self)
 
         match.friendly_life = self.player_life;
+        match.puzzle = self
         match.save()
 
         for starting_unit in starting_units:
@@ -42,7 +43,8 @@ class Puzzle(models.Model):
         for starting_unit in PuzzleStartingUnit.objects.filter(puzzle=self):
             turn.append( { 
                 'card': starting_unit.unit_card.id,
-                'node': starting_unit.location.id
+                'node': starting_unit.location.id,
+                'must_be_killed': starting_unit.must_be_killed_for_victory
                 })
 
         return turn
@@ -85,6 +87,21 @@ class Match(models.Model):
     ai_tech = models.IntegerField(default=1)
 
 
+    def on_unit_death(self):
+
+        if self.type == "puzzle":
+
+            for unit in Unit.objects.filter(match=self):
+
+                if unit.must_be_killed_for_puzzle_victory and unit.type == "unit":
+                    # at least one required unit is still alive
+                    return
+
+            # all units which should be dead are dead.. player wins!
+            self.winner = "friendly"
+            self.save() 
+
+
 # auto-called whenever match is saved, to tell us if someone
 # has won based on current life totals
 def check_for_winner(sender, instance, raw, **kwargs):
@@ -107,17 +124,13 @@ def check_for_winner(sender, instance, raw, **kwargs):
 
             # if we haven't already beaten this puzzle, mark that we have
             if instance.puzzle.id not in instance.player.get_profile().beaten_puzzle_ids:
-                instance.player.get_profile().beaten_puzzle_ids.push(instance.puzzle.id)
+                instance.player.get_profile().beaten_puzzle_ids.append(instance.puzzle.id)
                 instance.player.get_profile().save()
 
                 logging.info("$$$ saved that user beat puzzle")
 
 
 pre_save.connect(check_for_winner, sender=Match)
-
-
-
-
 
 
 
@@ -144,7 +157,8 @@ class PuzzleStartingUnit(models.Model):
                 match=match,
                 owner_alignment=self.owner,
                 row=self.location.row,
-                x=self.location.x)
+                x=self.location.x,
+                must_be_killed_for_puzzle_victory=self.must_be_killed_for_victory)
         unit.save()
         return unit
 
@@ -230,19 +244,31 @@ class Unit(models.Model):
 
     def die(self, save_to_db=True):
 
-        if save_to_db:
-            logging.info('*** unit has died')
 
+        become_rubble = False
 
         if self.type == "unit" and self.rubble_duration > 0:
-            # when unit dies, it becomes rubble
-            self.type = "rubble"
-            if save_to_db:
-                logging.info('*** unit turned to rubble: %s' % self.type)
-                self.save()
+            become_rubble = True 
+
+        if self.type == "unit":
+            if self.rubble_duration > 0:
+                # when unit dies, it becomes rubble
+                self.type = "rubble"
+                if save_to_db:
+                    logging.info('*** unit turned to rubble: %s' % self.type)
+                    self.save()
+                    self.match.on_unit_death()
+
+            else:
+                logging.info("*** unit disappeared into empty on death")
+                self.type = "empty"
+                if save_to_db:
+                    self.save()
+                    self.match.on_unit_death()
+                    self.delete() 
 
         else:
-            logging.info("*** unit disappeared into empty on death")
+            logging.info("*** rubble disappeared into empty")
             self.type = "empty"
             if save_to_db:
                 self.save()
