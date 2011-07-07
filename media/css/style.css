@@ -460,6 +460,24 @@ button.blue, .button.blue {
     color: #fff!important;
     text-shadow: 0 -1px 0 #11506F;
 }
+button.yellow, .button.yellow {
+    background: url("grad-yellow.gif") repeat-x center top #166890;
+    border: 1px solid #11506F;
+    color: #fff!important;
+    text-shadow: 0 -1px 0 #11506F;
+}
+button.red, .button.red {
+    background: url("grad-red.gif") repeat-x center top #166890;
+    border: 1px solid #11506F;
+    color: #fff!important;
+    text-shadow: 0 -1px 0 #11506F;
+}
+button.green, .button.green {
+    background: url("grad-green.gif") repeat-x center top #166890;
+    border: 1px solid #11506F;
+    color: #fff!important;
+    text-shadow: 0 -1px 0 #11506F;
+}
 button, .button {
     cursor: pointer;
     display: inline-block;
@@ -494,10 +512,28 @@ background:url('grad-grey-rev.gif') repeat-x center top #c3c3c3;
 button {  width: auto; overflow: visible; }
 
 button.blue:hover, .button.blue:hover {
-    background:url("grad-blue-hover.gif") repeat-x center top #166890;
+    background:url("grad-blue-hover.gif") repeat-x center top #166890 !important;
 }
 button.blue:active, .button.blue:active {
-    background:url("grad-blue-rev.gif") repeat-x center top #166890;
+    background:url("grad-blue-rev.gif") repeat-x center top #166890 !important;
+}
+button.green:hover, .button.green:hover {
+    background:url("grad-green-hover.gif") repeat-x center top #166890 !important;
+}
+button.green:active, .button.green:active {
+    background:url("grad-green-rev.gif") repeat-x center top #166890 !important;
+}
+button.yellow:hover, .button.yellow:hover {
+    background:url("grad-yellow-hover.gif") repeat-x center top #166890 !important;
+}
+button.yellow:active, .button.yellow:active {
+    background:url("grad-yellow-rev.gif") repeat-x center top #166890 !important;
+}
+button.red:hover, .button.red:hover {
+    background:url("grad-red-hover.gif") repeat-x center top #166890 !important;
+}
+button.red:active, .button.red:active {
+    background:url("grad-red-rev.gif") repeat-x center top #166890 !important;
 }
  
 

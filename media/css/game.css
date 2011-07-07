@@ -80,6 +80,26 @@ h1.green {
     background:#fff;
     z-index:10;
 }
+#game_controls {
+    position:absolute;
+    bottom:10px;
+    right:24px; 
+}
+#game_controls h3 {
+    margin:0 0 10px 24px;
+    font-size:12px;
+}
+#game_controls .button {
+    background:none;
+    border:none; 
+    text-shadow:none;
+    margin:0 0 0 10px;
+    color:#191919 !important;
+}
+#game_controls .button:hover {
+    //background:url(grad-blue.gif) repeat-x center top #166890;
+    color:#fff !important;
+}
 
 .left_column, .right_column {
     float:left;
