@@ -200,6 +200,19 @@ class Deck(models.Model):
 
     card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
 
+    def create_starting_deck():
+
+        starting_deck = Deck(nickname="Soldiers 'n archers")
+
+        soldier = Card.objects.filter(attack=1, defense=2, attack_type="melee", tech_level=1)[0]
+        archer = Card.objects.filter(attack=1, defense=1, attack_type="ranged", tech_level=1)[0]
+
+        starting_deck.card_ids = [soldier.id, soldier.id, soldier.id, soldier.id, archer.id, archer.id, archer.id] 
+
+        starting_deck.save() 
+        return starting_deck
+
+    create_starting_deck = staticmethod(create_starting_deck)
 
     def all_cards(self):
         if not self.card_ids:

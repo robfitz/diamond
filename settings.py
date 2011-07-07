@@ -109,5 +109,6 @@ INSTALLED_APPS = (
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
+AUTH_PROFILE_MODULE = 'd_users.UserProfile'
 
 LOGIN_REDIRECT_URL = "/"

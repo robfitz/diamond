@@ -9,6 +9,8 @@ from django.template import RequestContext
 from d_board.models import Node
 from d_cards.models import Card, ShuffledLibrary, Deck
 from d_game.models import Turn, Match, Board, Unit, AI, Puzzle
+from d_cards.util import get_deck_from
+import d_users
 
 
 def puzzle(request):
@@ -60,14 +62,7 @@ def init_puzzle_match(puzzle):
 
 def init_match(request):
 
-    try:
-        # get my custom deck progress that i built via the editor
-        deck_id = request.session.get("deck_id")
-        deck = Deck.objects.get(id=deck_id)
-    except:
-        # start me a new deck
-        deck = Deck()
-        deck.save()
+    deck = get_deck_from(request)
 
     ai_deck = Deck.objects.all()[0]
 

@@ -4,17 +4,30 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
+from d_cards.models import Deck
+
+
 class UserProfile(models.Model):
 
     user = models.OneToOneField(User)
+
+    deck = models.OneToOneField(Deck, null=True)
 
 
     def __unicode__(self):
         return self.user.username
 
 def create_user_profile(sender, instance, created, **kwargs):
+
     if created:
-        UserProfile.objects.create(user=instance)
+
+        # extra info
+        profile = UserProfile.objects.create(user=instance)
+
+        # cards they start with
+        profile.deck = Deck.create_starting_deck()
+        profile.save()
+
 
 
 post_save.connect(create_user_profile, sender=User)

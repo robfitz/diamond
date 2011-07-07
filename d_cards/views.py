@@ -7,35 +7,36 @@ from django.http import HttpResponse
 
 from d_cards.models import Deck, Card
 from d_game.models import Puzzle
+from d_cards.util import get_deck_from
 
 
 def edit_deck(request):
 
-    if request.GET.get("ai"):
-        # ai deck is just the first one
-        deck = Deck.objects.all()[0]
-    elif request.GET.get("new"):
-        # make a new deck instead of checking the session
-        deck = Deck()
-        deck.save() 
-    elif request.GET.get("id"):
-        deck = Deck.objects.get(id=request.GET.get("id")) 
-    elif request.GET.get("p"):
-        puzzle = Puzzle.objects.get(id=request.GET.get("p"))
-        if not puzzle.player_deck:
-            puzzle.player_deck = Deck()
-            puzzle.player_deck.save()
-        deck = puzzle.player_deck 
+    deck = None
+
+    # first check for various params which cause us
+    # to load special decks...
+    if request.user.is_staff:
+        if request.GET.get("ai"):
+            # ai deck is just the first one
+            deck = Deck.objects.all()[0]
+        elif request.GET.get("id"):
+            deck = Deck.objects.get(id=request.GET.get("id")) 
+        elif request.GET.get("p"):
+            puzzle = Puzzle.objects.get(id=request.GET.get("p"))
+            if not puzzle.player_deck:
+                puzzle.player_deck = Deck()
+                puzzle.player_deck.save()
+            deck = puzzle.player_deck 
+        # and if none of the special params exist, get the
+        # user's deck
+        else: 
+            deck = get_deck_from(request)
+
+    # non-staff users aren't allowed to use the special deck
+    # params, so just load their deck regardless
     else: 
-        try:
-            # get my deck-in-progress that i built via the editor
-            deck_id = request.session["deck_id"]
-            deck = Deck.objects.get(id=deck_id)
-        except:
-            # start me a new deck
-            deck = Deck()
-            deck.save()
-            request.session["deck_id"] = deck.id
+        deck = get_deck_from(request) 
 
     return render_to_response("edit_deck.html", locals(), context_instance=RequestContext(request))
 
