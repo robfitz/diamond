@@ -39,6 +39,8 @@ var match = {
     // "ai", "pvp", "puzzle"
     type: "ai",
 
+    winner: null,
+
     tech: { 
         'friendly': 1, 
         'ai': 1 
@@ -178,6 +180,8 @@ var match = {
     }
 
     function next_phase(is_first_turn) {
+
+        if (match.winner) return;
 
         if (is_first_turn) {
             var units = match.turn_data.ai_starting_units;
@@ -501,8 +505,7 @@ function Unit(json_model, location_node_pk, alignment) {
                 }
             }
             // all required units are dead, player won puzzle
-            $("#win_screen").show(); 
-            end_turn();
+            win();
         }
     }
 
@@ -511,6 +514,16 @@ function Unit(json_model, location_node_pk, alignment) {
     }
 
     this.redraw();
+}
+
+function win() { 
+    $("#win_screen").show(); 
+    end_turn();
+    match.winner = 'friendly';
+}
+function lose() {
+    $("#lose_screen").show();
+    match.winner = 'ai';
 }
 
 function set_unit_damage(node_pk, alignment, total_damage) {
@@ -748,11 +761,10 @@ function heal_units(alignment) {
 
         if (match.life[alignment] <= 0) {
             if (alignment == "ai") {
-                $("#win_screen").show();
-                end_turn();
+                win();
             }
             else {
-                $("#lose_screen").show();
+                lose();
             } 
         }
     }
