@@ -49,7 +49,6 @@ var match = {
     },
     phase: -1,
 
-    //hand_cards[card_pk] = card.fields
     hand_cards: {},
 
     //same format as hand_cards, but contains
@@ -232,8 +231,13 @@ var match = {
             }
         }
         else if (match.phase == 1) {
-            //do nothing.
-            //wait for player to play card
+            if ($("#friendly_hand").children().length == 0) {
+                setTimeout(next_phase, 400); 
+            }
+            else {
+                //do nothing.
+                //wait for player to play card
+            }
         }
         else if (match.phase == 2) {
             //begin logic for auto-attacking
@@ -241,8 +245,13 @@ var match = {
             setTimeout(next_phase, delay + 1000);
         }
         else if (match.phase == 3) {
-            //do nothing.
-            //wait for player to play card
+            if ($("#friendly_hand").children().length == 0) {
+                setTimeout(next_phase, 400); 
+            }
+            else {
+                //do nothing.
+                //wait for player to play card
+            }
         }
         else if (match.phase == 4) {
             //ai draw & heal
