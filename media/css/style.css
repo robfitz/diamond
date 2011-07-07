@@ -338,6 +338,14 @@ h2.ribbon {
     z-index:10;
 }
 
+.ribbon.red {
+    background: url(grad-red.gif) repeat-x center top #d2634e;
+    border: 1px solid #a2230e;
+}
+.triangle-ribbon.red {
+    border-color: transparent #a2230e transparent transparent;
+}
+
 .hide_ribbon {
     background: none !important;
     border: 0px solid #11506F !important;
@@ -699,15 +707,6 @@ img.learn_more {
     float:left;
 }
 
-.modal {
-    z-index:1000;
-    background: url(/media/diagonals.gif);
-    width:100%;
-    height:100%;
-    position:absolute; 
-    top:0;
-    left:0;
-}
 .fl { float:left; }
 .fr { float:right; }
 
@@ -746,3 +745,28 @@ img.learn_more {
     padding:10px 20px;
     font-size:24px;
 }
+
+.modal {
+    z-index:1000;
+    background: url(/media/diagonals.gif);
+    width:100%;
+    height:100%;
+    position:absolute; 
+    top:0;
+    left:0;
+}
+
+.results_popup {
+    width:520px;
+    height:400px;
+    margin:100px; 
+    background-color:#ffffff;
+    color:#fff; 
+    padding:0 40px;
+    border:1px solid #191919;
+}
+.results_popup h2.ribbon {
+    width:100%;
+    text-align:center
+}
+

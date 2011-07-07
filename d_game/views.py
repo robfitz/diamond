@@ -19,6 +19,17 @@ def puzzle(request):
     # init
 
     puzzle = Puzzle.objects.get(id=request.GET.get('p'))
+    puzzles = Puzzle.objects.all()
+    i = 0
+    for p in puzzles:
+        if p == puzzle:
+            try:
+                next_puzzle_url = "/puzzle/?p=%s" % puzzles[i+1].id
+            except:
+                next_puzzle_url = "/" 
+            break
+        i += 1 
+
     logging.info("** got puzzle w/ life: %s" % puzzle.player_life)
     request.session["puzzle"] = puzzle.id
 
