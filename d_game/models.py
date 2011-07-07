@@ -342,6 +342,17 @@ class AI():
 
         match = board.match
 
+        if match.type == "puzzle":
+            ai_turn = Turn(play_1=None,
+                    target_node_1=None,
+                    is_tech_1=False,
+                    target_alignment_1="pass",
+                    play_2=None,
+                    target_node_2=None,
+                    is_tech_2=False,
+                    target_alignment_2="pass")
+            return ai_turn
+
         is_tech_1 = False
         is_tech_2 = False
         target_node_1 = None
