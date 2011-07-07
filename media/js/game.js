@@ -36,6 +36,9 @@ function pass_turn() {
 
 var match = {
 
+    // "ai", "pvp", "puzzle"
+    type: "ai",
+
     tech: { 
         'friendly': 1, 
         'ai': 1 
@@ -102,7 +105,6 @@ var match = {
 
     function verify_board_state(server_board) {
 
-        //alert('verify board state, friendly life/tech: ' + server_board["life"]["friendly"] + "/" + server_board["tech"]["friendly"]); 
 
         if (server_board["life"]["friendly"] != match["life"]["friendly"]) {
             alert("different life totals, friendly (server v local): " + server_board['life']['friendly'] + "," + match['life']['friendly']);
@@ -181,6 +183,12 @@ var match = {
         if (is_first_turn) {
             var units = match.turn_data.ai_starting_units;
             if (units) {
+
+                // TODO: this shouldn't be determined like this,
+                //       but it'll work for now.
+                match.type = "puzzle"; 
+                $(".life.ai h1").text("∞"); 
+
                 for (i = 0; i < units.length; i ++) {
                     var card = match.turn_data.ai_cards[i];
                     var node = $(".board.ai [name='" + units[i].node + "']");
@@ -700,6 +708,12 @@ function heal_units(alignment) {
     }
 
     function damage_player(alignment, amount) {
+
+        if (match.type == "puzzle" && alignment == "ai") {
+            // enemy is immortal in puzzle mode
+            return;
+        } 
+
         match.life[alignment] -= amount;
 
         var str = "" + match.life[alignment];

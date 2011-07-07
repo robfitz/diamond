@@ -12,11 +12,6 @@ from d_board.models import Node
 
 class Puzzle(models.Model):
 
-    PUZZLE_GOALS = (
-            ("kill units", "Kill units"), 
-            ("kill player", "Kill player"),
-        )
-
     # naming is mostly for admin convenience
     name = models.CharField(max_length=50, default="", blank=True)
 
@@ -25,9 +20,6 @@ class Puzzle(models.Model):
 
     # starting life
     player_life = models.IntegerField(default=1)
-
-    # goal: destroy all units
-    goal = models.CharField(max_length=20, choices=PUZZLE_GOALS, default="kill units")
 
     player_deck = models.ForeignKey(Deck, blank=True, null=True)
 
@@ -775,9 +767,10 @@ class Board():
                 # bumped into enemy player
 
                 if alignment == "ai":
-                    self.match.ai_life -= unit.card.attack
-                    if save_to_db:
-                        self.match.save()
+                    if self.match.type != "puzzle":
+                        self.match.ai_life -= unit.card.attack
+                        if save_to_db:
+                            self.match.save()
                 else:
                     self.match.friendly_life -= unit.card.attack
                     if save_to_db:
