@@ -82,7 +82,7 @@ AI mode
                 <div class="ai board">
                     {% block ai_nodes %}
                         {% for node in board %}
-                        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
+                        <div class="node empty" id="ai_node_{{node.pk}}" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
                             </div>
                         {% endfor %}
                     {% endblock ai_nodes %}
@@ -90,7 +90,7 @@ AI mode
                 <div class="friendly board">
                     {% block friendly_nodes %}
                         {% for node in board %}
-                        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+                        <div class="node empty" id="friendly_node_{{node.pk}}" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
                             </div>
                         {% endfor %}
                     {% endblock friendly_nodes %}

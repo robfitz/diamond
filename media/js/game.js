@@ -785,10 +785,23 @@ function heal_units(alignment) {
         card_str = "T" + f.tech_level + ": " + f.name + " (" + f.attack + "/" + f.defense + " " + f.attack_type + ")";
         card.text(card_str);
 
-        match.hand_cards[card_json.pk] = card_json;
+        match.hand_cards[card_json.pk] = card_json; 
+
+        card.draggable({ 
+            start: function(event, ui) { 
+                begin_card_drag(event, card, card_json); 
+            },
+            revert: "invalid",
+            //snap: ".node",
+            //snapMode: "inner",
+        });
 
         card.click( function(event) {
+            begin_card_drag(event, card, card_json); 
+        });
+    }
 
+    function begin_card_drag(event, ui, card_json) {
             cancel_cast();
 
             if (match.phase != 1 && match.phase != 3) {
@@ -803,7 +816,7 @@ function heal_units(alignment) {
                 return;
             }
 
-            $(this).addClass("selected");
+            ui.addClass("selected");
 
             // if the tech level is high enough, select the places
             // on the board we can use this card
@@ -832,7 +845,19 @@ function heal_units(alignment) {
 
                 // highlight valid targets and allow them to respond to click
                 targets.addClass("targettable").click( function (event) {
-                    cast($(".card.selected"), $(this));
+                    cast($(".card.selected"), $("#" + event.target.id));
+                });
+
+                targets.droppable( {
+                    drop: function(event, ui) {
+                        cast($(".card.selected"), $("#" + event.target.id)); 
+                    },
+                    over: function(event, ui) {
+                        $("#" + event.target.id).addClass("hovered");   
+                    },
+                    out: function(event, ui) {
+                        $("#" + event.target.id).removeClass("hovered");
+                    },
                 });
             }
 
@@ -843,8 +868,8 @@ function heal_units(alignment) {
                     trash($(".card.selected"));
                 });
             }
-        });
     }
+
 
     function trash(hand_card) {
 

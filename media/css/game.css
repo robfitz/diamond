@@ -259,6 +259,9 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 .unit.targettable, .board.ai .targettable .unit_piece {
     background-color:#f00 !important;
 }
+.targettable.hovered {
+    background-color:#9f9 !important;
+}
 
 #phases {
     position:absolute;
