@@ -14,6 +14,8 @@ Deck editor
     </ul>
     </p>
 
+    <h3><span id="num_remaining"></span> spots left in deck</h3>
+
     <p>
     <strong>Deck</strong>
     <ul id="deck" class="card_list">
@@ -23,14 +25,18 @@ Deck editor
     </ul>
     </p>
 
+
     <script>
         var card_data = {};
+
+        var unique_i = 0;
 
         $(function() {
             $.ajax({ url: "/deck/get_library_cards/",
                 success: function(card_data_text) {
                     card_data = eval('(' + card_data_text + ')');
                     init_library();
+                    $("#num_remaining").text("" + ({{ deck.max_size }} - $("#deck").children().length));
                 }
             });
         });
@@ -43,7 +49,16 @@ Deck editor
 
             $(".library_card").click( function (event) {
                 
-                var num = $("#save_form").children().length + 1;
+                var num = $("#deck").children().length + 1;
+
+                // don't allow deck to grow beyond max.
+                // this is just for the UI -- the server also checks.
+                if (num > {{ deck.max_size }}) {
+                    return;
+                } 
+
+                unique_i += 1;
+
                 var card_id = $(this).attr("id");
                 var card;
 
@@ -54,24 +69,25 @@ Deck editor
                     } 
                 }
                 
-                $("<input name='deck_card_" + num + "' value='" + card_id + "' />").attr('id', card.pk).addClass(card_id).appendTo("#save_form");
+                $("<input class='hidden' name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass(card_id).appendTo("#save_form");
 
-                $("<li class='deck_card' name='deck_card_" + num + "'></li>").attr('id', card_id).addClass(card_id).appendTo("#deck").text(card.fields.name).bind( 'click', { 'card': card }, on_deck_card_click );
+                $("<li class='deck_card' name='deck_card_" + unique_i + "'></li>").attr('id', card_id).addClass(card_id).appendTo("#deck").text(card.fields.name).bind( 'click', { 'card': card }, on_deck_card_click );
 
+
+                $("#num_remaining").text("" + ({{ deck.max_size }} - num));
             });
 
             $(".deck_card").bind( 'click', on_deck_card_click );
         }
         function on_deck_card_click (event) {
 
-            var num = $("#save_form").children().length + 1;
             var card_id = event.target.id;
 
-            //alert(card_id);
-
-            //alert("#deck #" + card_id);
             $("#deck .deck_card." + card_id).first().remove();
             $("#save_form ." + card_id).first().remove();
+
+            var num = $("#deck").children().length;
+            $("#num_remaining").text("" + ({{ deck.max_size }} - num));
         }
 
     </script>
@@ -88,7 +104,7 @@ Deck editor
 
         {% for card_id in deck.card_ids %}
 
-            <input name="deck_card_{{ forloop.counter }}" value="{{ card_id }}" id="{{ card_id }}" class="{{ card_id }}" />
+            <input name="deck_card_{{ forloop.counter }}" value="{{ card_id }}" id="{{ card_id }}" class="hidden {{ card_id }}" />
 
         {% endfor %} 
 

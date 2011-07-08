@@ -63,7 +63,7 @@ def save_deck(request):
     deck_id = request.POST.get("deck_id")
     deck = Deck.objects.get(id=deck_id)
 
-    deck.card_ids = card_ids
+    deck.card_ids = card_ids[:deck.max_size]
     deck.nickname = request.POST.get("nickname", "")
     deck.save()
 

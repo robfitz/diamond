@@ -203,9 +203,11 @@ class ShuffledLibrary(models.Model):
 
 class Deck(models.Model):
 
+
     nickname = models.CharField(max_length=50)
 
     card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
+    max_size = models.IntegerField(default=20)
 
     def create_starting_deck():
 
