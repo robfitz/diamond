@@ -494,12 +494,19 @@ function Unit(json_model, location_node_pk, alignment) {
         //killed. remove from board.
         boards[this.alignment][this.node.attr('name')] = null;
 
-        this.node.children(".unit_piece").remove(); 
+
         this.node.addClass("empty");
         this.node.removeClass("unit"); 
         this.node.removeClass("occupied");
 
-        add_rubble(this.alignment, this.node, 1);
+        var rubble = add_rubble(this.alignment, this.node, 1);
+        rubble.hide();
+
+        //this.node.children(".unit_piece").remove(); 
+        this.node.children(".unit_piece").hide("explode", function() {
+                $(this).remove();
+                rubble.show("bounce");
+            });
 
         if (this.alignment == 'ai' && match.type == 'puzzle') {
             for (var node_pk in boards['ai']) { 
@@ -521,13 +528,18 @@ function Unit(json_model, location_node_pk, alignment) {
 }
 
 function win() { 
-    $("#win_screen").show(); 
-    end_turn();
-    match.winner = 'friendly';
+
+    setTimeout(function() { 
+        $("#win_screen").show("slide", "slow"); 
+        end_turn();
+        match.winner = 'friendly';
+        }, 500);
 }
 function lose() {
-    $("#lose_screen").show();
-    match.winner = 'ai';
+    setTimeout(function() {
+        $("#lose_screen").show("slide", "slow");
+        match.winner = 'ai';
+        }, 500);
 }
 
 function set_unit_damage(node_pk, alignment, total_damage) {
@@ -566,16 +578,23 @@ function heal_units(alignment) {
     function remove_one_rubble(alignment) {
         $(".board." + alignment + " .rubble").each( function() {
             show_message($(this).parent(), "-1");
-            $(this).children("img").first().remove();
 
-            if ( $(this).children("img").size() == 0) {
+            $(this).hide("puff", function() {
+                $(this).children("img").first().remove(); 
 
-                boards[alignment][$(this).parent().attr('name')] = null;
+                if ( $(this).children("img").size() == 0) {
 
-                $(this).parent().removeClass("occupied");
-                $(this).parent().addClass("empty"); 
-                $(this).remove(); 
-            } 
+                    boards[alignment][$(this).parent().attr('name')] = null;
+
+                    $(this).parent().removeClass("occupied");
+                    $(this).parent().addClass("empty"); 
+
+                    $(this).remove(); 
+                } 
+                else {
+                    this.show();
+                }
+            });
         });
     }
 
@@ -592,6 +611,7 @@ function heal_units(alignment) {
                 "type": "rubble",
                 "amount": quantity
             };
+        return rubble;
     }
 
     function cast_card(target_alignment, card, node) {
