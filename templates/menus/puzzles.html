@@ -4,6 +4,10 @@
 <link rel="stylesheet" type="text/css" href="/media/css/menus.css" type="text/css" />
 {% endblock meta %}
 
+{% block header_title %}
+Puzzles
+{% endblock %}
+
 {% block content %}
 
     {% for puzzle in puzzles %}
@@ -31,5 +35,12 @@
         </div> 
 
     {% endfor %}    
+
+    <script>
+        $(function() {
+            banner_alert('info', 'Welcome to puzzle mode!', "Normally you'd earn new units by beating puzzles, but that doesn't exist yet, so just enjoy [hopefully].");
+        });
+    </script>
+
 
 {% endblock %}

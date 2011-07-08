@@ -32,6 +32,9 @@ Deck editor
         var unique_i = 0;
 
         $(function() {
+
+            banner_alert('info', 'Welcome to the deck editor', "During the intial beta, you're free to use any cards you please. Try out some variations against the ai. Remember to save the deck when you're done editing!");
+
             $.ajax({ url: "/deck/get_library_cards/",
                 success: function(card_data_text) {
                     card_data = eval('(' + card_data_text + ')');

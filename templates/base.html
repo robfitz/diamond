@@ -43,6 +43,12 @@
 
             } );
 
+            function banner_alert(type, title, message) {
+                $(".message h3").text(title);
+                $(".message p").html(message);
+                $(".message").removeClass("info").removeClass("alert").removeClass("warning").removeClass("success").addClass(type).slideDown(); 
+            }
+
             /** buggy
               *
             function confirm(button_id, to_call) {
@@ -147,7 +153,14 @@
 
             {% endblock header %}
 
-            <div class="border rounded fl" style="padding:40px;width:898px;background-color:#fff;">
+            <div class="border rounded fl" style="position:relative;padding:40px;width:898px;background-color:#fff;">
+
+                <div class="hidden message">
+                    <span style="font-size:12px;;position:absolute;right:8px;top:4px;"><a href="javascript:void(0);" style="color:#fff;text-decoration:none;" onclick="$('.message').slideUp();">[X] Close</a></span>
+                <h3>FYI, something just happened!</h3>
+                <p>This is just an info notification message.</p>
+                </div>
+
                 {% block content %}
                 {% endblock %}
             </div>

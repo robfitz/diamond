@@ -437,7 +437,11 @@ function Unit(json_model, location_node_pk, alignment) {
     for (var i = 0; i < this.model_fields.attack; i ++) {
         $("<img src='/media/units/" + this.model_fields.attack_type + ".png' />").appendTo(unit_piece); 
     }
-    $("<div class='defense'></div>").appendTo(unit_piece);
+    var def = $("<div class='defense'></div>").appendTo(unit_piece);
+
+    for (i = 0; i < this.total_life; i ++) {
+        $("<div class='defense_point health'></div>").appendTo(def); 
+    }
 
     var w = parseInt(unit_piece.css('width'));
     var h = parseInt(unit_piece.css('height'));
@@ -510,7 +514,7 @@ function Unit(json_model, location_node_pk, alignment) {
     }
 
     this.redraw = function() { 
-        this.node.find(".defense").html(this.remaining_life); 
+        //this.node.find(".defense").html(this.remaining_life); 
     }
 
     this.redraw();
@@ -536,6 +540,10 @@ function damage_unit(node_pk, alignment, delta_damage) {
     var unit = boards[alignment][node_pk]; 
     if (!unit) return; 
     unit.suffer_damage(delta_damage);
+
+    for (var i = 0; i < delta_damage; i ++) {
+        unit.node.find(".defense_point.health").filter(":last").removeClass("health").addClass("damage");
+    }
 }
 
 function heal_units(alignment) {
@@ -543,6 +551,7 @@ function heal_units(alignment) {
         var unit = boards[alignment][node_pk]; 
         if (unit && unit['type'] == 'unit') {
             unit.heal();
+            unit.node.find(".defense_point.damage").removeClass("damage").addClass("health");
         }
     }
 }

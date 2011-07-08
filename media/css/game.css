@@ -212,8 +212,22 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 }
 .unit_piece .defense {
     position:absolute;
-    bottom:4px;
-    right:10px;
+    bottom:-14px;
+    left:0;
+    width:60px;
+}
+.unit_piece .defense .defense_point {
+    width:12px;
+    height:12px;
+    background-color:#0f0;
+    float:left;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    margin:0 1px;
+    border:1px solid black;
+}
+.unit_piece .defense .defense_point.damage {
+    background-color:#f00;
 }
 
 .board.ai .unit_piece img {
