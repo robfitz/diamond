@@ -109,11 +109,12 @@ class Card(models.Model):
 
 def set_tooltip(sender, instance, raw, **kwargs):
 
-    instance.tooltip = "<b>%s</b><br/>" % instance.name
+    instance.tooltip = "<b>T%s: %s</b><br/>" % (instance.tech_level, instance.name)
+
     if instance.defense:
-        instance.tooltip += "%s/%s %s<br/>" % (instance.attack, instance.defense, instance.attack_type)
+        instance.tooltip += "%s/%s %s" % (instance.attack, instance.defense, instance.attack_type)
     if instance.direct_damage:
-        instance.tooltip += "%s<br/> direct damage" % (instance.direct_damage)
+        instance.tooltip += "%s direct damage" % (instance.direct_damage)
 
     if instance.target_aiming == "all":
         tar = None 
@@ -125,9 +126,28 @@ def set_tooltip(sender, instance, raw, **kwargs):
             tar = "nodes"
         elif instance.target_occupant == "rubble":
             tar = "rubble"
-        instance.tooltip += "to all %s %s<br/>" % (instance.target_alignment, tar)
-    else:
-        instance.tooltip += "to %s %s<br/>" % (instance.target_alignment, instance.target_occupant)
+        instance.tooltip += " to all %s %s" % (instance.target_alignment, tar)
+    elif instance.target_alignment == "friendly" and instance.target_occupant == "empty":
+        # basic summon doesn't need to be described
+        pass
+    else: 
+        instance.tooltip += " to %s %s" % (instance.target_alignment, instance.target_occupant)
+
+    instance.tooltip += "<br/>"
+
+    if instance.defense:
+        # extra info about the attack type of units,
+        # in lieu of a proper tutorial
+
+        instance.tooltip += "<br/>"
+        if instance.attack_type == "melee":
+            instance.tooltip += "Melee units move forward until they reach any unit, friendly or otherwise.<br/>"
+
+        if instance.attack_type == "ranged":
+            instance.tooltip += "Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>"
+
+        if instance.attack_type == "flying":
+            instance.tooltip += "Flying units skip over exactly 2 spaces in front of them, and then attack the next unit.<br/>"
 
 
 pre_save.connect(set_tooltip, sender=Card)
@@ -207,6 +227,7 @@ class ShuffledLibrary(models.Model):
         # add cards to hand
         for card in to_draw:
             self.hand_card_ids.append(card) 
+
 
         self.save()
 

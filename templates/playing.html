@@ -113,7 +113,9 @@ AI mode
                 </div>
                 <div id="game_controls">
                     <h3>Game controls</h3>
+                    <!--
                     <a class="button green">Help!</a>
+                    -->
                     <a id="pass_button" class="button yellow" href="javascript:void(0);" onclick="pass_turn()">Skip phase</a> 
                     <a id="surrender_button" class="button red" href="javascript:void(0);" onclick="surrender();">Surrender</a>
                 </div>
@@ -128,7 +130,6 @@ AI mode
         <div id="lose_screen" class="modal hidden">
             {% include 'menus/lose.html' %} 
         </div> 
-
     </div>
 
     <form id="current_turn" method="post" action="/playing/end_turn/">
@@ -163,6 +164,7 @@ AI mode
             {% if puzzle %}
                 set_player_life("friendly", {{ puzzle.player_life }} ); 
                 $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win.");
+
             {% endif %}
 
             draw_starting_hand();
@@ -190,10 +192,6 @@ AI mode
             else  {
                 show_message(target, "+" + amount, "green");
             }
-        }
-
-        function show_message(target, message) {
-            show_message(target, message, "");
         }
 
         function show_message(target, message, color) {

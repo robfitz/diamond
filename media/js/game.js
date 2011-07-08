@@ -805,8 +805,11 @@ function heal_units(alignment) {
         var card = $("<li class='card' id='" + card_json.pk + "'></li>").appendTo("#friendly_hand");
 
         var f = card_json.fields;
-        card_str = "T" + f.tech_level + ": " + f.name + " (" + f.attack + "/" + f.defense + " " + f.attack_type + ")";
+        card_str = "T" + f.tech_level + ": " + f.name;
         card.text(card_str);
+
+        card.attr("title", f.tooltip);
+        init_tooltips("#friendly_hand");
 
         match.hand_cards[card_json.pk] = card_json; 
 
