@@ -7,6 +7,8 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib import auth
 
+from d_game.models import Match
+
 
 def register(request):
 
@@ -14,6 +16,8 @@ def register(request):
     errors = ""
 
     if request.method == "POST":
+
+        pre_login_session_key = request.session.session_key
 
         username = request.POST.get("username")
 
@@ -32,6 +36,24 @@ def register(request):
                 user = auth.authenticate(username=username, password=pw1)
                 if user: 
                     auth.login(request, user) 
+
+                    # attach any session state to this new account 
+
+                    beaten_matches = Match.objects.filter(session_key=pre_login_session_key)
+                    logging.info("@@@ beaten matches: %s" % beaten_matches)
+                    beaten_puzzle_ids = []
+                    for match in beaten_matches:
+                        if match.type == "puzzle" and match.puzzle.id not in beaten_puzzle_ids:
+                            beaten_puzzle_ids.append(match.puzzle.id)
+
+                        # update from pointing to an outdated session key
+                        # to pointing at a real live user
+                        match.player = user
+                        match.save()
+
+                    user.get_profile().beaten_puzzle_ids = beaten_puzzle_ids
+                    user.get_profile().save()
+
                     return HttpResponseRedirect(request.POST.get("next"))
 
 

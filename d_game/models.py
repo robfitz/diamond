@@ -4,10 +4,46 @@ import logging, random
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
 from django.db.models.signals import pre_save
 
 from d_cards.models import Card, ShuffledLibrary, Deck
 from d_board.models import Node
+
+
+class PuzzleStartingUnit(models.Model):
+
+    OWNER_CHOICES = (
+            ("player", "Player"), 
+            ("ai", "AI"),
+        )
+
+    puzzle = models.ForeignKey("Puzzle")
+
+    owner = models.CharField(max_length=10, default="ai")
+
+    unit_card = models.ForeignKey(Card)
+    location = models.ForeignKey(Node) 
+
+    must_be_killed_for_victory = models.BooleanField(default=True)
+
+
+    def create_unit(self, match):
+
+        unit = Unit(card=self.unit_card,
+                match=match,
+                owner_alignment=self.owner,
+                row=self.location.row,
+                x=self.location.x,
+                must_be_killed_for_puzzle_victory=self.must_be_killed_for_victory)
+        unit.save()
+        return unit
+
+
+    def __unicode__(self):
+
+        return "%s for %s" % (self.unit_card, self.puzzle)
 
 
 class Puzzle(models.Model):
@@ -66,8 +102,13 @@ class Match(models.Model):
 
     type = models.CharField(max_length=10, choices=MATCH_TYPES)
 
-    # human who is playing in this match
-    player = models.ForeignKey(User)
+    # human who is playing in this match, or null
+    # if an anon is playing
+    player = models.ForeignKey(User, null=True)
+
+    # if we don't have a real player, this'll do!
+    # and it gets flipped over when they register.
+    session_key = models.CharField(max_length=100)
 
     # if the match type is "puzzle" this will point at it
     puzzle = models.ForeignKey(Puzzle, blank=True, null=True)
@@ -123,49 +164,18 @@ def check_for_winner(sender, instance, raw, **kwargs):
         if instance.type == "puzzle":
 
             # if we haven't already beaten this puzzle, mark that we have
-            if instance.puzzle.id not in instance.player.get_profile().beaten_puzzle_ids:
-                instance.player.get_profile().beaten_puzzle_ids.append(instance.puzzle.id)
-                instance.player.get_profile().save()
 
-                logging.info("$$$ saved that user beat puzzle")
+            if instance.player:
+
+                if instance.puzzle.id not in instance.player.get_profile().beaten_puzzle_ids:
+                    instance.player.get_profile().beaten_puzzle_ids.append(instance.puzzle.id)
+                    instance.player.get_profile().save()
 
 
 pre_save.connect(check_for_winner, sender=Match)
 
 
 
-class PuzzleStartingUnit(models.Model):
-
-    OWNER_CHOICES = (
-            ("player", "Player"), 
-            ("ai", "AI"),
-        )
-
-    puzzle = models.ForeignKey(Puzzle)
-
-    owner = models.CharField(max_length=10, default="ai")
-
-    unit_card = models.ForeignKey(Card)
-    location = models.ForeignKey(Node) 
-
-    must_be_killed_for_victory = models.BooleanField(default=True)
-
-
-    def create_unit(self, match):
-
-        unit = Unit(card=self.unit_card,
-                match=match,
-                owner_alignment=self.owner,
-                row=self.location.row,
-                x=self.location.x,
-                must_be_killed_for_puzzle_victory=self.must_be_killed_for_victory)
-        unit.save()
-        return unit
-
-
-    def __unicode__(self):
-
-        return "%s for %s" % (self.unit_card, self.puzzle)
 
 
 class Unit(models.Model):
@@ -361,6 +371,10 @@ class AI():
         match = board.match
 
         if match.type == "puzzle":
+            # puzzles are special turns for the AI,
+            # with all the auto-steps (healing, attacking,
+            # rubble) but without any casting.
+
             ai_turn = Turn(play_1=None,
                     target_node_1=None,
                     is_tech_1=False,
@@ -369,6 +383,12 @@ class AI():
                     target_node_2=None,
                     is_tech_2=False,
                     target_alignment_2="pass")
+
+            #heal, attack, rubble
+            board.heal("ai")
+            board.do_attack_phase("ai", True)
+            board.remove_one_rubble("ai")
+
             return ai_turn
 
         is_tech_1 = False

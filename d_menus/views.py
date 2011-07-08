@@ -1,11 +1,24 @@
+import logging
+
 from django.shortcuts import render_to_response
 
-from d_game.models import Puzzle
+from d_game.models import Puzzle, Match
 
 
 def puzzle_navigator(request):
 
-    profile = request.user.get_profile()
+    logging.info("XXX sess %s: %s" % (request.session.session_key, request.session.get("beaten_puzzle_ids")))
+
+    beaten_puzzle_ids = []
+    try:
+        profile = request.user.get_profile()
+        beaten_puzzle_ids = profile.beaten_puzzle_ids
+    except:
+        # probably an anonymous user, so no profile
+        beaten_matches = Match.objects.filter(session_key=request.session.session_key)
+        for match in beaten_matches:
+            if match.type == "puzzle" and match.puzzle.id not in beaten_puzzle_ids:
+                beaten_puzzle_ids.append(match.puzzle.id)
 
     puzzles = Puzzle.objects.all() 
 
@@ -13,7 +26,7 @@ def puzzle_navigator(request):
     unlock_next_unbeaten = True
 
     for puzzle in puzzles:
-        if profile and puzzle.id in profile.beaten_puzzle_ids:
+        if puzzle.id in beaten_puzzle_ids:
             puzzle.player_state = 'beaten' 
             # if they've beaten a level, unlock the first
             # locked one after that. this means that if

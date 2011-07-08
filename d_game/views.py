@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.core import serializers
 from django.template import RequestContext
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
 
 from d_board.models import Node
 from d_cards.models import Card, ShuffledLibrary, Deck
@@ -64,8 +66,14 @@ def init_puzzle_match(request, puzzle):
 
     #ai doesn't get a hand or library...  
 
+    if request.user.is_authenticated():
+        player = request.user
+    else:
+        player = None
+
     match = Match(type="puzzle",
-            player=request.user,
+            player=player,
+            session_key=request.session.session_key,
             friendly_library=friendly_library,
             ai_library=None)
     match.save()
