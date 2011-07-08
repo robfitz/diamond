@@ -432,7 +432,9 @@ function Unit(json_model, location_node_pk, alignment) {
 
     this.node.children(".unit_piece").remove();
     
-    var unit_piece = $("<div class='unit_piece attack_" + this.model_fields.attack + "' id='" + this.model.pk + "'></div>").appendTo(this.node);
+    var unit_piece = $("<div title='" + this.model_fields.tooltip + "' class='unit_piece attack_" + this.model_fields.attack + "' id='" + this.model.pk + "'></div>").appendTo(this.node);
+
+    init_tooltips(".node");
 
     for (var i = 0; i < this.model_fields.attack; i ++) {
         $("<img src='/media/units/" + this.model_fields.attack_type + ".png' />").appendTo(unit_piece); 
@@ -599,7 +601,9 @@ function heal_units(alignment) {
     }
 
     function add_rubble(alignment, node, quantity) { 
-        var rubble = $("<div class='rubble r_" + quantity + "'></div>").appendTo(node);
+        var rubble = $("<div title='Rubble appears when units die and prevents new units from being placed until it decays.' class='rubble r_" + quantity + "'></div>").appendTo(node);
+
+        init_tooltips(".node");
 
         for (var i = 0; i < quantity; i ++) {
             $("<img src='/media/units/rubble.png' />").appendTo(rubble); 
@@ -635,7 +639,6 @@ function heal_units(alignment) {
             if (card.fields.defense) { 
 
                 var unit = new Unit(card, node.attr('name'), target_alignment);
-
 
                 match.played_cards[card.pk] = card.fields; 
                 boards[target_alignment][node.attr("name")] = unit; 

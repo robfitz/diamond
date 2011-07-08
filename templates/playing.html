@@ -60,12 +60,12 @@ AI mode
             <div class="left_column">
 
                 <div class="ribbon_gui">
-                    <div id="ai_life" class="top ai life">
+                    <div id="ai_life" title="The enemy's life. Reduce it to 0 to win." class="top ai life">
                         <h1>10</h1> 
                     </div>
 
 
-                    <div id="friendly_life" class="bottom friendly life">
+                    <div id="friendly_life" title="Your life. Protect it with strategic unit placement." class="bottom friendly life">
                         <h1>10</h1> 
                     </div>
 
@@ -99,11 +99,11 @@ AI mode
 
             <div class="right_column">
                 <div class="ribbon_gui">
-                    <div id="ai_tech" class="top ai tech" name="tech">
+                    <div id="ai_tech" title="The enemy's tech level allows tem to use more powerful cards." class="top ai tech" name="tech">
                         <h1>T1</h1>
                     </div> 
 
-                    <div id="friendly_tech" class="bottom tech" name="tech">
+                    <div id="friendly_tech" title="Increase your tech by dragging a card here during your turn. Certain cards need higher tech." class="bottom tech" name="tech">
                         <h1>T1</h1>
                     </div>
 
@@ -162,6 +162,7 @@ AI mode
 
             {% if puzzle %}
                 set_player_life("friendly", {{ puzzle.player_life }} ); 
+                $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win.");
             {% endif %}
 
             draw_starting_hand();

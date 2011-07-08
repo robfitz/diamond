@@ -48,8 +48,9 @@
             function init_tooltips(selector) {
                 $(selector).find("*").each( function() { 
                         if ($(this).attr("title")) {
+                            $(this).unbind("mouseenter");
                             $(this).mouseenter(function(e) {
-                                $("#tooltip .text").text($(this).attr("title"));
+                                $("#tooltip .text").html($(this).attr("title"));
                                 $(this).attr("title", "");
                                 $("#tooltip").show();
                                 $("#tooltip").position({
@@ -61,9 +62,10 @@
                                 $("#tooltip").hide();
                                 $("#tooltip").fadeIn(); 
                             }); 
+                            $(this).unbind("mouseleave");
                             $(this).mouseleave(function(e) {
                                 $("#tooltip").hide();
-                                $(this).attr("title", $("#tooltip .text").text());
+                                $(this).attr("title", $("#tooltip .text").html());
                             });
                         }
                 });

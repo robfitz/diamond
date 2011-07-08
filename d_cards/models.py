@@ -6,6 +6,7 @@ from django.db import models
 from django.core import serializers
 from django.contrib import admin
 from djangotoolbox.fields import ListField 
+from django.db.models.signals import pre_save
 
 
 class Card(models.Model):
@@ -23,6 +24,8 @@ class Card(models.Model):
         )
 
     name = models.CharField(max_length=20, blank=True)
+
+    tooltip = models.CharField(max_length=200, blank=True, default="")
 
     #how much damage this unit deals to a player or unit each time it attacks
     attack = models.IntegerField(default=1, help_text="If this card summons a unit, how much damage it can deal per attack")
@@ -102,6 +105,32 @@ class Card(models.Model):
             str += "Heal %s. " % self.health_change
 
         return str
+
+
+def set_tooltip(sender, instance, raw, **kwargs):
+
+    instance.tooltip = "<b>%s</b><br/>" % instance.name
+    if instance.defense:
+        instance.tooltip += "%s/%s %s<br/>" % (instance.attack, instance.defense, instance.attack_type)
+    if instance.direct_damage:
+        instance.tooltip += "%s<br/> direct damage" % (instance.direct_damage)
+
+    if instance.target_aiming == "all":
+        tar = None 
+        if instance.target_occupant == "empty":
+            tar = "empty spaces"
+        elif instance.target_occupant == "unit":
+            tar = "units"
+        elif instance.target_occupant == "any":
+            tar = "nodes"
+        elif instance.target_occupant == "rubble":
+            tar = "rubble"
+        instance.tooltip += "to all %s %s<br/>" % (instance.target_alignment, tar)
+    else:
+        instance.tooltip += "to %s %s<br/>" % (instance.target_alignment, instance.target_occupant)
+
+
+pre_save.connect(set_tooltip, sender=Card)
 
 
 class CardAdmin(admin.ModelAdmin):
@@ -202,7 +231,6 @@ class ShuffledLibrary(models.Model):
 
 
 class Deck(models.Model):
-
 
     nickname = models.CharField(max_length=50)
 
