@@ -42,9 +42,33 @@
                     $('#feedbackDialog').jqmShow();
                 });
 
+                init_tooltips("body");
+            });
 
+            function init_tooltips(selector) {
+                $(selector).find("*").each( function() { 
+                        if ($(this).attr("title")) {
+                            $(this).mouseenter(function(e) {
+                                $("#tooltip .text").text($(this).attr("title"));
+                                $(this).attr("title", "");
+                                $("#tooltip").show();
+                                $("#tooltip").position({
+                                    my: "left top",
+                                    at: "center bottom",
+                                    of: $(this),
+                                    offset: "-20 25",
+                                }); 
+                                $("#tooltip").hide();
+                                $("#tooltip").fadeIn(); 
+                            }); 
+                            $(this).mouseleave(function(e) {
+                                $("#tooltip").hide();
+                                $(this).attr("title", $("#tooltip .text").text());
+                            });
+                        }
+                });
 
-            } );
+            }
 
             function banner_alert(type, title, message) {
                 $(".message h3").text(title);
@@ -137,7 +161,7 @@
 
                     <ul id="nav">
                         <li>
-                            <a href="/puzzles/">Puzzles!</a>
+                            <a title="Play some puzzles" href="/puzzles/">Puzzles!</a>
                         </li>
                         <li>
                             <a href="/play/">Play vs. the AI</a>
@@ -188,6 +212,14 @@
             <a class="button" onclick="$('#button_confirm').hide();">Cancel</a>
             <a class="button yellow confirm">Proceed</a> 
         </div>
+
+        <div id="tooltip" class="hidden">
+            <span class='text'></span>
+            <div class="tick">
+                <div class="tick_inner"></div>
+            </div>
+        </div>
+
 
         <!--
 		<div id="feedback_button" style="float:right;position:fixed;right:0px;top:30%;">
