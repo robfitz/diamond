@@ -160,12 +160,22 @@ AI mode
                 board_node_pks["{{ node.row }}"]["{{ node.x }}"] = "{{ node.pk }}";
             {% endfor %} 
 
-
             {% if puzzle %}
                 set_player_life("friendly", {{ puzzle.player_life }} ); 
                 $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win.");
 
             {% endif %}
+
+            $(".gameplay_container").mousedown(function(e) {
+                // if you click on an element which isn't targettable,
+                // or it isn't a sub-component of something targettable,
+                // then cancel the cast
+                if (! $(e.target).hasClass("targettable")) { 
+                    if (! $(e.target).parentsUntil("targettable")) { 
+                        cancel_cast();
+                    }
+                }
+            });
 
             draw_starting_hand();
         });
