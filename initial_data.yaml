@@ -1,6 +1,1420 @@
-- model: invoice.invoice
-  pk: 1
-  fields: 
-    key: default_invoice 
-    invoice_number: 0
-    is_default: True
+[
+    {
+        "pk": 190, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 2, 
+            "name": "Soldier", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/soldier.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Soldier</b><br/>1/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 192, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Archer", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/archer.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Archer</b><br/>1/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/archer-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 194, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Longbowman", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/archer.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Longbowman</b><br/>2/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 2, 
+            "icon_url_back": "/media/units/archer-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 196, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Sniper", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/archer.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Sniper</b><br/>3/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 3, 
+            "unit_power_level": 3, 
+            "icon_url_back": "/media/units/archer-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 198, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Swordsman", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/soldier.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Swordsman</b><br/>2/3 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 2, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 200, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 4, 
+            "name": "Knight", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/soldier.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Knight</b><br/>3/4 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 3, 
+            "unit_power_level": 3, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 747, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Militia Swarm", 
+            "target_aiming": "all", 
+            "icon_url": "/media/units/soldier.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Militia Swarm</b><br/>1/1 melee to all friendly empty spaces<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 839, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "na", 
+            "direct_damage": 3, 
+            "defense": 0, 
+            "name": "Zap", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/icons/damage_1.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Zap</b><br/>3 direct damage to enemy unit<br/>", 
+            "target_alignment": "enemy", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "", 
+            "target_occupant": "unit", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 841, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "na", 
+            "direct_damage": 1, 
+            "defense": 0, 
+            "name": "Plink", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/icons/damage_0.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Plink</b><br/>1 direct damage to enemy unit<br/>", 
+            "target_alignment": "enemy", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "", 
+            "target_occupant": "unit", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 883, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "na", 
+            "direct_damage": 1, 
+            "defense": 0, 
+            "name": "Falling rock", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/rubble.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Falling rock</b><br/>1 direct damage to any any<br/>", 
+            "target_alignment": "any", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "", 
+            "target_occupant": "any", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 1173, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Javelin Thrower", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/cannon.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Javelin Thrower</b><br/>1/3 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 2, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 1175, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 4, 
+            "name": "Ballista", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/cannon.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Ballista</b><br/>2/4 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 3, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 4894, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 2, 
+            "name": "Scholar", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/wizard.png", 
+            "tech_change": 1, 
+            "tooltip": "<b>T1: Scholar</b><br/>0/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "/media/units/wizard-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 4900, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "wall", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Small wall", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/wall.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Small wall</b><br/>0/3 wall<br/><br/>", 
+            "target_alignment": "friendly", 
+            "attack": 0, 
+            "unit_power_level": 1, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 557, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                194, 
+                194, 
+                196, 
+                198, 
+                198, 
+                200, 
+                747, 
+                839, 
+                841, 
+                192, 
+                192, 
+                190, 
+                190, 
+                190, 
+                883, 
+                883, 
+                1175, 
+                1173, 
+                1175, 
+                1173
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 891, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 892, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 893, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "robz deck", 
+            "card_ids": [
+                192, 
+                198, 
+                196, 
+                190, 
+                883, 
+                192, 
+                192, 
+                198, 
+                190, 
+                190, 
+                839, 
+                841, 
+                194
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1172, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1252, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1256, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1257, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "4 soldiers and an archer", 
+            "card_ids": [
+                190, 
+                192, 
+                190, 
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1259, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1260, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1261, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1534, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1535, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 2013, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 2014, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                839, 
+                839, 
+                841, 
+                883, 
+                883, 
+                841, 
+                192, 
+                190, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 2774, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 2775, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                194, 
+                198, 
+                839, 
+                841, 
+                1173, 
+                196, 
+                192, 
+                190, 
+                190, 
+                192, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 2892, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 2893, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                190, 
+                192, 
+                196, 
+                192, 
+                1173, 
+                1175, 
+                194, 
+                883, 
+                194, 
+                192, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 3288, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 3289, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 3297, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 3301, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                196, 
+                192, 
+                190, 
+                192, 
+                194, 
+                196, 
+                196, 
+                196, 
+                194, 
+                196, 
+                200, 
+                200, 
+                747
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 3312, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4016, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4019, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4038, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4048, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4741, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4750, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                192, 
+                190, 
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4814, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                196, 
+                196
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4815, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4816, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4817, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4818, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4819, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": null, 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4820, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                196, 
+                196
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4821, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                200, 
+                200
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4822, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4823, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                839, 
+                839
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4824, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                747, 
+                747
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4825, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4836, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                196, 
+                190, 
+                192, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4889, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 4950, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "3 archers", 
+            "card_ids": [
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5027, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                190, 
+                192, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5058, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                190, 
+                190, 
+                192, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5075, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                192, 
+                190, 
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5146, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                841, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5189, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                841, 
+                841, 
+                190, 
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5198, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                190, 
+                198, 
+                190, 
+                190, 
+                190
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5212, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                194, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 1231, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "Basic soldiers move forward until they hit something. They're are healed at the beginning of their turn, so to kill one you'll have to do 2 damage to it on the same turn.", 
+            "name": "Angled Melee", 
+            "player_deck": 1252, 
+            "order": "1.000"
+        }
+    }, 
+    {
+        "pk": 1237, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "Ranged units can shoot over your own forces and hit the first enemy they reach. Combine melee and range to deal 2 damage to the enemy unit.", 
+            "name": "Basic ranged", 
+            "player_deck": 4836, 
+            "order": "2.000"
+        }
+    }, 
+    {
+        "pk": 4737, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "Some positions are vulnerable to being attacked from an angle. Use positioning to take out the defended archer.", 
+            "name": "Behind the lines", 
+            "player_deck": 4889, 
+            "order": "3.000"
+        }
+    }, 
+    {
+        "pk": 1235, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "When a unit dies, it leaves rubble which stops you from using that space for your next turn. Combine ranged and melee units to overcome the enemy defences.", 
+            "name": "Ranged II", 
+            "player_deck": 4825, 
+            "order": "4.000"
+        }
+    }, 
+    {
+        "pk": 4739, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "The order you play in is important -- each turn, the player can place a unit, then all of their units attack, and then they can place one more unit before the enemy's turn.", 
+            "name": "Ordering I", 
+            "player_deck": 4950, 
+            "order": "5.000"
+        }
+    }, 
+    {
+        "pk": 1233, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Ordering II", 
+            "player_deck": 1257, 
+            "order": "6.000"
+        }
+    }, 
+    {
+        "pk": 5025, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Defensive formation ", 
+            "player_deck": 5027, 
+            "order": "7.000"
+        }
+    }, 
+    {
+        "pk": 5028, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Rubble I", 
+            "player_deck": 5058, 
+            "order": "8.000"
+        }
+    }, 
+    {
+        "pk": 5030, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Rubble II", 
+            "player_deck": 5075, 
+            "order": "9.000"
+        }
+    }, 
+    {
+        "pk": 5128, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Direct damage I", 
+            "player_deck": 5146, 
+            "order": "10.000"
+        }
+    }, 
+    {
+        "pk": 5130, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Direct Damage II", 
+            "player_deck": 5189, 
+            "order": "11.000"
+        }
+    }, 
+    {
+        "pk": 5132, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Teching I", 
+            "player_deck": 5198, 
+            "order": "12.000"
+        }
+    }, 
+    {
+        "pk": 5134, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Teching II", 
+            "player_deck": 5212, 
+            "order": "13.000"
+        }
+    }, 
+    {
+        "pk": 1241, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1231, 
+            "location": 137, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 1244, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1233, 
+            "location": 145, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 1246, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1233, 
+            "location": 137, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 1248, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1235, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 1250, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1235, 
+            "location": 139, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 4837, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1237, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 4892, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 4737, 
+            "location": 141, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 4896, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": false, 
+            "puzzle": 4737, 
+            "location": 149, 
+            "unit_card": 4900
+        }
+    }, 
+    {
+        "pk": 4955, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 4739, 
+            "location": 145, 
+            "unit_card": 4894
+        }
+    }, 
+    {
+        "pk": 4958, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 4739, 
+            "location": 137, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 5034, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5025, 
+            "location": 149, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5036, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5025, 
+            "location": 151, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 5038, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5028, 
+            "location": 139, 
+            "unit_card": 194
+        }
+    }, 
+    {
+        "pk": 5040, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5028, 
+            "location": 147, 
+            "unit_card": 4894
+        }
+    }, 
+    {
+        "pk": 5042, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5030, 
+            "location": 135, 
+            "unit_card": 194
+        }
+    }, 
+    {
+        "pk": 5044, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5030, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5089, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5030, 
+            "location": 139, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 5136, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5128, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5138, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5128, 
+            "location": 139, 
+            "unit_card": 196
+        }
+    }, 
+    {
+        "pk": 5140, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5130, 
+            "location": 141, 
+            "unit_card": 198
+        }
+    }, 
+    {
+        "pk": 5142, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5132, 
+            "location": 143, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5144, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5134, 
+            "location": 143, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 135, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": 0, 
+            "parent": null, 
+            "row": 0
+        }
+    }, 
+    {
+        "pk": 137, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": 1, 
+            "parent": 135, 
+            "row": 1
+        }
+    }, 
+    {
+        "pk": 139, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": 0, 
+            "parent": 135, 
+            "row": 1
+        }
+    }, 
+    {
+        "pk": 141, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": -1, 
+            "parent": 135, 
+            "row": 1
+        }
+    }, 
+    {
+        "pk": 143, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": 2, 
+            "parent": 137, 
+            "row": 2
+        }
+    }, 
+    {
+        "pk": 145, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": 1, 
+            "parent": 139, 
+            "row": 2
+        }
+    }, 
+    {
+        "pk": 147, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": 0, 
+            "parent": 139, 
+            "row": 2
+        }
+    }, 
+    {
+        "pk": 149, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": -1, 
+            "parent": 141, 
+            "row": 2
+        }
+    }, 
+    {
+        "pk": 151, 
+        "model": "d_board.node", 
+        "fields": {
+            "x": -2, 
+            "parent": 141, 
+            "row": 2
+        }
+    }
+]

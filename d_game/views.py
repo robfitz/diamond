@@ -98,8 +98,13 @@ def init_match(request):
     # starting hand, to be filled to 5 on first AI turn
     ai_library.draw(3)
 
+    if request.user.is_authenticated():
+        player = request.user
+    else:
+        player = None
+
     match = Match(friendly_library=friendly_library,
-            player=request.user,
+            player=player,
             ai_library=ai_library,
             type="ai")
     match.save()

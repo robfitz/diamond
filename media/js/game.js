@@ -253,7 +253,7 @@ var match = {
         else if (match.phase == 2) {
             //begin logic for auto-attacking
             var delay = do_attack_phase("friendly");
-            setTimeout(next_phase, delay + 1000);
+            setTimeout(next_phase, delay);
         }
         else if (match.phase == 3) {
             if ($("#friendly_hand").children().length == 0) {
@@ -274,7 +274,7 @@ var match = {
             do_ai_play_1();
             setTimeout ( function() {
                 next_phase();
-            }, 400); 
+            }, 1000); 
         } 
         else if (match.phase == 6) {
             //ai attack
@@ -286,7 +286,7 @@ var match = {
 
             setTimeout ( function() {
                 next_phase();
-            }, 400); 
+            }, 1000); 
             remove_one_rubble("ai");
 
             verify_board_state(match.turn_data["verify_board_state_after_ai"]);
@@ -408,6 +408,7 @@ var match = {
                         }     
                     ); 
                 }
+                animation_ms += 500;
         });
         return animation_ms;
     }

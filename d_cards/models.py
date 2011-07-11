@@ -265,10 +265,13 @@ class Deck(models.Model):
 
         starting_deck = Deck(nickname="Soldiers 'n archers")
 
-        soldier = Card.objects.filter(attack=1, defense=2, attack_type="melee", tech_level=1)[0]
-        archer = Card.objects.filter(attack=1, defense=1, attack_type="ranged", tech_level=1)[0]
+        try:
+            soldier = Card.objects.filter(attack=1, defense=2, attack_type="melee", tech_level=1)[0]
+            archer = Card.objects.filter(attack=1, defense=1, attack_type="ranged", tech_level=1)[0]
 
-        starting_deck.card_ids = [soldier.id, soldier.id, soldier.id, soldier.id, archer.id, archer.id, archer.id] 
+            starting_deck.card_ids = [soldier.id, soldier.id, soldier.id, soldier.id, archer.id, archer.id, archer.id] 
+        except:
+            starting_deck.card_ids = []
 
         starting_deck.save() 
         return starting_deck

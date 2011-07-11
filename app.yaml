@@ -1,7 +1,9 @@
 application: multiplayful
-version: 1
+version: 5
 runtime: python
 api_version: 1
+
+default_expiration: "1m"
 
 builtins:
 - remote_api: on
@@ -19,11 +21,9 @@ handlers:
 
 - url: /media/admin
   static_dir: django/contrib/admin/media
-  expiration: '0'
 
 - url: /media
   static_dir: media
-  expiration: '0'
 
 - url: /.*
   script: djangoappengine/main/main.py

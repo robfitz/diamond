@@ -1,3 +1,6 @@
+from d_cards.models import Deck
+
+
 def get_deck_from(request):
 
     deck = None

@@ -68,6 +68,7 @@ h1.green {
     position: relative;
     width:800px;
     height:600px;
+    background: #ccc url('../boards/board-2.jpg');
 }
 
 #friendly_hand {
@@ -155,10 +156,8 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     position:relative;
 }
 .board.friendly {
-    background: #ccc url('../board_friendly.png');
 }
 .board.ai {
-    background: #ccc url('../board_ai.png');
 }
 
 .card {

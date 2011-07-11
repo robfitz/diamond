@@ -125,7 +125,7 @@ class Match(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     friendly_library = models.OneToOneField(ShuffledLibrary, null=True)
-    ai_library = models.OneToOneField(ShuffledLibrary, null=True)
+    ai_library = models.OneToOneField(ShuffledLibrary, null=True, related_name="ai_library")
 
     friendly_life = models.IntegerField(default=10)
     ai_life = models.IntegerField(default=10)
@@ -839,27 +839,27 @@ class Turn(models.Model):
             ("ai", "AI"),
         )
 
-    play_1 = models.ForeignKey(Card, null=True)
+    play_1 = models.ForeignKey(Card, null=True, related_name="play_1")
 
     #this might be ignored, e.g. in the case of "all" targetting
-    target_node_1 = models.ForeignKey(Node, null=True)
+    target_node_1 = models.ForeignKey(Node, null=True, related_name="target_node_1")
 
     is_tech_1 = models.BooleanField(default=False)
 
     target_alignment_1 = models.CharField(max_length=10, choices=ALIGNMENT_CHOICES)
 
-    play_2 = models.ForeignKey(Card, null=True)
+    play_2 = models.ForeignKey(Card, null=True, related_name="play_2")
 
     #this might be ignored, e.g. in the case of "all" targetting
-    target_node_2 = models.ForeignKey(Node, null=True)
+    target_node_2 = models.ForeignKey(Node, null=True, related_name="target_node_2")
 
     is_tech_2 = models.BooleanField(default=False)
 
     target_alignment_2 = models.CharField(max_length=10, choices=ALIGNMENT_CHOICES, null=True)
 
 
-    draw_1 = models.ForeignKey(Card, null=True)
-    draw_2 = models.ForeignKey(Card, null=True)
+    draw_1 = models.ForeignKey(Card, null=True, related_name="draw_1")
+    draw_2 = models.ForeignKey(Card, null=True, related_name="draw_2")
 
 
 

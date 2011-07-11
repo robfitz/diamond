@@ -1,0 +1,387 @@
+[
+    {
+        "pk": 1231, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "Basic soldiers move forward until they hit something. They're are healed at the beginning of their turn, so to kill one you'll have to do 2 damage to it on the same turn.", 
+            "name": "Angled Melee", 
+            "player_deck": 1252, 
+            "order": "1.000"
+        }
+    }, 
+    {
+        "pk": 1237, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "Ranged units can shoot over your own forces and hit the first enemy they reach. Combine melee and range to deal 2 damage to the enemy unit.", 
+            "name": "Basic ranged", 
+            "player_deck": 4836, 
+            "order": "2.000"
+        }
+    }, 
+    {
+        "pk": 4737, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "Some positions are vulnerable to being attacked from an angle. Use positioning to take out the defended archer.", 
+            "name": "Behind the lines", 
+            "player_deck": 4889, 
+            "order": "3.000"
+        }
+    }, 
+    {
+        "pk": 1235, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "When a unit dies, it leaves rubble which stops you from using that space for your next turn. Combine ranged and melee units to overcome the enemy defences.", 
+            "name": "Ranged II", 
+            "player_deck": 4825, 
+            "order": "4.000"
+        }
+    }, 
+    {
+        "pk": 4739, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "The order you play in is important -- each turn, the player can place a unit, then all of their units attack, and then they can place one more unit before the enemy's turn.", 
+            "name": "Ordering I", 
+            "player_deck": 4950, 
+            "order": "5.000"
+        }
+    }, 
+    {
+        "pk": 1233, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Ordering II", 
+            "player_deck": 1257, 
+            "order": "6.000"
+        }
+    }, 
+    {
+        "pk": 5025, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Defensive formation ", 
+            "player_deck": 5027, 
+            "order": "7.000"
+        }
+    }, 
+    {
+        "pk": 5028, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Rubble I", 
+            "player_deck": 5058, 
+            "order": "8.000"
+        }
+    }, 
+    {
+        "pk": 5030, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Rubble II", 
+            "player_deck": 5075, 
+            "order": "9.000"
+        }
+    }, 
+    {
+        "pk": 5128, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Direct damage I", 
+            "player_deck": 5146, 
+            "order": "10.000"
+        }
+    }, 
+    {
+        "pk": 5130, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Direct Damage II", 
+            "player_deck": 5189, 
+            "order": "11.000"
+        }
+    }, 
+    {
+        "pk": 5132, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Teching I", 
+            "player_deck": 5198, 
+            "order": "12.000"
+        }
+    }, 
+    {
+        "pk": 5134, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "", 
+            "name": "Teching II", 
+            "player_deck": 5212, 
+            "order": "13.000"
+        }
+    }, 
+    {
+        "pk": 1241, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1231, 
+            "location": 137, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 1244, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1233, 
+            "location": 145, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 1246, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1233, 
+            "location": 137, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 1248, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1235, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 1250, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1235, 
+            "location": 139, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 4837, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1237, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 4892, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 4737, 
+            "location": 141, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 4896, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": false, 
+            "puzzle": 4737, 
+            "location": 149, 
+            "unit_card": 4900
+        }
+    }, 
+    {
+        "pk": 4955, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 4739, 
+            "location": 145, 
+            "unit_card": 4894
+        }
+    }, 
+    {
+        "pk": 4958, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 4739, 
+            "location": 137, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 5034, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5025, 
+            "location": 149, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5036, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5025, 
+            "location": 151, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 5038, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5028, 
+            "location": 139, 
+            "unit_card": 194
+        }
+    }, 
+    {
+        "pk": 5040, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5028, 
+            "location": 147, 
+            "unit_card": 4894
+        }
+    }, 
+    {
+        "pk": 5042, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5030, 
+            "location": 135, 
+            "unit_card": 194
+        }
+    }, 
+    {
+        "pk": 5044, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5030, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5089, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5030, 
+            "location": 139, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 5136, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5128, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5138, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5128, 
+            "location": 139, 
+            "unit_card": 196
+        }
+    }, 
+    {
+        "pk": 5140, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5130, 
+            "location": 141, 
+            "unit_card": 198
+        }
+    }, 
+    {
+        "pk": 5142, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5132, 
+            "location": 143, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 5144, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5134, 
+            "location": 143, 
+            "unit_card": 190
+        }
+    }
+]

@@ -1,153 +1,21 @@
 [
     {
-        "pk": 155, 
-        "model": "d_cards.targetting", 
-        "fields": {
-            "location": "chosen", 
-            "name": "Summon", 
-            "alignment": "friendly", 
-            "occupant": "empty"
-        }
-    }, 
-    {
-        "pk": 158, 
-        "model": "d_cards.targetting", 
-        "fields": {
-            "location": "chosen", 
-            "name": "Direct damage", 
-            "alignment": "enemy", 
-            "occupant": "unit"
-        }
-    }, 
-    {
-        "pk": 161, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "melee", 
-            "attack": 1, 
-            "defense": 2, 
-            "name": "Soldier"
-        }
-    }, 
-    {
-        "pk": 163, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "ranged", 
-            "attack": 1, 
-            "defense": 1, 
-            "name": "Archer"
-        }
-    }, 
-    {
-        "pk": 165, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "ranged", 
-            "attack": 2, 
-            "defense": 1, 
-            "name": "Longbowman"
-        }
-    }, 
-    {
-        "pk": 167, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "ranged", 
-            "attack": 3, 
-            "defense": 1, 
-            "name": "Wizard"
-        }
-    }, 
-    {
-        "pk": 169, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "melee", 
-            "attack": 2, 
-            "defense": 3, 
-            "name": "Swordsman"
-        }
-    }, 
-    {
-        "pk": 171, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "melee", 
-            "attack": 3, 
-            "defense": 4, 
-            "name": "Knight"
-        }
-    }, 
-    {
-        "pk": 174, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "defender", 
-            "attack": 1, 
-            "defense": 3, 
-            "name": "Dwarf"
-        }
-    }, 
-    {
-        "pk": 176, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "defender", 
-            "attack": 2, 
-            "defense": 5, 
-            "name": "Hydra"
-        }
-    }, 
-    {
-        "pk": 178, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "melee", 
-            "attack": 1, 
-            "defense": 1, 
-            "name": "Worker"
-        }
-    }, 
-    {
-        "pk": 181, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "wall", 
-            "attack": 0, 
-            "defense": 3, 
-            "name": "Fence"
-        }
-    }, 
-    {
-        "pk": 184, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "wall", 
-            "attack": 0, 
-            "defense": 5, 
-            "name": "Wall"
-        }
-    }, 
-    {
-        "pk": 186, 
-        "model": "d_cards.unit", 
-        "fields": {
-            "attack_type": "wall", 
-            "attack": 0, 
-            "defense": 7, 
-            "name": "Fortress"
-        }
-    }, 
-    {
         "pk": 190, 
         "model": "d_cards.card", 
         "fields": {
-            "rubble_duration": 0, 
-            "health_change": 0, 
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 2, 
+            "name": "Soldier", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/soldier.png", 
             "tech_change": 0, 
-            "summon": 161, 
-            "targetting": 155, 
+            "tooltip": "<b>T1: Soldier</b><br/>1/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
             "tech_level": 1
         }
     }, 
@@ -155,11 +23,19 @@
         "pk": 192, 
         "model": "d_cards.card", 
         "fields": {
-            "rubble_duration": 0, 
-            "health_change": 0, 
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Archer", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/archer.png", 
             "tech_change": 0, 
-            "summon": 163, 
-            "targetting": 155, 
+            "tooltip": "<b>T1: Archer</b><br/>1/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/archer-back.png", 
+            "target_occupant": "empty", 
             "tech_level": 1
         }
     }, 
@@ -167,11 +43,19 @@
         "pk": 194, 
         "model": "d_cards.card", 
         "fields": {
-            "rubble_duration": 0, 
-            "health_change": 0, 
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Longbowman", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/archer.png", 
             "tech_change": 0, 
-            "summon": 165, 
-            "targetting": 155, 
+            "tooltip": "<b>T3: Longbowman</b><br/>2/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 2, 
+            "icon_url_back": "/media/units/archer-back.png", 
+            "target_occupant": "empty", 
             "tech_level": 3
         }
     }, 
@@ -179,11 +63,19 @@
         "pk": 196, 
         "model": "d_cards.card", 
         "fields": {
-            "rubble_duration": 0, 
-            "health_change": 0, 
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Sniper", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/archer.png", 
             "tech_change": 0, 
-            "summon": 167, 
-            "targetting": 155, 
+            "tooltip": "<b>T5: Sniper</b><br/>3/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 3, 
+            "unit_power_level": 3, 
+            "icon_url_back": "/media/units/archer-back.png", 
+            "target_occupant": "empty", 
             "tech_level": 5
         }
     }, 
@@ -191,11 +83,19 @@
         "pk": 198, 
         "model": "d_cards.card", 
         "fields": {
-            "rubble_duration": 0, 
-            "health_change": 0, 
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Swordsman", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/soldier.png", 
             "tech_change": 0, 
-            "summon": 169, 
-            "targetting": 155, 
+            "tooltip": "<b>T3: Swordsman</b><br/>2/3 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 2, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
             "tech_level": 3
         }
     }, 
@@ -203,12 +103,180 @@
         "pk": 200, 
         "model": "d_cards.card", 
         "fields": {
-            "rubble_duration": 0, 
-            "health_change": 0, 
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 4, 
+            "name": "Knight", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/soldier.png", 
             "tech_change": 0, 
-            "summon": 171, 
-            "targetting": 155, 
+            "tooltip": "<b>T5: Knight</b><br/>3/4 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 3, 
+            "unit_power_level": 3, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
             "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 747, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Militia Swarm", 
+            "target_aiming": "all", 
+            "icon_url": "/media/units/soldier.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Militia Swarm</b><br/>1/1 melee to all friendly empty spaces<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/soldier-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 839, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "na", 
+            "direct_damage": 3, 
+            "defense": 0, 
+            "name": "Zap", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/icons/damage_1.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Zap</b><br/>3 direct damage to enemy unit<br/>", 
+            "target_alignment": "enemy", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "", 
+            "target_occupant": "unit", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 841, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "na", 
+            "direct_damage": 1, 
+            "defense": 0, 
+            "name": "Plink", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/icons/damage_0.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Plink</b><br/>1 direct damage to enemy unit<br/>", 
+            "target_alignment": "enemy", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "", 
+            "target_occupant": "unit", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 883, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "na", 
+            "direct_damage": 1, 
+            "defense": 0, 
+            "name": "Falling rock", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/rubble.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Falling rock</b><br/>1 direct damage to any any<br/>", 
+            "target_alignment": "any", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "", 
+            "target_occupant": "any", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 1173, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Javelin Thrower", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/cannon.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Javelin Thrower</b><br/>1/3 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 2, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 1175, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "ranged", 
+            "direct_damage": 0, 
+            "defense": 4, 
+            "name": "Ballista", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/cannon.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Ballista</b><br/>2/4 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 3, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 4894, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "melee", 
+            "direct_damage": 0, 
+            "defense": 2, 
+            "name": "Scholar", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/wizard.png", 
+            "tech_change": 1, 
+            "tooltip": "<b>T1: Scholar</b><br/>0/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 0, 
+            "unit_power_level": 0, 
+            "icon_url_back": "/media/units/wizard-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 4900, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "wall", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Small wall", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/wall.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Small wall</b><br/>0/3 wall<br/><br/>", 
+            "target_alignment": "friendly", 
+            "attack": 0, 
+            "unit_power_level": 1, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 1
         }
     }
 ]
