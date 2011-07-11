@@ -95,6 +95,7 @@ INSTALLED_APPS = (
     'd_game',
     'd_menus',
     'd_users',
+    'd_feedback',
 
     'django.contrib.admin',
     'django.contrib.admindocs',

@@ -90,7 +90,7 @@ AI mode
                 <div class="friendly board">
                     {% block friendly_nodes %}
                         {% for node in board %}
-                        <div class="node empty" id="friendly_node_{{node.pk}}" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+                        <div class="node empty" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
                             </div>
                         {% endfor %}
                     {% endblock friendly_nodes %}
@@ -162,9 +162,11 @@ AI mode
 
             {% if puzzle %}
                 set_player_life("friendly", {{ puzzle.player_life }} ); 
-                $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win.");
-
-            {% endif %}
+                $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win."); 
+                banner_alert("warning", "Tips for this puzzle", "{{ puzzle.intro }}");
+            {% else %}
+                banner_alert("warning", "Howdy", "AI battles are still half-baked and the computer plays *VERY* slowly (~10 sedonds for each of its turns). </p><p>Also, if you're getting whipped, don't forget to go <a href='/deck/'>edit your deck</a> and add some more powerful cards");
+            {% endif %} 
 
             $(".gameplay_container").mousedown(function(e) {
                 // if you click on an element which isn't targettable,

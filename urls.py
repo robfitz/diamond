@@ -28,9 +28,11 @@ urlpatterns = patterns('',
     ('^puzzle/$', 'd_game.views.puzzle'),
     ('^puzzles/$', 'd_menus.views.puzzle_navigator'),
 
-    ('^$', 
-        'django.views.generic.simple.direct_to_template',
-        {'template': 'index.html'}),
+    # submit mini-survey
+    ('^feedback/puzzle/$', 'd_feedback.views.puzzle_feedback'),
+
+    ('^$', 'd_menus.views.puzzle_navigator'),
+        
 
     #('', 'django.views.generic.simple.direct_to_template',
      #{'template': 'home.html'}),

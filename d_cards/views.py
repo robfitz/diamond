@@ -25,8 +25,10 @@ def edit_deck(request):
         elif request.GET.get("p"):
             puzzle = Puzzle.objects.get(id=request.GET.get("p"))
             if not puzzle.player_deck:
-                puzzle.player_deck = Deck()
-                puzzle.player_deck.save()
+                d = Deck()
+                d.save()
+                puzzle.player_deck = d
+                puzzle.save()
             deck = puzzle.player_deck 
         # and if none of the special params exist, get the
         # user's deck
@@ -61,6 +63,7 @@ def save_deck(request):
             card_ids.append(card_id)
 
     deck_id = request.POST.get("deck_id")
+    logging.info("**** got deck id: %s" % deck_id)
     deck = Deck.objects.get(id=deck_id)
 
     deck.card_ids = card_ids[:deck.max_size]

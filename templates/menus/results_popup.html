@@ -1,0 +1,29 @@
+<div class="results_popup">
+
+    {% block results_title %}
+    {% endblock %}
+
+    {% if form %}
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+    </form>
+    {% endif %}
+
+    {% block results_nav %}
+    {% endblock results_nav %} 
+
+    <script>
+        function go_to(url) {
+            {% if form and puzzle %}
+                $.post("/feedback/puzzle/",
+                    $(".results_popup form").serialize()
+                ); 
+            {% endif %}
+            window.location.href = url;
+        }
+    </script> 
+</div>
+

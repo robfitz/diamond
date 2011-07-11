@@ -32,7 +32,8 @@ def register(request):
                 errors = "Passwords don't match. Typo?"
 
             else:
-                user = User.objects.create_user(username, email=username, password=pw1)
+                email = request.POST.get("email", "")
+                user = User.objects.create_user(username, email=email, password=pw1)
                 user = auth.authenticate(username=username, password=pw1)
                 if user: 
                     auth.login(request, user) 

@@ -59,6 +59,12 @@ class Puzzle(models.Model):
 
     player_deck = models.ForeignKey(Deck, blank=True, null=True)
 
+    intro = models.TextField(blank=True)
+
+
+    class Meta:
+        ordering = ['order']
+
 
     def init(self, match):
 
@@ -118,7 +124,7 @@ class Match(models.Model):
 
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    friendly_library = models.OneToOneField(ShuffledLibrary)
+    friendly_library = models.OneToOneField(ShuffledLibrary, null=True)
     ai_library = models.OneToOneField(ShuffledLibrary, null=True)
 
     friendly_life = models.IntegerField(default=10)
@@ -139,6 +145,7 @@ class Match(models.Model):
                     return
 
             # all units which should be dead are dead.. player wins!
+            logging.info("@@@@ player has won")
             self.winner = "friendly"
             self.save() 
 
@@ -856,7 +863,13 @@ class Turn(models.Model):
 
 
 
+class PuzzleAdmin(admin.ModelAdmin):
 
-admin.site.register(Puzzle)
+    list_display_links = ("__unicode__",)
+    list_display = ("__unicode__", "name", "order", "player_life", "player_deck", "intro")
+    list_editable = ("name", "order", "player_life", "player_deck", "intro")
+
+
+admin.site.register(Puzzle, PuzzleAdmin)
 admin.site.register(PuzzleStartingUnit)
     

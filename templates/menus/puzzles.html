@@ -12,33 +12,31 @@ Puzzles
 
     {% for puzzle in puzzles %}
 
-        <div class="puzzle_thumb {{ puzzle.player_state }}">
-            {% if puzzle.player_state == "locked" %}
-                <div class="lock_icon">
+    <div class="puzzle_thumb {{ puzzle.player_state }}" {% if puzzle.player_state != "locked" %}onclick="window.location.href='/puzzle/?p={{puzzle.id}}';"{% endif %}>
+                {% if puzzle.player_state == "locked" %}
+                    <img class="lock_icon" src="/media/icons/locked.png">
+                {% else %}
                     <p>
-                    {{ puzzle.name }}
+                    {{ forloop.counter }}
                     </p>
-                </div>
-            {% else %}
-                <p> 
-                    <a href="/puzzle/?p={{ puzzle.id }}">
-                    {{ puzzle.name }}
-                    </a>
-                </p>
-            {% endif %}
-            
-            {% if request.user.is_staff %}
-                <a href="/deck/?p={{ puzzle.id }}">Edit deck</a>
-                <a href="/admin/d_game/puzzle/{{ puzzle.id }}/">Edit puzzle</a> 
-            {% endif %}
+                {% endif %}
+                
+                {% if request.user.is_staff %}
+                    <a href="/deck/?p={{ puzzle.id }}">Edit deck</a>
+                    <a href="/admin/d_game/puzzle/{{ puzzle.id }}/">Edit puzzle</a> 
+                {% endif %}
 
-        </div> 
+            </div> 
 
     {% endfor %}    
 
     <script>
         $(function() {
             banner_alert('info', 'Welcome to puzzle mode!', "Normally you'd earn new units by beating puzzles, but that doesn't exist yet, so just enjoy [hopefully].");
+
+            $(".puzzle_thumb.current, .puzzle_thumb.beaten").mouseenter(function(e) { 
+                $(this).effect("bounce", { times: 3, distance: 15}, 200); 
+            });
         });
     </script>
 

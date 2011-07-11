@@ -27,6 +27,9 @@ class Card(models.Model):
 
     tooltip = models.CharField(max_length=200, blank=True, default="")
 
+    icon_url = models.CharField(max_length=200, blank=True, default="")
+    icon_url_back = models.CharField(max_length=200, blank=True, default="")
+
     #how much damage this unit deals to a player or unit each time it attacks
     attack = models.IntegerField(default=1, help_text="If this card summons a unit, how much damage it can deal per attack")
 
@@ -155,8 +158,8 @@ pre_save.connect(set_tooltip, sender=Card)
 
 class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
-    list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
-    list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
+    list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage', 'icon_url', 'icon_url_back')
+    list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage', 'icon_url', 'icon_url_back')
 
 
 class ShuffledLibrary(models.Model):

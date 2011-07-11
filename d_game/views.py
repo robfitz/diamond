@@ -13,6 +13,7 @@ from d_board.models import Node
 from d_cards.models import Card, ShuffledLibrary, Deck
 from d_game.models import Turn, Match, Board, Unit, AI, Puzzle
 from d_cards.util import get_deck_from
+from d_feedback.models import PuzzleFeedbackForm
 import d_users
 
 
@@ -39,6 +40,8 @@ def puzzle(request):
     request.session["match"] = match.id
 
     board = Node.objects.all().order_by('-pk')
+
+    form = PuzzleFeedbackForm()
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 

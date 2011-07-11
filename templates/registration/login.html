@@ -21,10 +21,17 @@ Log in
                 <td>{{ form.password.label_tag }}</td>
                 <td>{{ form.password }}</td>
             </tr>
-        </table>
 
-        <input type="submit" value="login" />
-        <input type="hidden" name="next" value="{{ next }}" />
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <input type="submit" class="button blue" style="width:129px;" value="Log In" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+        </table>
 
     </form>
 

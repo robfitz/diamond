@@ -1,7 +1,11 @@
-<div class="results_popup">
-    <h2 class="ribbon">Victory!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :D</h2>
+{% extends 'menus/results_popup.html' %}
+
+{% block results_title %} 
+    <h2 class="ribbon">Victory!&nbsp;&nbsp;&nbsp;&nbsp; :D</h2> 
     <div class="triangle-ribbon"></div>
+{% endblock %}
 
-    <a class="fr button blue" style="margin-top:220px;" href="{{ next_puzzle_url }}">Onward and upward!</a>
-</div>
-
+{% block results_nav %}
+    <a class="continue button blue" href="javascript:void(0);" onclick="go_to('{{ next_puzzle_url }}')">Onward and upward!</a>
+    <a class="continue button" href="javascript:void(0);" onclick="go_to('')">Replay</a>
+{% endblock results_nav %} 

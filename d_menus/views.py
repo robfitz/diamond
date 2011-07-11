@@ -17,7 +17,7 @@ def puzzle_navigator(request):
         # probably an anonymous user, so no profile
         beaten_matches = Match.objects.filter(session_key=request.session.session_key)
         for match in beaten_matches:
-            if match.type == "puzzle" and match.puzzle.id not in beaten_puzzle_ids:
+            if match.type == "puzzle" and match.winner == "friendly" and match.puzzle.id not in beaten_puzzle_ids:
                 beaten_puzzle_ids.append(match.puzzle.id)
 
     puzzles = Puzzle.objects.all() 

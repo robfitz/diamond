@@ -102,6 +102,13 @@ var match = {
                 next_phase();
             }
         );
+
+        $("input[name='card1']").val("");
+        $("input[name='node1']").val("");
+        $("input[name='align1']").val("");
+        $("input[name='card2']").val("");
+        $("input[name='node2']").val("");
+        $("input[name='align2']").val("");
     }
 
     function verify_board_state(server_board) {
@@ -407,6 +414,7 @@ var match = {
 
 function Unit(json_model, location_node_pk, alignment) {
 
+
     // full details of this unit just in case
     this.model = json_model;
     this.model_fields = this.model.fields;
@@ -436,11 +444,25 @@ function Unit(json_model, location_node_pk, alignment) {
 
     init_tooltips(".node");
 
-    for (var i = 0; i < this.model_fields.attack; i ++) {
-        $("<img src='/media/units/" + this.model_fields.attack_type + ".png' />").appendTo(unit_piece); 
+    if (this.alignment == 'friendly' && this.model_fields.icon_url_back) {
+        $("<img src='" + this.model_fields.icon_url_back + "' />").appendTo(unit_piece); 
+    } 
+    else {
+        $("<img src='" + this.model_fields.icon_url + "' />").appendTo(unit_piece); 
     }
-    var def = $("<div class='defense'></div>").appendTo(unit_piece);
 
+
+
+    // container for holding attack icons
+    var unit_attack = $("<div class='unit_attack'></div>").appendTo(unit_piece);
+
+    // attack icons, one per attack point
+    for (var i = 0; i < this.model_fields.attack; i ++) {
+        $("<img src='/media/units/attack_type_" + this.model_fields.attack_type + ".png' />").appendTo(unit_attack);
+    }
+
+    //life bubbles, one per defense, which display life & damage
+    var def = $("<div class='defense'></div>").appendTo(unit_piece); 
     for (i = 0; i < this.total_life; i ++) {
         $("<div class='defense_point health'></div>").appendTo(def); 
     }
@@ -477,19 +499,23 @@ function Unit(json_model, location_node_pk, alignment) {
             show_number(this.node, this.total_life - this.remaining_life);
         }
         this.remaining_life = this.total_life;
-        this.redraw();
     }
 
     this.suffer_damage = function(delta_damage) { 
         this.remaining_life -= delta_damage;
         show_number(this.node, -1 * delta_damage);
 
-        if (this.remaining_life <= 0) {
-            this.die();
+        for (var i = 0; i < delta_damage; i ++) {
+            this.node.find(".defense_point.health").filter(":last").removeClass("health").addClass("damage");
         }
-        else {
-            this.redraw();
-        }
+
+        var unit = this;
+        this.node.children(".unit_piece").effect("bounce", "fast", function() { 
+            if (unit.remaining_life <= 0) {
+                unit.die();
+            }
+        });
+
     } 
 
     this.die = function() { 
@@ -513,7 +539,7 @@ function Unit(json_model, location_node_pk, alignment) {
         if (this.alignment == 'ai' && match.type == 'puzzle') {
             for (var node_pk in boards['ai']) { 
                 var unit = boards['ai'][node_pk]; 
-                if (unit && unit['type'] == 'unit') {
+                if (unit && unit['type'] == 'unit' && unit.must_be_killed) {
                     return;
                 }
             }
@@ -521,27 +547,25 @@ function Unit(json_model, location_node_pk, alignment) {
             win();
         }
     }
-
-    this.redraw = function() { 
-        //this.node.find(".defense").html(this.remaining_life); 
-    }
-
-    this.redraw();
 }
 
 function win() { 
 
-    setTimeout(function() { 
-        $("#win_screen").show("slide", "slow"); 
-        end_turn();
-        match.winner = 'friendly';
-        }, 500);
+    if (!match.winner) {
+        setTimeout(function() { 
+            $("#win_screen").show("slide", "slow"); 
+            end_turn();
+            match.winner = 'friendly';
+            }, 500);
+    }
 }
 function lose() {
-    setTimeout(function() {
-        $("#lose_screen").show("slide", "slow");
-        match.winner = 'ai';
-        }, 500);
+    if (!match.winner) {
+        setTimeout(function() {
+            $("#lose_screen").show("slide", "slow");
+            match.winner = 'ai';
+            }, 500);
+    }
 }
 
 function set_unit_damage(node_pk, alignment, total_damage) {
@@ -555,9 +579,6 @@ function damage_unit(node_pk, alignment, delta_damage) {
     if (!unit) return; 
     unit.suffer_damage(delta_damage);
 
-    for (var i = 0; i < delta_damage; i ++) {
-        unit.node.find(".defense_point.health").filter(":last").removeClass("health").addClass("damage");
-    }
 }
 
 function heal_units(alignment) {
@@ -871,12 +892,12 @@ function heal_units(alignment) {
 
                 // highlight valid targets and allow them to respond to click
                 targets.addClass("targettable").click( function (event) {
-                    cast($(".card.selected"), $("#" + event.target.id));
+                    cast($(".card.selected"), $(event.currentTarget));
                 });
 
                 targets.droppable( {
                     drop: function(event, ui) {
-                        cast($(".card.selected"), $("#" + event.target.id)); 
+                        cast($(".card.selected"), $("#" + event.currentTarget.id)); 
                     },
                     over: function(event, ui) {
                         $("#" + event.target.id).addClass("hovered");   
