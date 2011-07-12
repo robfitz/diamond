@@ -112,6 +112,7 @@ class Card(models.Model):
 
 def set_tooltip(sender, instance, raw, **kwargs):
 
+
     instance.tooltip = "<b>T%s: %s</b><br/>" % (instance.tech_level, instance.name)
 
     if instance.defense:
@@ -151,6 +152,14 @@ def set_tooltip(sender, instance, raw, **kwargs):
 
         if instance.attack_type == "flying":
             instance.tooltip += "Flying units skip over exactly 2 spaces in front of them, and then attack the next unit.<br/>"
+
+
+    if instance.tech_change:
+        instance.tooltip += "<br/>"
+        if instance.tech_change > 0:
+            instance.tooltip += "Increases tech by %s when cast<br/>"
+        else:
+            instance.tooltip += "Decreases tech by %s when cast<br/>"
 
 
 pre_save.connect(set_tooltip, sender=Card)
