@@ -92,6 +92,13 @@ var match = {
         $.post("/playing/end_turn/",
             $("#current_turn").serialize(),
             function(data) {
+
+                if (match.winner) {
+                    // if the match has already been won or
+                    // lost, ignore how the AI responds
+                    return;
+                }
+
                 match.turn_data = eval('(' + data + ')');
 
                 verify_board_state(match["turn_data"]["verify_board_state_before_ai"]);
@@ -182,10 +189,6 @@ var match = {
         }
     }
 
-    function next_phase() {
-        next_phase(false);
-    }
-
     function next_phase(is_first_turn) {
 
         if (match.winner) return;
@@ -204,7 +207,8 @@ var match = {
                     var node = $(".board.ai [name='" + units[i].node + "']");
                     ai_cast(card,
                             node,
-                            'ai'); 
+                            'ai',
+                            is_first_turn); 
                     boards['ai'][units[i].node].must_be_killed = units[i].must_be_killed; 
                 } 
             }
@@ -283,13 +287,14 @@ var match = {
         }
         else if (match.phase == 7 ) {
             do_ai_play_2();
+            remove_one_rubble("ai");
+
+            verify_board_state(match.turn_data["verify_board_state_after_ai"]);
 
             setTimeout ( function() {
                 next_phase();
             }, 1000); 
-            remove_one_rubble("ai");
 
-            verify_board_state(match.turn_data["verify_board_state_after_ai"]);
         }
     }
 
@@ -384,9 +389,6 @@ var match = {
                                 else if (action == "damage_unit") {
                                     damage_unit(target_node_pk, opponent_alignment, unit.attack); 
                                 } 
-
-                                // i have no idea if this will work
-                                attack_path = do_attack(unit, node_id, alignment);
 
                                 current_animation_step ++;
 
@@ -592,8 +594,8 @@ function heal_units(alignment) {
     }
 }
 
-    function ai_cast(card, node, alignment) { 
-        cast_card(alignment, card, node); 
+    function ai_cast(card, node, alignment, is_first_turn) { 
+        cast_card('ai', alignment, card, node, is_first_turn); 
 
         action_indicator(node, "AI cast " + card.fields.name);
     }
@@ -640,7 +642,7 @@ function heal_units(alignment) {
         return rubble;
     }
 
-    function cast_card(target_alignment, card, node) {
+    function cast_card(caster_alignment, target_alignment, card, node, skip_side_effects) {
 
         if (card.fields.target_aiming == "all") {
             nodes = node.parent().children(".empty");
@@ -665,6 +667,14 @@ function heal_units(alignment) {
                 match.played_cards[card.pk] = card.fields; 
                 boards[target_alignment][node.attr("name")] = unit; 
             }
+            if (!skip_side_effects && card.fields.tech_change) {
+                if (caster_alignment == "ai") {
+                    ai_tech_up(card.fields.tech_change);
+                }
+                else {
+                    tech_up(card.fields.tech_change);
+                } 
+            }
         } 
     }
 
@@ -677,6 +687,11 @@ function heal_units(alignment) {
      * { dx:XXX, drow:XXX, [action:damage_unit/damage_player/blocked], node_id:node_pk } 
      */ 
     function do_attack(unit, node_id, alignment) {
+
+        if (!unit) {
+            alert('attempted attack from non-existant unit at node ' + node_id + " of alignment " + alignment);
+            return; 
+        }
 
         if (unit.attack == 0
             || unit.attack_type == "wall"
@@ -1011,9 +1026,9 @@ function heal_units(alignment) {
         hand_card.remove(); 
         var card_id = hand_card.attr("id");
 
-        cast_card(align, card, node);
+        cast_card('friendly', align, card, node);
 
-        next_phase();
+        setTimeout( next_phase, 800);
     }
 
     function cancel_cast() {
