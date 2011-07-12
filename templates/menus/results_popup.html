@@ -1,5 +1,16 @@
 <div class="results_popup">
 
+    <script>
+        function go_to(url) {
+            {% if form and puzzle %}
+                $.post("/feedback/puzzle/",
+                    $(".results_popup form").serialize()
+                ); 
+            {% endif %}
+            window.location.href = url;
+        }
+    </script> 
+
     {% block results_title %}
     {% endblock %}
 
@@ -15,15 +26,5 @@
     {% block results_nav %}
     {% endblock results_nav %} 
 
-    <script>
-        function go_to(url) {
-            {% if form and puzzle %}
-                $.post("/feedback/puzzle/",
-                    $(".results_popup form").serialize()
-                ); 
-            {% endif %}
-            window.location.href = url;
-        }
-    </script> 
 </div>
 
