@@ -385,13 +385,11 @@
         "pk": 1257, 
         "model": "d_cards.deck", 
         "fields": {
-            "nickname": "4 soldiers and an archer", 
+            "nickname": "", 
             "card_ids": [
-                190, 
                 192, 
                 190, 
-                190, 
-                190
+                192
             ], 
             "max_size": 20
         }
@@ -818,11 +816,8 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                192, 
-                196, 
                 190, 
-                192, 
-                190
+                192
             ], 
             "max_size": 20
         }
@@ -870,9 +865,8 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                190, 
-                190, 
                 192, 
+                190, 
                 190
             ], 
             "max_size": 20
@@ -912,10 +906,9 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                841, 
-                841, 
                 190, 
                 190, 
+                841, 
                 190
             ], 
             "max_size": 20
@@ -927,11 +920,9 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                190, 
+                4894, 
                 198, 
-                190, 
-                190, 
-                190
+                192
             ], 
             "max_size": 20
         }
@@ -944,6 +935,58 @@
             "card_ids": [
                 192, 
                 194, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5871, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5877, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                4894, 
+                4894, 
+                747, 
+                747, 
+                747, 
+                4894, 
+                4894, 
+                4894
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 5986, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
                 192, 
                 192, 
                 192
@@ -1007,24 +1050,24 @@
         }
     }, 
     {
-        "pk": 1233, 
-        "model": "d_game.puzzle", 
-        "fields": {
-            "player_life": 1, 
-            "intro": "", 
-            "name": "Ordering II", 
-            "player_deck": 1257, 
-            "order": "6.000"
-        }
-    }, 
-    {
         "pk": 5025, 
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "It's good practice to protect your flimsy ranged units from all possible angles of attack before placing them.", 
             "name": "Defensive formation ", 
             "player_deck": 5027, 
+            "order": "6.000"
+        }
+    }, 
+    {
+        "pk": 1233, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "player_life": 1, 
+            "intro": "The first unit you cast will get to attack this turn, while the second one has to wait until next turn. The order you use your cards in can make a big difference.", 
+            "name": "Ordering II", 
+            "player_deck": 1257, 
             "order": "7.000"
         }
     }, 
@@ -1033,7 +1076,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "Whenever a unit dies, the space is covered with rubble and can't be re-used for a full turn. However, units are still able to attack through rubble. ", 
             "name": "Rubble I", 
             "player_deck": 5058, 
             "order": "8.000"
@@ -1044,7 +1087,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "Overcome this powerful defensive formation while coping with rubble.", 
             "name": "Rubble II", 
             "player_deck": 5075, 
             "order": "9.000"
@@ -1055,7 +1098,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "You can use spells to attack specific, problematic units -- especially useful against dangerous but low-defense archers.", 
             "name": "Direct damage I", 
             "player_deck": 5146, 
             "order": "10.000"
@@ -1066,7 +1109,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "Spells can also help overcome a tech dis-advantage and let you bring down large, threatening units.", 
             "name": "Direct Damage II", 
             "player_deck": 5189, 
             "order": "11.000"
@@ -1077,7 +1120,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "Certain cards can increase your tech level when they're used. Although it doesn't have any attack, the scholar's ability to give you a blocker plus tech can be very useful.", 
             "name": "Teching I", 
             "player_deck": 5198, 
             "order": "12.000"
@@ -1088,7 +1131,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "", 
+            "intro": "Units at the very edges are particularly tricky to kill since you can only manage to attack them from one spot. Stay alive while you tech up sufficiently to win.", 
             "name": "Teching II", 
             "player_deck": 5212, 
             "order": "13.000"
@@ -1321,7 +1364,7 @@
             "owner": "ai", 
             "must_be_killed_for_victory": true, 
             "puzzle": 5132, 
-            "location": 143, 
+            "location": 147, 
             "unit_card": 190
         }
     }, 
@@ -1334,6 +1377,17 @@
             "puzzle": 5134, 
             "location": 143, 
             "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 6118, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5132, 
+            "location": 139, 
+            "unit_card": 192
         }
     }, 
     {
