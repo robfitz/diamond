@@ -19,7 +19,7 @@ class Card(models.Model):
             ("na", "N/A"),
             ("melee", "Melee"),
             ("ranged", "Ranged"),
-            ("defender", "Defender"),
+            ("counterattack", "Counter-attack"),
             ("wall", "Wall"),
         )
 
@@ -41,7 +41,7 @@ class Card(models.Model):
     ## ranged passes over friendly units & rubble to hit the first hostile ones. 
     ## defenders counter-attack anything that strikes them, but don't actively attack
     ## on their own
-    attack_type = models.CharField(max_length=10, choices=ATTACK_CHOICES, default="na", help_text="If this card summons a unit, how it behaves during an attack (e.g. ranged, melee, defender..)")
+    attack_type = models.CharField(max_length=20, choices=ATTACK_CHOICES, default="na", help_text="If this card summons a unit, how it behaves during an attack (e.g. ranged, melee, defender..)")
 
     # which tech level you need to be at in order to play this card.
     # should generally be either 1, 3, or 5.
@@ -153,6 +153,8 @@ def set_tooltip(sender, instance, raw, **kwargs):
         if instance.attack_type == "flying":
             instance.tooltip += "Flying units skip over exactly 2 spaces in front of them, and then attack the next unit.<br/>"
 
+        if instance.attack_type == "counterattack":
+            instance.tooltip += "Counter-attack units don't actually attack, but will lash back at any melee or flying units which get close to them." 
 
     if instance.tech_change:
         instance.tooltip += "<br/>"

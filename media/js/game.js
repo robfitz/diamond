@@ -387,7 +387,7 @@ var match = {
                                     damage_player(opponent_alignment, unit.attack);
                                 }
                                 else if (action == "damage_unit") {
-                                    damage_unit(target_node_pk, opponent_alignment, unit.attack); 
+                                    damage_unit(target_node_pk, opponent_alignment, unit.attack, unit); 
                                 } 
 
                                 current_animation_step ++;
@@ -504,7 +504,13 @@ function Unit(json_model, location_node_pk, alignment) {
         this.remaining_life = this.total_life;
     }
 
-    this.suffer_damage = function(delta_damage) { 
+    this.suffer_damage = function(delta_damage, damage_source) { 
+
+        if (damage_source.type == "unit" && this.model_fields.attack_type == "counterattack") {
+            // counter-attack if appropriate
+            damage_source.suffer_damage(this.attack, this); 
+        }
+
         this.remaining_life -= delta_damage;
         show_number(this.node, -1 * delta_damage);
 
@@ -571,16 +577,10 @@ function lose() {
     }
 }
 
-function set_unit_damage(node_pk, alignment, total_damage) {
+function damage_unit(node_pk, alignment, delta_damage, damage_source) {
     var unit = boards[alignment][node_pk]; 
     if (!unit) return; 
-    unit.set_damage(total_damage);
-}
-
-function damage_unit(node_pk, alignment, delta_damage) {
-    var unit = boards[alignment][node_pk]; 
-    if (!unit) return; 
-    unit.suffer_damage(delta_damage);
+    unit.suffer_damage(delta_damage, damage_source);
 
 }
 
@@ -658,7 +658,7 @@ function heal_units(alignment) {
             node = nodes.eq(i);
 
             if (card.fields.direct_damage) {
-                damage_unit(node.attr('name'), target_alignment, card.fields.direct_damage); 
+                damage_unit(node.attr('name'), target_alignment, card.fields.direct_damage, card); 
             }
             if (card.fields.defense) { 
 
@@ -690,12 +690,13 @@ function heal_units(alignment) {
 
         if (!unit) {
             alert('attempted attack from non-existant unit at node ' + node_id + " of alignment " + alignment);
-            return; 
+            return []; 
         }
 
         if (unit.attack == 0
-            || unit.attack_type == "wall"
-            || unit.attack_type == "defender") {
+            || unit.model_fields.attack_type == "na"
+            || unit.model_fields.attack_type == "wall"
+            || unit.model_fields.attack_type == "counterattack") {
 
             // no attack from this unit 
             return [];

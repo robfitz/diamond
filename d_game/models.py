@@ -1,3 +1,4 @@
+import sys
 import simplejson
 import logging, random
 
@@ -225,14 +226,27 @@ class Unit(models.Model):
 
 
     # returns true if the damage was fatal
-    def suffer_damage(self, amount, save_to_db=True):
-        if save_to_db: 
-            logging.info("*** unit is suffering damage: %s %s" % (amount, save_to_db))
+    def suffer_damage(self, amount, save_to_db, damage_source):
 
-        if self.type != "unit":
-            return False
+        if save_to_db and damage_source.card.attack_type == "counterattack":
+            logging.info("!@# !@# i just got hit by a counterattack!")
 
         self.damage += amount
+
+        if self.card.attack_type == "counterattack":
+            if save_to_db:
+                logging.info("!@# i'm bout to counterattack: %s %s %s" % (damage_source, damage_source.card.defense, damage_source.card.attack_type))
+
+            try:
+                if damage_source and damage_source.card.defense and damage_source.card.attack_type != "ranged":
+                    logging.info("!@# seriously damaging it right now")
+                    damage_source.suffer_damage(self.card.attack, save_to_db, self) 
+                    logging.info("!@# SUCCESS seriously damaging it right now")
+            except:
+                # not attacked by a unit
+                if save_to_db:
+                    logging.info("!@# exception counterattacking: %s" % sys.exc_info()[0])
+                pass
 
         if self.damage >= self.card.defense: 
             self.die(save_to_db)
@@ -682,7 +696,7 @@ class Board():
                 # direct damage BOOOIOIY!!!
                 target = self.nodes[owner_alignment]["%s_%s" % (node["row"], node['x'])]
                 if target and target.type == "unit":
-                    target.suffer_damage(card_to_play.direct_damage, save_to_db)
+                    target.suffer_damage(card_to_play.direct_damage, save_to_db, card_to_play)
 
             if card_to_play.defense: 
                 # it's a freaking summon!
@@ -774,6 +788,10 @@ class Board():
 
     def do_attack(self, unit, save_to_db):
 
+        if unit.card.attack_type == "na" or unit.card.attack_type == "counterattack":
+            # some types of units don't do anything during an active attack
+            return
+
         row = unit.row
         x = unit.x
         starting_alignment = unit.owner_alignment
@@ -813,7 +831,7 @@ class Board():
                     return
                 elif next_node and next_node.type == "unit":
                     # bumped into enemy unit
-                    is_dead = next_node.suffer_damage(unit.card.attack, save_to_db)
+                    is_dead = next_node.suffer_damage(unit.card.attack, save_to_db, unit)
                     return
                     
             elif row == 0 and x == 0:
