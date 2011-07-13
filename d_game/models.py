@@ -228,24 +228,14 @@ class Unit(models.Model):
     # returns true if the damage was fatal
     def suffer_damage(self, amount, save_to_db, damage_source):
 
-        if save_to_db and damage_source.card.attack_type == "counterattack":
-            logging.info("!@# !@# i just got hit by a counterattack!")
-
         self.damage += amount
 
-        if self.card.attack_type == "counterattack":
-            if save_to_db:
-                logging.info("!@# i'm bout to counterattack: %s %s %s" % (damage_source, damage_source.card.defense, damage_source.card.attack_type))
-
+        if self.card.attack_type == "counterattack": 
             try:
                 if damage_source and damage_source.card.defense and damage_source.card.attack_type != "ranged":
-                    logging.info("!@# seriously damaging it right now")
                     damage_source.suffer_damage(self.card.attack, save_to_db, self) 
-                    logging.info("!@# SUCCESS seriously damaging it right now")
             except:
-                # not attacked by a unit
-                if save_to_db:
-                    logging.info("!@# exception counterattacking: %s" % sys.exc_info()[0])
+                # not attacked by a unit, could have been plinked by spell etc
                 pass
 
         if self.damage >= self.card.defense: 

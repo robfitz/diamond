@@ -704,7 +704,12 @@ function heal_units(alignment) {
             node = nodes.eq(i);
 
             if (card.fields.direct_damage) {
+                var node_pk = node.attr("name");
+                var unit = boards[target_alignment][node_pk]; 
+
                 damage_unit(node.attr('name'), target_alignment, card.fields.direct_damage, card); 
+                unit.show_next_damage();
+
             }
             if (card.fields.defense) { 
 
