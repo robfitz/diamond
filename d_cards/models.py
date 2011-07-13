@@ -20,6 +20,7 @@ class Card(models.Model):
             ("melee", "Melee"),
             ("ranged", "Ranged"),
             ("counterattack", "Counter-attack"),
+            ("flying", "Flying"),
             ("wall", "Wall"),
         )
 

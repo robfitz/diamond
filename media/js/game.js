@@ -693,8 +693,7 @@ function heal_units(alignment) {
             return []; 
         }
 
-        if (unit.attack == 0
-            || unit.model_fields.attack_type == "na"
+        if (unit.model_fields.attack_type == "na"
             || unit.model_fields.attack_type == "wall"
             || unit.model_fields.attack_type == "counterattack") {
 
@@ -713,6 +712,8 @@ function heal_units(alignment) {
         var d_row = 1;
 
         var path_info = [];
+
+        var steps_taken = 0;
 
         while (is_searching) {
 
@@ -771,6 +772,12 @@ function heal_units(alignment) {
             }
 
             path_info.push(path_node);
+
+            steps_taken ++;
+            if (unit.model_fields.attack_type == "flying" && steps_taken < 3) {
+                // flying units always pass over the subsequent 2 nodes
+                continue;
+            }
 
             //is there a guy there?
             var collision_unit = get_unit_at(alignment, next_node_id)

@@ -431,7 +431,8 @@ class AI():
             play_1 = first["play"]
             target_node_1 = first["target"] 
             align_1 = first["target_align"]
-            match.ai_library.play(play_1.id)
+            if play_1:
+                match.ai_library.play(play_1.id)
 
 
         #heal and attack
@@ -454,7 +455,8 @@ class AI():
             play_2 = second["play"]
             target_node_2 = second["target"]
             align_2 = second["target_align"]
-            match.ai_library.play(play_2.id)
+            if play_2:
+                match.ai_library.play(play_2.id)
 
         # ai play second card 
         if not target_node_2 or target_node_2 == "tech": 
@@ -799,6 +801,8 @@ class Board():
         alignment = starting_alignment
         is_searching = True
 
+        steps_taken = 0 
+
         while is_searching:
             if alignment != starting_alignment:
                 d_row = -1
@@ -814,6 +818,12 @@ class Board():
 
             if x != 0 and abs(x) > row:
                 x = row * x / abs(x)
+
+            steps_taken += 1
+
+            if unit.card.attack_type == "flying" and steps_taken < 3:
+                # flying units skip the 2 spots in front of them
+                continue
 
             if alignment == starting_alignment and unit.card.attack_type == "ranged":
                 # ranged units always pass over friendly tiles, so
@@ -848,6 +858,7 @@ class Board():
                         self.match.save()
 
                 return 
+
 
 
 class Turn(models.Model):
