@@ -189,9 +189,29 @@ var match = {
         }
     }
 
+    function test_game_over() {
+        if (match.type == 'puzzle') {
+            for (var node_pk in boards['ai']) { 
+                var unit = boards['ai'][node_pk]; 
+                if (unit && unit['type'] == 'unit' && unit.must_be_killed) {
+                    return;
+                }
+            }
+            // all required units are dead, player won puzzle
+            win();
+        }
+
+        if (match.life["ai"] <= 0) {
+            win();
+        }
+        else if (match.life["friendly"] <= 0) {
+            lose();
+        } 
+    }
+
     function next_phase(is_first_turn) {
 
-        if (match.winner) return;
+        if (match.winner || test_game_over()) return;
 
         if (is_first_turn) {
             var units = match.turn_data.ai_starting_units;
@@ -387,7 +407,9 @@ var match = {
                                     damage_player(opponent_alignment, unit.attack);
                                 }
                                 else if (action == "damage_unit") {
-                                    damage_unit(target_node_pk, opponent_alignment, unit.attack, unit); 
+                                    var damaged_unit = attack_path[current_animation_step].damaged_unit;
+                                    damaged_unit.show_next_damage();
+                                    animation_ms += 1000;
                                 } 
 
                                 current_animation_step ++;
@@ -410,7 +432,6 @@ var match = {
                         }     
                     ); 
                 }
-                animation_ms += 500;
         });
         return animation_ms;
     }
@@ -433,6 +454,12 @@ function Unit(json_model, location_node_pk, alignment) {
     this.must_be_killed = false;
 
     this.type = "unit"; 
+
+    // for differentiating between model state and animation state
+    this.gui_life = this.remaining_life;
+    this.undisplayed_damage_queue = [];
+
+    this.rubble_duration = 1;
 
     //init and add to board
     this.node = $(".board." + alignment + " .node[name='" + location_node_pk + "']");
@@ -512,49 +539,87 @@ function Unit(json_model, location_node_pk, alignment) {
         }
 
         this.remaining_life -= delta_damage;
-        show_number(this.node, -1 * delta_damage);
 
-        for (var i = 0; i < delta_damage; i ++) {
-            this.node.find(".defense_point.health").filter(":last").removeClass("health").addClass("damage");
-        }
+        this.undisplayed_damage_queue.push(delta_damage);
 
-        var unit = this;
-        this.node.children(".unit_piece").effect("bounce", "fast", function() { 
-            if (unit.remaining_life <= 0) {
-                unit.die();
-            }
-        });
-
+        if (this.remaining_life <= 0) {
+            this.die();
+        } 
     } 
 
-    this.die = function() { 
-        //killed. remove from board.
-        boards[this.alignment][this.node.attr('name')] = null;
+    this.show_next_damage = function() {
 
+        var delta_damage = this.undisplayed_damage_queue.shift();
+
+        if (delta_damage) {
+
+            for (var i = 0; i < delta_damage; i ++) {
+                this.node.find(".defense_point.health").filter(":last").removeClass("health").addClass("damage");
+            }
+
+            this.gui_life -= delta_damage;
+
+            var unit = this;
+            this.node.children(".unit_piece").effect("bounce", "fast", function() {
+                    if (unit.gui_life <= 0) {
+                        // die if it's relevant
+
+                        if (unit.rubble_duration > 0) {
+                            unit.node.children(".unit_piece").hide("explode", function() {
+
+                                    // remove unit icon
+                                    $(this).remove();
+
+                                    // create rubble icon
+                                    var rubble = $("<div title='Rubble appears when units die and prevents new units from being placed until it decays.' class='rubble r_" + unit.rubble_duration + "'></div>").appendTo(unit.node);
+                                    $("<img src='/media/units/rubble.png' />").appendTo(rubble); 
+
+                                    init_tooltips(".node");
+
+                                    // intro animation
+                                    rubble.hide();
+                                    rubble.show("bounce");
+                            }); 
+                        }
+                        else {
+                            unit.node.children(".unit_piece").hide("explode", function() {
+
+                                    // remove unit icon
+                                    $(this).remove();
+                            });
+                        } 
+
+                    } 
+            });
+            show_number(this.node, -1 * delta_damage); 
+        } 
+    }
+
+    this.die = function() { 
 
         this.node.addClass("empty");
         this.node.removeClass("unit"); 
         this.node.removeClass("occupied");
 
-        var rubble = add_rubble(this.alignment, this.node, 1);
-        rubble.hide();
+        if (this.rubble_duration > 0) {
+            // killed. leave in place but become rubble
+            this.type = "rubble";
 
-        //this.node.children(".unit_piece").remove(); 
-        this.node.children(".unit_piece").hide("explode", function() {
-                $(this).remove();
-                rubble.show("bounce");
-            });
+            this.node.addClass("occupied");
+            this.node.removeClass("empty"); 
 
-        if (this.alignment == 'ai' && match.type == 'puzzle') {
-            for (var node_pk in boards['ai']) { 
-                var unit = boards['ai'][node_pk]; 
-                if (unit && unit['type'] == 'unit' && unit.must_be_killed) {
-                    return;
-                }
-            }
-            // all required units are dead, player won puzzle
-            win();
+            boards[alignment][this.node.attr('name')] = { 
+                    "type": "rubble",
+                    "amount": this.rubble_duration,
+                };
+        } 
+        else {
+            this.type == "dead";
+
+            // killed and no rubble left. remove from board.
+            boards[this.alignment][this.node.attr('name')] = null;
         }
+
     }
 }
 
@@ -580,8 +645,7 @@ function lose() {
 function damage_unit(node_pk, alignment, delta_damage, damage_source) {
     var unit = boards[alignment][node_pk]; 
     if (!unit) return; 
-    unit.suffer_damage(delta_damage, damage_source);
-
+    unit.suffer_damage(delta_damage, damage_source); 
 }
 
 function heal_units(alignment) {
@@ -622,24 +686,6 @@ function heal_units(alignment) {
                 }
             });
         });
-    }
-
-    function add_rubble(alignment, node, quantity) { 
-        var rubble = $("<div title='Rubble appears when units die and prevents new units from being placed until it decays.' class='rubble r_" + quantity + "'></div>").appendTo(node);
-
-        init_tooltips(".node");
-
-        for (var i = 0; i < quantity; i ++) {
-            $("<img src='/media/units/rubble.png' />").appendTo(rubble); 
-        } 
-        node.addClass("occupied");
-        node.removeClass("empty"); 
-
-        boards[alignment][node.attr('name')] = { 
-                "type": "rubble",
-                "amount": quantity
-            };
-        return rubble;
     }
 
     function cast_card(caster_alignment, target_alignment, card, node, skip_side_effects) {
@@ -797,6 +843,8 @@ function heal_units(alignment) {
                 else {
                     //no? ai! hit it!
                     path_node.action = "damage_unit";
+                    path_node.damaged_unit = collision_unit;
+                    damage_unit(next_node_id, alignment, unit.attack, unit); 
                     is_searching = false;
                 }
             }
@@ -836,14 +884,6 @@ function heal_units(alignment) {
 
         show_number($(".life." + alignment), -1 * amount);
 
-        if (match.life[alignment] <= 0) {
-            if (alignment == "ai") {
-                win();
-            }
-            else {
-                lose();
-            } 
-        }
     }
 
     function add_card_to_hand(card_json) {
