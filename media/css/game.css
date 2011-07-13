@@ -73,13 +73,24 @@ h1.green {
 
 #friendly_hand {
     border:1px solid black;
-    padding:10px;
     position:absolute;
-    bottom:10px;
-    left:24px;
+    bottom:4px;
+    left:4px;
     background:#fff;
     z-index:10;
+
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
 }
+#friendly_hand .ribbon {
+    left:-13px;
+    margin-top:-50px;
+}
+#friendly_hand .triangle-ribbon {
+    left:-26px;
+    margin-top:0;
+}
+
 #game_controls {
     position:absolute;
     bottom:10px;
@@ -161,6 +172,19 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 }
 
 .card {
+    float:left;
+    margin:2px; 
+    position:absolute;
+    left:-20px !important;
+    top:-16px !important; 
+}
+.card .card_name {
+    display:block !important;
+    position:absolute;
+    color: #000;
+    font-weight:bold; 
+    font-size:10px;
+    top:84px;
 }
 .card:hover {
     background-color:yellow;
@@ -241,6 +265,9 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     width:16px;
     margin:0;
     padding:0;
+}
+.unit_piece .card_name {
+    display:none;
 }
 
 .node {

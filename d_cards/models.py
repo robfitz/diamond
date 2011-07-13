@@ -221,8 +221,11 @@ class ShuffledLibrary(models.Model):
         hand = []
 
         for id in card_ids:
-            card = Card.objects.get(id=id)
-            hand.append(card) 
+            try:
+                card = Card.objects.get(id=id)
+                hand.append(card) 
+            except:
+                continue
 
         hand_json = serializers.serialize("json", hand)
 
@@ -296,8 +299,12 @@ class Deck(models.Model):
 
         cards = Card.objects.all()
         with_duplicates = []
+
         for id in self.card_ids:
-            with_duplicates.append(cards.get(id=id))
+            try:
+                with_duplicates.append(cards.get(id=id))
+            except:
+                continue
         return with_duplicates 
 
     def __unicode__(self):

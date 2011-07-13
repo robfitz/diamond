@@ -470,32 +470,10 @@ function Unit(json_model, location_node_pk, alignment) {
 
     this.node.children(".unit_piece").remove();
     
-    var unit_piece = $("<div title='" + this.model_fields.tooltip + "' class='unit_piece attack_" + this.model_fields.attack + "' id='" + this.model.pk + "'></div>").appendTo(this.node);
+    var unit_piece = get_unit_body(this.model).appendTo(this.node);
+    unit_piece.addClass("unit_piece");
 
     init_tooltips(".node");
-
-    if (this.alignment == 'friendly' && this.model_fields.icon_url_back) {
-        $("<img src='" + this.model_fields.icon_url_back + "' />").appendTo(unit_piece); 
-    } 
-    else {
-        $("<img src='" + this.model_fields.icon_url + "' />").appendTo(unit_piece); 
-    }
-
-
-
-    // container for holding attack icons
-    var unit_attack = $("<div class='unit_attack'></div>").appendTo(unit_piece);
-
-    // attack icons, one per attack point
-    for (var i = 0; i < this.model_fields.attack; i ++) {
-        $("<img src='/media/units/attack_type_" + this.model_fields.attack_type + ".png' />").appendTo(unit_attack);
-    }
-
-    //life bubbles, one per defense, which display life & damage
-    var def = $("<div class='defense'></div>").appendTo(unit_piece); 
-    for (i = 0; i < this.total_life; i ++) {
-        $("<div class='defense_point health'></div>").appendTo(def); 
-    }
 
     var w = parseInt(unit_piece.css('width'));
     var h = parseInt(unit_piece.css('height'));
@@ -622,6 +600,38 @@ function Unit(json_model, location_node_pk, alignment) {
 
     }
 }
+
+function get_unit_body(model, alignment) {
+    var model_fields = model.fields;
+    var unit_piece = $("<div title='" + model_fields.tooltip + "' class='attack_" + model_fields.attack + "' id='" + model.pk + "'></div>");
+
+    if (alignment == 'friendly' && model_fields.icon_url_back) {
+        $("<img src='" + model_fields.icon_url_back + "' />").appendTo(unit_piece); 
+    } 
+    else {
+        $("<img src='" + model_fields.icon_url + "' />").appendTo(unit_piece); 
+    } 
+
+    // container for holding attack icons
+    var unit_attack = $("<div class='unit_attack'></div>").appendTo(unit_piece);
+
+    // attack icons, one per attack point
+    for (var i = 0; i < model_fields.attack; i ++) {
+        $("<img src='/media/units/attack_type_" + model_fields.attack_type + ".png' />").appendTo(unit_attack);
+    }
+
+    //life bubbles, one per defense, which display life & damage
+    var def = $("<div class='defense'></div>").appendTo(unit_piece); 
+    for (i = 0; i < model_fields.defense; i ++) {
+        $("<div class='defense_point health'></div>").appendTo(def); 
+    }
+
+    $("<div class='card_name'>T" + model.fields.tech_level + ":" + model.fields.name + "</div>").appendTo(unit_piece);
+
+    return unit_piece;
+}
+
+
 
 function win() { 
 
@@ -892,13 +902,8 @@ function heal_units(alignment) {
     }
 
     function add_card_to_hand(card_json) {
-        var card = $("<li class='card' id='" + card_json.pk + "'></li>").appendTo("#friendly_hand");
+        var card = get_unit_body(card_json).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
 
-        var f = card_json.fields;
-        card_str = "T" + f.tech_level + ": " + f.name;
-        card.text(card_str);
-
-        card.attr("title", f.tooltip);
         init_tooltips("#friendly_hand");
 
         match.hand_cards[card_json.pk] = card_json; 
