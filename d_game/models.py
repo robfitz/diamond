@@ -670,7 +670,7 @@ class Board():
             return hval + 1000
         elif self.match.ai_life <= 0:
             return hval - 1000
-        else return hval
+        else: return hval
 
 
     def cast(self, owner_alignment, card_to_play, node_to_target, save_to_db):
