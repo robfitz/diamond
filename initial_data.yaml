@@ -8,13 +8,13 @@
             "defense": 2, 
             "name": "Soldier", 
             "target_aiming": "chosen", 
-            "icon_url": "/media/units/soldier.png", 
+            "icon_url": "/media/units/soldier-white.png", 
             "tech_change": 0, 
             "tooltip": "<b>T1: Soldier</b><br/>1/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
             "target_alignment": "friendly", 
             "attack": 1, 
             "unit_power_level": 1, 
-            "icon_url_back": "/media/units/soldier-back.png", 
+            "icon_url_back": "/media/units/soldier-white-back.png", 
             "target_occupant": "empty", 
             "tech_level": 1
         }
@@ -48,13 +48,13 @@
             "defense": 1, 
             "name": "Longbowman", 
             "target_aiming": "chosen", 
-            "icon_url": "/media/units/archer.png", 
+            "icon_url": "/media/units/archer-blue.png", 
             "tech_change": 0, 
             "tooltip": "<b>T3: Longbowman</b><br/>2/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
             "target_alignment": "friendly", 
             "attack": 2, 
             "unit_power_level": 2, 
-            "icon_url_back": "/media/units/archer-back.png", 
+            "icon_url_back": "/media/units/archer-blue-back.png", 
             "target_occupant": "empty", 
             "tech_level": 3
         }
@@ -68,13 +68,13 @@
             "defense": 1, 
             "name": "Sniper", 
             "target_aiming": "chosen", 
-            "icon_url": "/media/units/archer.png", 
+            "icon_url": "/media/units/archer-red.png", 
             "tech_change": 0, 
             "tooltip": "<b>T5: Sniper</b><br/>3/1 ranged<br/><br/>Ranged units shoot over friendly units to hit the first enemy in front of them.<br/>", 
             "target_alignment": "friendly", 
             "attack": 3, 
             "unit_power_level": 3, 
-            "icon_url_back": "/media/units/archer-back.png", 
+            "icon_url_back": "/media/units/archer-red-back.png", 
             "target_occupant": "empty", 
             "tech_level": 5
         }
@@ -108,13 +108,13 @@
             "defense": 4, 
             "name": "Knight", 
             "target_aiming": "chosen", 
-            "icon_url": "/media/units/soldier.png", 
+            "icon_url": "/media/units/soldier-black.png", 
             "tech_change": 0, 
             "tooltip": "<b>T5: Knight</b><br/>3/4 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
             "target_alignment": "friendly", 
             "attack": 3, 
             "unit_power_level": 3, 
-            "icon_url_back": "/media/units/soldier-back.png", 
+            "icon_url_back": "/media/units/soldier-black-back.png", 
             "target_occupant": "empty", 
             "tech_level": 5
         }
@@ -128,13 +128,13 @@
             "defense": 1, 
             "name": "Militia Swarm", 
             "target_aiming": "all", 
-            "icon_url": "/media/units/soldier.png", 
+            "icon_url": "/media/units/soldier-leather.png", 
             "tech_change": 0, 
             "tooltip": "<b>T5: Militia Swarm</b><br/>1/1 melee to all friendly empty spaces<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
             "target_alignment": "friendly", 
             "attack": 1, 
             "unit_power_level": 1, 
-            "icon_url_back": "/media/units/soldier-back.png", 
+            "icon_url_back": "/media/units/soldier-leather-back.png", 
             "target_occupant": "empty", 
             "tech_level": 5
         }
@@ -230,7 +230,7 @@
             "target_aiming": "chosen", 
             "icon_url": "/media/units/wizard.png", 
             "tech_change": 1, 
-            "tooltip": "<b>T1: Scholar</b><br/>0/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/>", 
+            "tooltip": "<b>T1: Scholar</b><br/>0/2 melee<br/><br/>Melee units move forward until they reach any unit, friendly or otherwise.<br/><br/>Increases tech by %s when cast<br/>", 
             "target_alignment": "friendly", 
             "attack": 0, 
             "unit_power_level": 0, 
@@ -365,13 +365,11 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                190, 
-                190, 
-                190, 
-                198, 
-                200, 
-                198, 
-                190
+                841, 
+                841, 
+                841, 
+                841, 
+                841
             ], 
             "max_size": 20
         }
@@ -1049,16 +1047,14 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                841, 
-                841, 
-                841, 
-                747, 
-                883, 
-                6260, 
-                883, 
                 190, 
+                192, 
+                192, 
                 841, 
+                194, 
+                190, 
                 6258, 
+                192, 
                 6258
             ], 
             "max_size": 20
