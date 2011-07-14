@@ -331,6 +331,16 @@ class AI():
             test_board.load_from_match_id(match.id)
             match.ai_tech += 1
 
+            if is_before_attack:
+                # promote offensive play by simulating
+                # our AI attack
+                test_board.do_attack_phase("ai", False)
+            else:
+                # promote more defensive play by
+                # simulating the player's attack.
+                test_board.cast("friendly", test_militia, None, False)
+                test_board.do_attack_phase("friendly", False) 
+
             hval = test_board.get_ai_heuristic_value(hand_cards) 
             if hval > best_hval:
                 best_hval = hval
@@ -340,6 +350,7 @@ class AI():
 
             # tech back down to compensate for trying out teching
             match.ai_tech -= 1
+            test_board.load_from_match_id(match.id)
 
             if card.tech_level > match.ai_tech:
                 continue
@@ -354,6 +365,7 @@ class AI():
                     # our AI attack
                     test_board.do_attack_phase("ai", False)
                 else:
+                    # if we're summoning, 
                     # promote more defensive play by
                     # simulating the player's attack.
                     test_board.cast("friendly", test_militia, None, False)
@@ -547,8 +559,8 @@ class Board():
         valid_targets = []
 
         enemy_alignment = "ai"
-        if owner_alignment == "friendly":
-            enemy_alignment = "ai"
+        if owner_alignment == "ai":
+            enemy_alignment = "friendly"
 
         alignments = []
         if card.target_alignment == "any":
@@ -625,7 +637,7 @@ class Board():
 
         my_hand = 0
         # hand choices
-        for card in hand_cards:
+        for card in hand_cards: 
 
             # cards you can cast are worth lots
             if card.tech_level <= self.match.ai_tech:

@@ -105,9 +105,9 @@ Deck editor
 
         <input type="submit" value="Save">
 
-        {% for card_id in deck.card_ids %}
+        {% for card in deck.all_cards %}
 
-            <input name="deck_card_{{ forloop.counter }}" value="{{ card_id }}" id="{{ card_id }}" class="hidden {{ card_id }}" />
+            <input name="deck_card_{{ forloop.counter }}" value="{{ card.id }}" id="{{ card.id }}" class="hidden {{ card.id }}" />
 
         {% endfor %} 
 
