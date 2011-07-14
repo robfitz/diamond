@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block results_nav %}
-    <a class="continue button blue" href="javascript:void(0);" onclick="go_to('{{ next_puzzle_url }}')">On to the next puzzle</a>
-    <a class="continue button" href="javascript:void(0);" onclick="go_to('/puzzles/')">Back to puzzle list</a>
+    {% if puzzle %}
+        <a class="continue button blue" href="javascript:void(0);" onclick="go_to('{{ next_puzzle_url }}')">On to the next puzzle</a>
+        <a class="continue button" href="javascript:void(0);" onclick="go_to('/puzzles/')">Back to puzzle list</a>
+    {% else %}
+
+        <a class="continue button blue" href="javascript:void(0);" onclick="go_to('/play/')">Play again</a>
+        <a class="continue button" href="javascript:void(0);" onclick="go_to('/deck/')">Edit your deck</a> {% endif %}
 {% endblock results_nav %} 

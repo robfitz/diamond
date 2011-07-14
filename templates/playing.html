@@ -8,7 +8,11 @@
 {% endblock meta %}
 
 {% block header_title %}
-AI mode
+    {% if puzzle %}
+        Diamond - Puzzle mode
+    {% else %}
+        Diamond - AI battle mode
+    {% endif %}
 {% endblock header_title %}
 
 {% block style %}
