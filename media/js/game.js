@@ -23,14 +23,14 @@ function pass_turn() {
         $("input[name='node1']").val('pass'); 
         $("input[name='align1']").val('pass'); 
 
-        next_phase(); 
+        next_phase(false); 
     }
     else if (match.phase == 3) {
         $("input[name='card2']").val('pass');
         $("input[name='node2']").val('pass'); 
         $("input[name='align2']").val('pass'); 
 
-        next_phase();
+        next_phase(false);
     }
 }
 
@@ -106,7 +106,7 @@ var match = {
                 // TODO: this probably shouldn't be here. clean up
                 // the end of my turn/beginning of their turn ordering
                 heal_units("ai");
-                next_phase();
+                next_phase(false);
             }
         );
 
@@ -258,16 +258,16 @@ var match = {
                 }
                 setTimeout ( function() {
                     heal_units("friendly");
-                    next_phase();
+                    next_phase(false);
                 }, 200 * i); 
             }
             else {
-                next_phase();
+                next_phase(false);
             }
         }
         else if (match.phase == 1) {
-            if ($("#friendly_hand").children().length == 0) {
-                setTimeout(next_phase, 400); 
+            if ($("#friendly_hand").children().length <= 2) {
+                setTimeout( function() { next_phase(false); }, 400); 
             }
             else {
                 //do nothing.
@@ -277,11 +277,11 @@ var match = {
         else if (match.phase == 2) {
             //begin logic for auto-attacking
             var delay = do_attack_phase("friendly");
-            setTimeout(next_phase, delay);
+            setTimeout(function() { next_phase(false); }, delay + 1000);
         }
         else if (match.phase == 3) {
-            if ($("#friendly_hand").children().length == 0) {
-                setTimeout(next_phase, 400); 
+            if ($("#friendly_hand").children().length <= 2) {
+                setTimeout( function() { next_phase(false); }, 400); 
             }
             else {
                 //do nothing.
@@ -297,13 +297,15 @@ var match = {
         else if (match.phase == 5 ) {
             do_ai_play_1();
             setTimeout ( function() {
-                next_phase();
+                next_phase(false);
             }, 1000); 
         } 
         else if (match.phase == 6) {
             //ai attack
             var delay = do_attack_phase("ai");
-            setTimeout(next_phase, delay + 1000);
+            setTimeout( function() {
+                    next_phase(false);
+                }, delay + 1000);
         }
         else if (match.phase == 7 ) {
             do_ai_play_2();
@@ -312,7 +314,7 @@ var match = {
             verify_board_state(match.turn_data["verify_board_state_after_ai"]);
 
             setTimeout ( function() {
-                next_phase();
+                next_phase(false);
             }, 1000); 
 
         }
@@ -1015,7 +1017,7 @@ function heal_units(alignment) {
             $("input[name='align2']").val("friendly"); 
         }
 
-        next_phase();
+        next_phase(false);
     }
 
     function ai_tech_up(amount) {
@@ -1086,7 +1088,7 @@ function heal_units(alignment) {
 
         cast_card('friendly', align, card, node);
 
-        setTimeout( next_phase, 800);
+        setTimeout( function() { next_phase(false) }, 800);
     }
 
     function cancel_cast() {

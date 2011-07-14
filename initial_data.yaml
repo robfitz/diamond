@@ -180,26 +180,6 @@
         }
     }, 
     {
-        "pk": 883, 
-        "model": "d_cards.card", 
-        "fields": {
-            "attack_type": "na", 
-            "direct_damage": 1, 
-            "defense": 0, 
-            "name": "Falling rock", 
-            "target_aiming": "chosen", 
-            "icon_url": "/media/units/rubble.png", 
-            "tech_change": 0, 
-            "tooltip": "<b>T1: Falling rock</b><br/>1 direct damage to any any<br/>", 
-            "target_alignment": "any", 
-            "attack": 0, 
-            "unit_power_level": 0, 
-            "icon_url_back": "", 
-            "target_occupant": "any", 
-            "tech_level": 1
-        }
-    }, 
-    {
         "pk": 1173, 
         "model": "d_cards.card", 
         "fields": {
@@ -280,32 +260,118 @@
         }
     }, 
     {
+        "pk": 6170, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "counterattack", 
+            "direct_damage": 0, 
+            "defense": 2, 
+            "name": "Lazy mob", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/defender.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Lazy mob</b><br/>1/2 counterattack<br/><br/>Counter-attack units don't actually attack, but will lash back at any melee or flying units which get close to them.", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "/media/units/defender-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 6172, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "counterattack", 
+            "direct_damage": 0, 
+            "defense": 5, 
+            "name": "Phalynx", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/defender.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T5: Phalynx</b><br/>2/5 counterattack<br/><br/>Counter-attack units don't actually attack, but will lash back at any melee or flying units which get close to them.", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 3, 
+            "icon_url_back": "/media/units/defender-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 5
+        }
+    }, 
+    {
+        "pk": 6174, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "counterattack", 
+            "direct_damage": 0, 
+            "defense": 3, 
+            "name": "Garrison", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/defender.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Garrison</b><br/>1/3 counterattack<br/><br/>Counter-attack units don't actually attack, but will lash back at any melee or flying units which get close to them.", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 2, 
+            "icon_url_back": "/media/units/defender-back.png", 
+            "target_occupant": "empty", 
+            "tech_level": 3
+        }
+    }, 
+    {
+        "pk": 6258, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "flying", 
+            "direct_damage": 0, 
+            "defense": 1, 
+            "name": "Pidgeon rider", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/flying_1.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T1: Pidgeon rider</b><br/>1/1 flying<br/><br/>Flying units skip over exactly 2 spaces in front of them, and then attack the next unit.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 1, 
+            "unit_power_level": 1, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 1
+        }
+    }, 
+    {
+        "pk": 6260, 
+        "model": "d_cards.card", 
+        "fields": {
+            "attack_type": "flying", 
+            "direct_damage": 0, 
+            "defense": 2, 
+            "name": "Ostrich rider", 
+            "target_aiming": "chosen", 
+            "icon_url": "/media/units/flying_2.png", 
+            "tech_change": 0, 
+            "tooltip": "<b>T3: Ostrich rider</b><br/>2/2 flying<br/><br/>Flying units skip over exactly 2 spaces in front of them, and then attack the next unit.<br/>", 
+            "target_alignment": "friendly", 
+            "attack": 2, 
+            "unit_power_level": 2, 
+            "icon_url_back": "", 
+            "target_occupant": "empty", 
+            "tech_level": 3
+        }
+    }, 
+    {
         "pk": 557, 
         "model": "d_cards.deck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
-                192, 
-                194, 
-                194, 
-                196, 
-                198, 
+                190, 
+                190, 
+                190, 
                 198, 
                 200, 
-                747, 
-                839, 
-                841, 
-                192, 
-                192, 
-                190, 
-                190, 
-                190, 
-                883, 
-                883, 
-                1175, 
-                1173, 
-                1175, 
-                1173
+                198, 
+                190
             ], 
             "max_size": 20
         }
@@ -981,15 +1047,19 @@
         "pk": 5986, 
         "model": "d_cards.deck", 
         "fields": {
-            "nickname": "Soldiers 'n archers", 
+            "nickname": "", 
             "card_ids": [
+                841, 
+                841, 
+                841, 
+                747, 
+                883, 
+                6260, 
+                883, 
                 190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
+                841, 
+                6258, 
+                6258
             ], 
             "max_size": 20
         }
