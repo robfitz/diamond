@@ -1,20 +1,7 @@
 function surrender() { 
-    if (match.phase == 1) {
-        $("input[name='card1']").val('surrender');
-        $("input[name='node1']").val('surrender'); 
-        $("input[name='align1']").val('surrender'); 
-
-        // jump to 0 life
-        damage_player("friendly", match.life['friendly']);
-    }
-    else if (match.phase == 3) {
-        $("input[name='card2']").val('surrender');
-        $("input[name='node2']").val('surrender'); 
-        $("input[name='align2']").val('surrender'); 
-
-        // jump to 0 life
-        damage_player("friendly", match.life['friendly']);
-    }
+    // jump to 0 life
+    damage_player("friendly", match.life['friendly']);
+    test_game_over(); 
 }
 
 function pass_turn() {
@@ -190,6 +177,13 @@ var match = {
     }
 
     function test_game_over() {
+        if (match.life["ai"] <= 0) {
+            win();
+        }
+        else if (match.life["friendly"] <= 0) {
+            lose();
+        } 
+
         if (match.type == 'puzzle') {
             for (var node_pk in boards['ai']) { 
                 var unit = boards['ai'][node_pk]; 
@@ -199,13 +193,6 @@ var match = {
             }
             // all required units are dead, player won puzzle
             win();
-        }
-
-        if (match.life["ai"] <= 0) {
-            win();
-        }
-        else if (match.life["friendly"] <= 0) {
-            lose();
         } 
     }
 
