@@ -628,16 +628,16 @@ function win() {
         setTimeout(function() { 
             $("#win_screen").show("slide", "slow"); 
             end_turn();
-            match.winner = 'friendly';
             }, 500);
+        match.winner = 'friendly';
     }
 }
 function lose() {
     if (!match.winner) {
         setTimeout(function() {
             $("#lose_screen").show("slide", "slow");
-            match.winner = 'ai';
             }, 500);
+        match.winner = 'ai';
     }
 }
 
