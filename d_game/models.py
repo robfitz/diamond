@@ -601,10 +601,6 @@ class Board():
     
     def get_ai_heuristic_value(self, hand_cards): 
 
-        if self.match.friendly_life <= 0:
-            return 1000
-        elif self.match.ai_life <= 0:
-            return -1000
         
         hval = 0
 
@@ -669,7 +665,12 @@ class Board():
                     # my_board += node.rubble_duration * self.node_power_levels["%s_%s" % (row, x)] * 0.33
 
         #logging.info("@@ got heuristic: %s from life=%s/%s, hand=%s, units=%s/%s, board=%s/%s" % (hval, my_life, their_life, my_hand, my_units, their_units, my_board, their_board))
-        return hval
+
+        if self.match.friendly_life <= 0:
+            return hval + 1000
+        elif self.match.ai_life <= 0:
+            return hval - 1000
+        else return hval
 
 
     def cast(self, owner_alignment, card_to_play, node_to_target, save_to_db):
