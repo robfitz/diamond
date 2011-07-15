@@ -1061,11 +1061,28 @@
         }
     }, 
     {
+        "pk": 7003, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
         "pk": 1231, 
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "Basic soldiers move forward until they hit something. They're are healed at the beginning of their turn, so to kill one you'll have to do 2 damage to it on the same turn.", 
+            "intro": "Beat puzzle levels by destroying all the enemy units. They're healed at the beginning of the turn, so you'll need to position your units to do 2 damage at the same time. Press the surrender button to try again if you get stuck!", 
             "name": "Angled Melee", 
             "player_deck": 1252, 
             "order": "1.000"
@@ -1098,7 +1115,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "When a unit dies, it leaves rubble which stops you from using that space for your next turn. Combine ranged and melee units to overcome the enemy defences.", 
+            "intro": "When a unit dies, it leaves rubble which stops you from re-using that space during your next turn. Combine ranged and melee units to overcome the enemy defences.", 
             "name": "Ranged II", 
             "player_deck": 4825, 
             "order": "4.000"
@@ -1142,7 +1159,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "Whenever a unit dies, the space is covered with rubble and can't be re-used for a full turn. However, units are still able to attack through rubble. ", 
+            "intro": "Remember -- whenever a unit dies, the space is covered with rubble and can't be re-used for a full turn. However, units are still able to attack through rubble. ", 
             "name": "Rubble I", 
             "player_deck": 5058, 
             "order": "8.000"
@@ -1175,7 +1192,7 @@
         "model": "d_game.puzzle", 
         "fields": {
             "player_life": 1, 
-            "intro": "Spells can also help overcome a tech dis-advantage and let you bring down large, threatening units.", 
+            "intro": "Spells can also help overcome a tech disadvantage by allowing you to bring down large, threatening units.", 
             "name": "Direct Damage II", 
             "player_deck": 5189, 
             "order": "11.000"

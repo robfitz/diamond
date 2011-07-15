@@ -17,7 +17,7 @@ class PuzzleFeedback(models.Model):
             ("impossible", "It may actually be impossible"),
         )
 
-    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, blank=False, default="no opinion", verbose_name="Puzzle difficulty")
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, blank=False, default="no opinion", verbose_name="Feedback on difficulty:")
 
     feedback = models.TextField(blank=True, verbose_name="Other thoughts?")
 
