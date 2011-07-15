@@ -37,6 +37,7 @@ var match = {
         'ai': 10 
     },
     phase: -1,
+    turn_num: 1,
 
     hand_cards: {},
 
@@ -226,7 +227,7 @@ var match = {
 
         if (match.phase >= phases.length) {
             match.phase = 0;
-            
+            match.turn_num ++; 
         }
 
         $("#phases").find("li.active").removeClass("active");
@@ -257,6 +258,11 @@ var match = {
                 setTimeout( function() { next_phase(false); }, 400); 
             }
             else {
+                if ( match.turn_num > 1) {
+                    slider_alert("It's the first half of your turn!",
+                            "Pick a card to play, tech up, or skip your turn",
+                            false); 
+                }
                 //do nothing.
                 //wait for player to play card
             }
@@ -271,6 +277,9 @@ var match = {
                 setTimeout( function() { next_phase(false); }, 400); 
             }
             else {
+                slider_alert("It's the second half of your turn!",
+                        "Pick a card to play, tech up, or skip your turn",
+                        false);
                 //do nothing.
                 //wait for player to play card
             }

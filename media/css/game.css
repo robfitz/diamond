@@ -1,3 +1,29 @@
+#slider_alert {
+    z-index:2000;
+    background: url(black-50.png); 
+    position:absolute;
+    left:0;
+    top:60px;
+    right:0;
+    border-top: 3px solid black;
+    border-bottom: 3px solid black;
+}
+#slider_alert .message_container {
+    width:400px;
+    margin-left:200px;
+    color:#fff;
+    padding:20px 0;
+}
+#slider_alert .message_container h4 {
+    margin-bottom: 10px;
+}
+#slider_alert .okay {
+    margin:0;
+    padding-left:100px;
+    padding-right:100px;
+    margin-left:80px;
+}
+
 h1.feedback {
     position:absolute;
     font-size:48px;
