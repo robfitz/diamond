@@ -1,3 +1,6 @@
+import logging
+from datetime import date
+
 from django.db import models
 from django.contrib.auth.models import User
 from djangotoolbox.fields import ListField 
@@ -28,13 +31,26 @@ class UserMetrics(models.Model):
 
     def seven_day_activity_percent(self):
 
-        active_days = 0
+        active_days = 0 
+        today = date.today()
 
-        for login_date in self.login_dates[-7:]:
+        max_days = 7
+        # if self.first_visit_date:
+            # max_days = (today - self.first_visit_date).days + 1
+            # if max_days > 7: 
+                # max_days = 7
+        # else:
+            # max_days = 7 
 
-            pass
 
-        return "TODO" 
+        for login_date in self.login_dates[-max_days:]:
+            delta = today - login_date
+            if delta.days >= max_days:
+                break
+            else: 
+                active_days += 1 
+
+        return 100 * active_days / max_days 
 
 
     def activation_funnel_percent(self):
