@@ -2,23 +2,18 @@ import logging
 
 from django.shortcuts import render_to_response
 
+from d_users import util as users_util
 from d_game.models import Puzzle, Match
 
+from d_game.util import daily_activity 
 
+
+@daily_activity
 def puzzle_navigator(request):
 
     logging.info("XXX sess %s: %s" % (request.session.session_key, request.session.get("beaten_puzzle_ids")))
 
-    beaten_puzzle_ids = []
-    try:
-        profile = request.user.get_profile()
-        beaten_puzzle_ids = profile.beaten_puzzle_ids
-    except:
-        # probably an anonymous user, so no profile
-        beaten_matches = Match.objects.filter(session_key=request.session.session_key)
-        for match in beaten_matches:
-            if match.type == "puzzle" and match.winner == "friendly" and match.puzzle.id not in beaten_puzzle_ids:
-                beaten_puzzle_ids.append(match.puzzle.id)
+    beaten_puzzle_ids = users_util.unique_puzzles_won(request)
 
     puzzles = Puzzle.objects.all() 
 

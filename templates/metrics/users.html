@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block header_title %}
+1984
+{% endblock header_title %}
+
+{% block content %} 
+<table>
+
+    <tr>
+        <th>First visit</th>
+        <th>Signup date</th>
+        <th>Signup version</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Acquisition</th>
+        <th>Activation</th>
+        <th>7 day activity</th>
+        <th>Puzzles complete</th>
+        <th>Total AI matches</th>
+        <th>Total cards earned</th>
+        <th>Total active days</th>
+    </tr>
+
+    {% for metrics in all_user_metrics %}
+        <tr>
+            <td>{{ metrics.first_visit_date }}</td>
+            <td>{{ metrics.user.get_profile.signup_date }}</td>
+            <td>{{ metrics.signup_version }}</td>
+            <td>{{ metrics.user.username }}</td>
+            <td>{{ metrics.user.email }}</td>
+            <td>{{ metrics.acquisition_funnel_percent }}%</td>
+            <td>{{ metrics.activation_funnel_percent }}%</td>
+            <td>{{ metrics.seven_day_activity_percent }}</td>
+            <td>{{ metrics.unique_puzzles_won }}</td>
+            <td>{{ metrics.total_ai_matches_begun }}</td>
+            <td>{{ metrics.total_cards_earned }}</td>
+            <td>{{ metrics.login_dates|length }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock content %}

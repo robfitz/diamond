@@ -17,6 +17,8 @@ class UserProfile(models.Model):
 
     beaten_puzzle_ids = ListField(models.PositiveIntegerField(), null=True, blank=True, default=[])
 
+    signup_date = models.DateTimeField(auto_now_add=True, null=True)
+
 
     def __unicode__(self):
         return self.user.username

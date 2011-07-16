@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     (r'^accounts/register/$', 'd_users.views.register'),
 
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    (r'^admin/metrics/', 'd_metrics.views.user_metrics'),
     (r'^admin/', include(admin.site.urls)),
 
     ('^deck/$', 'd_cards.views.edit_deck'),

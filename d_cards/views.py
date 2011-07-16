@@ -10,6 +10,7 @@ from d_game.models import Puzzle
 from d_cards.util import get_deck_from
 
 
+@daily_activity
 def edit_deck(request):
 
     deck = None

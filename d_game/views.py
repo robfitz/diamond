@@ -12,11 +12,16 @@ from django.contrib.sessions.backends.db import SessionStore
 from d_board.models import Node
 from d_cards.models import Card, ShuffledLibrary, Deck
 from d_game.models import Turn, Match, Board, Unit, AI, Puzzle
+from d_game.util import daily_activity
 from d_cards.util import get_deck_from
 from d_feedback.models import PuzzleFeedbackForm
+from d_metrics.models import UserMetrics
 import d_users
 
 
+
+
+@daily_activity
 def puzzle(request):
 
     # init
@@ -45,6 +50,7 @@ def puzzle(request):
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
+@daily_activity
 def playing(request): 
 
     # init
