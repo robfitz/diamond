@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from d_cards.models import Deck, Card
 from d_game.models import Puzzle
 from d_cards.util import get_deck_from
+from d_game.util import daily_activity
 
 
 @daily_activity

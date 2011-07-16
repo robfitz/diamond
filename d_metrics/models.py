@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from djangotoolbox.fields import ListField 
+from django.contrib import admin
 
 
 class UserMetrics(models.Model):
@@ -11,8 +12,8 @@ class UserMetrics(models.Model):
     first_visit_date = models.DateTimeField(auto_now_add=True, null=True) 
     signup_date = models.DateTimeField(null=True)
 
-    first_visit_version = models.IntegerField() 
-    signup_version = models.IntegerField()
+    first_visit_version = models.IntegerField(default=0) 
+    signup_version = models.IntegerField(default=0)
 
     login_dates = ListField(models.DateField(), default=[])
 
@@ -77,13 +78,4 @@ class UserMetrics(models.Model):
 
 
 
-    
-
-    
-    
-    
-
-    
-
-
-
+admin.site.register(UserMetrics)

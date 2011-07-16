@@ -26,7 +26,7 @@ def cache_user_metrics(request):
             begun = Match.objects.filter(player=metrics.user).filter(type='ai')
 
         else:
-            begun = len(Match.objects.filter(session_key=request.session.session_key)).filter(type='ai')
+            begun = Match.objects.filter(session_key=request.session.session_key).filter(type='ai')
 
         metrics.unique_puzzles_won = len(beaten_puzzle_ids)
 

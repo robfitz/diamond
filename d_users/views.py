@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -8,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 
 from d_game.models import Match
+from d_metrics.models import UserMetrics
 
 
 def register(request):
@@ -39,23 +41,44 @@ def register(request):
                     auth.login(request, user) 
 
                     # attach any session state to this new account 
-
-                    beaten_matches = Match.objects.filter(session_key=pre_login_session_key)
-                    logging.info("@@@ beaten matches: %s" % beaten_matches)
-                    beaten_puzzle_ids = []
-                    for match in beaten_matches:
-                        if match.type == "puzzle" and match.puzzle.id not in beaten_puzzle_ids:
-                            beaten_puzzle_ids.append(match.puzzle.id)
-
-                        # update from pointing to an outdated session key
-                        # to pointing at a real live user
-                        match.player = user
-                        match.save()
-
-                    user.get_profile().beaten_puzzle_ids = beaten_puzzle_ids
-                    user.get_profile().save()
+                    init_winnings(user, pre_login_session_key) 
+                    init_metrics(user, pre_login_session_key)
 
                     return HttpResponseRedirect(request.POST.get("next"))
 
 
     return render_to_response("registration/register.html", locals(), context_instance=RequestContext(request))
+
+
+def init_metrics(user, pre_login_session_key):
+
+    try:
+        metrics = UserMetrics.objects.get(anon_session_key=pre_login_session_key)
+        
+    except:
+        # they apparently logged in before doing ANYTHING, so
+        # create new metrics for them
+        metrics = UserMetrics(user=user)
+
+    metrics.user = user
+    metrics.signup_date = datetime.now()
+
+    metrics.save() 
+
+
+def init_winnings(user, pre_login_session_key):
+
+    beaten_matches = Match.objects.filter(session_key=pre_login_session_key)
+    logging.info("@@@ beaten matches: %s" % beaten_matches)
+    beaten_puzzle_ids = []
+    for match in beaten_matches:
+        if match.type == "puzzle" match.winner == "friendly" and match.puzzle.id not in beaten_puzzle_ids:
+            beaten_puzzle_ids.append(match.puzzle.id)
+
+        # update from pointing to an outdated session key
+        # to pointing at a real live user
+        match.player = user
+        match.save()
+
+    user.get_profile().beaten_puzzle_ids = beaten_puzzle_ids
+    user.get_profile().save()
