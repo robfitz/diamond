@@ -2,6 +2,8 @@ import logging
 
 from django.shortcuts import render_to_response
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+
 from settings import VERSION
 
 from d_users import util as users_util
@@ -10,6 +12,9 @@ from d_game.models import Match
 
 
 def user_metrics(request):
+
+    if not request.user.is_staff:
+        return HttpResponseRedirect("/")
 
     init_user_metrics()
     cache_user_metrics(request)
@@ -22,8 +27,7 @@ def user_metrics(request):
     return render_to_response("metrics/users.html", locals())
 
 
-def cache_user_metrics(request):
-
+def cache_user_metrics(request): 
 
     for metrics in UserMetrics.objects.all():
 
