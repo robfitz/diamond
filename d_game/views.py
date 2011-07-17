@@ -19,8 +19,6 @@ from d_metrics.models import UserMetrics
 import d_users
 
 
-
-
 @daily_activity
 def puzzle(request):
 

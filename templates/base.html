@@ -29,6 +29,11 @@
 
         <script type="text/javascript" language="javascript">
             $( function () {
+
+                if ($.browser == "msie") { 
+                    window.location.href = "/no_ie/"; 
+                } 
+
                 {% block ready_script %}
                 {% endblock %}
 

@@ -32,6 +32,8 @@ urlpatterns = patterns('',
     # submit mini-survey
     ('^feedback/puzzle/$', 'd_feedback.views.puzzle_feedback'),
 
+    ('^no_ie/$', 'django.views.generic.simple.direct_to_template', {'template': 'misc/no_ie.html'}),
+
     ('^$', 'd_menus.views.puzzle_navigator'),
         
 
