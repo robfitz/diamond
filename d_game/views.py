@@ -2,7 +2,7 @@ import logging
 import simplejson
 from random import random
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core import serializers
 from django.template import RequestContext
@@ -16,15 +16,21 @@ from d_game.util import daily_activity
 from d_cards.util import get_deck_from
 from d_feedback.models import PuzzleFeedbackForm
 from d_metrics.models import UserMetrics
-import d_users
+
+from d_users.util import has_permissions_for
 
 
 @daily_activity
 def puzzle(request):
 
-    # init
-
     puzzle = Puzzle.objects.get(id=request.GET.get('p'))
+
+    # check perms
+    if not has_permissions_for(puzzle, request.user, request.session.session_key):
+        return HttpResponseRedirect('/puzzles/')
+
+
+
     puzzles = Puzzle.objects.all()
     i = 0
     for p in puzzles:
