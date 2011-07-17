@@ -272,7 +272,9 @@
 
             x.animate({ top:"-=40" },
                 { duration: 1000 });
-            x.fadeOut(1000);
+                x.fadeOut(1000, function() {
+                    $(this).remove();    
+                });
         }
 
     </script>
