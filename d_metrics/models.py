@@ -28,6 +28,27 @@ class UserMetrics(models.Model):
 
     total_cards_earned = models.IntegerField(default=0)
 
+    total_activation_funnel_steps = 2
+    total_acquisition_funnel_steps = 4
+
+
+    def seven_day_activity_array(self):
+
+        max_days = 7
+        today = date.today()
+
+        activity = []
+        for i in range(max_days):
+            activity.append(False)
+
+        if self.login_dates:
+            for login_date in self.login_dates[-max_days:]:
+                day_delta = (today - login_date).days
+                if day_delta < max_days:
+                    activity[max_days - day_delta - 1] = True
+
+        return activity 
+
 
     def seven_day_activity_percent(self):
 
@@ -53,9 +74,8 @@ class UserMetrics(models.Model):
         return 100 * active_days / max_days 
 
 
-    def activation_funnel_percent(self):
+    def activation_funnel_step(self):
 
-        total_steps = 2
         completed = 0
 
         if self.user:
@@ -66,19 +86,22 @@ class UserMetrics(models.Model):
                 # has opted in for marketing
                 completed += 1
 
-        return 100 * completed / total_steps 
+        return completed 
+
+    def activation_funnel_percent(self):
+
+        return 100 * self.activation_funnel_step() / self.total_activation_funnel_steps
 
 
-    def acquisition_funnel_percent(self):
+    def acquisition_funnel_step(self):
 
-        total_steps = 4
         completed = 0
 
         # by virtue of this user being tracked,
         # they have arrived on the page so
         completed += 1
 
-        if self.unique_puzzles_won > 1:
+        if self.unique_puzzles_won >= 3:
             # has beaten a puzzle
             completed += 1
 
@@ -90,8 +113,11 @@ class UserMetrics(models.Model):
                     # has saved a new deck
                     completed += 1
 
-        return 100 * completed / total_steps 
+        return completed
 
+
+    def acquisition_funnel_percent(self): 
+        return 100 * self.acquisition_funnel_step() / self.total_acquisition_funnel_steps 
 
 
 admin.site.register(UserMetrics)

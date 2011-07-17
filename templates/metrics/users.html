@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block meta %} 
+    <link rel="stylesheet" type="text/css" href="/media/css/metrics.css" type="text/css" />
+{% endblock meta %}
+
 {% block header_title %}
 1984
 {% endblock header_title %}
@@ -13,9 +17,9 @@
         <th>Signup version</th>
         <th>Username</th>
         <th>Email</th>
-        <th>Acquisition</th>
-        <th>Activation</th>
-        <th>7 day activity</th>
+        <th colspan="5">Acquisition</th>
+        <th colspan="3">Activation</th>
+        <th colspan="8">7 day activity</th>
         <th>Puzzles complete</th>
         <th>Total AI matches</th>
         <th>Total cards earned</th>
@@ -29,9 +33,36 @@
             <td>{{ metrics.signup_version }}</td>
             <td>{{ metrics.user.username }}</td>
             <td>{{ metrics.user.email }}</td>
-            <td>{{ metrics.acquisition_funnel_percent }}%</td>
+            <td> {{ metrics.acquisition_funnel_percent }}% </td>
+
+            {% for i in acquisition_range %}
+                {% if metrics.acquisition_funnel_step > i %}
+                <td class="funnel_step_complete">&nbsp;</td>
+                {% else %}
+                <td class="funnel_step_incomplete">&nbsp;</td>
+                {% endif %} 
+            {% endfor %}
+
             <td>{{ metrics.activation_funnel_percent }}%</td>
+
+            {% for i in activation_range %}
+                {% if metrics.activation_funnel_step > i %}
+                <td class="funnel_step_complete">&nbsp;</td>
+                {% else %}
+                <td class="funnel_step_incomplete">&nbsp;</td>
+                {% endif %} 
+            {% endfor %}
+
             <td>{{ metrics.seven_day_activity_percent }}%</td>
+
+            {% for day in metrics.seven_day_activity_array %}
+                {% if day %}
+                <td class="funnel_step_complete">&nbsp;</td>
+                {% else %}
+                <td class="funnel_step_incomplete">&nbsp;</td>
+                {% endif %} 
+            {% endfor %}
+
             <td>{{ metrics.unique_puzzles_won }}</td>
             <td>{{ metrics.total_ai_matches_begun }}</td>
             <td>{{ metrics.total_cards_earned }}</td>

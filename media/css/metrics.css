@@ -1,0 +1,8 @@
+.funnel_step_complete {
+    background-color:#0f0;
+    width:10px;
+}
+.funnel_step_incomplete {
+    background-color:#e5e5e5;
+    width:10px;
+}

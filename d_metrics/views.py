@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render_to_response
 from django.contrib.auth.models import User
 
@@ -13,14 +15,19 @@ def user_metrics(request):
 
     all_user_metrics = UserMetrics.objects.all()
 
+    activation_range = range(UserMetrics().total_activation_funnel_steps)
+    acquisition_range = range(UserMetrics().total_acquisition_funnel_steps)
+
     return render_to_response("metrics/users.html", locals())
 
 
 def cache_user_metrics(request):
 
-    beaten_puzzle_ids = users_util.unique_puzzles_won(request)
 
     for metrics in UserMetrics.objects.all():
+
+        metrics.anon_session_key
+        beaten_puzzle_ids = users_util.unique_puzzles_won(metrics.user, metrics.anon_session_key)
 
         if metrics.user: 
             begun = Match.objects.filter(player=metrics.user).filter(type='ai')

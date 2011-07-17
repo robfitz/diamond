@@ -13,7 +13,7 @@ def puzzle_navigator(request):
 
     logging.info("XXX sess %s: %s" % (request.session.session_key, request.session.get("beaten_puzzle_ids")))
 
-    beaten_puzzle_ids = users_util.unique_puzzles_won(request)
+    beaten_puzzle_ids = users_util.unique_puzzles_won(request.user, request.session.session_key)
 
     puzzles = Puzzle.objects.all() 
 
