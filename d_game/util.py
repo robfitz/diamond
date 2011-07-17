@@ -19,9 +19,7 @@ def daily_activity(view):
             try:
                 metrics = UserMetrics.objects.get(anon_session_key=request.session.session_key)
             except:
-                metrics = UserMetrics(anon_session_key=request.session.session_key,
-                        first_visit_version=0,
-                        signup_version=0)
+                metrics = UserMetrics(anon_session_key=request.session.session_key)
                 metrics.save()
 
         if len(metrics.login_dates) == 0 or metrics.login_dates[-1] != datetime.date.today():

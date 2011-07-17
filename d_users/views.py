@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from settings import VERSION
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
@@ -61,6 +62,7 @@ def init_metrics(user, pre_login_session_key):
         metrics = UserMetrics(user=user)
 
     metrics.user = user
+    metrics.signup_version = VERSION
     metrics.signup_date = datetime.now()
 
     metrics.save() 
@@ -72,7 +74,7 @@ def init_winnings(user, pre_login_session_key):
     logging.info("@@@ beaten matches: %s" % beaten_matches)
     beaten_puzzle_ids = []
     for match in beaten_matches:
-        if match.type == "puzzle" match.winner == "friendly" and match.puzzle.id not in beaten_puzzle_ids:
+        if match.type == "puzzle" and match.winner == "friendly" and match.puzzle.id not in beaten_puzzle_ids:
             beaten_puzzle_ids.append(match.puzzle.id)
 
         # update from pointing to an outdated session key

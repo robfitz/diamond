@@ -1,10 +1,13 @@
 import logging
 from datetime import date
 
+from django import forms
 from django.db import models
 from django.contrib.auth.models import User
 from djangotoolbox.fields import ListField 
 from django.contrib import admin
+
+from settings import VERSION
 
 
 class UserMetrics(models.Model):
@@ -15,7 +18,7 @@ class UserMetrics(models.Model):
     first_visit_date = models.DateTimeField(auto_now_add=True, null=True) 
     signup_date = models.DateTimeField(null=True)
 
-    first_visit_version = models.IntegerField(default=0) 
+    first_visit_version = models.IntegerField(default=VERSION) 
     signup_version = models.IntegerField(default=0)
 
     login_dates = ListField(models.DateField(), default=[])
@@ -120,4 +123,9 @@ class UserMetrics(models.Model):
         return 100 * self.acquisition_funnel_step() / self.total_acquisition_funnel_steps 
 
 
-admin.site.register(UserMetrics)
+class UserMetricsAdmin(admin.ModelAdmin):
+
+    pass
+
+
+admin.site.register(UserMetrics, UserMetricsAdmin)

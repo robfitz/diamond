@@ -2,6 +2,7 @@ import logging
 
 from django.shortcuts import render_to_response
 from django.contrib.auth.models import User
+from settings import VERSION
 
 from d_users import util as users_util
 from d_metrics.models import UserMetrics
@@ -65,7 +66,7 @@ def init_user_metrics():
                     first_visit_date=None,
                     signup_date=user.get_profile().signup_date,
                     first_visit_version=0,
-                    signup_version=0) 
+                    signup_version=VERSION) 
 
             metrics.save() 
             metrics.first_visit_date = None

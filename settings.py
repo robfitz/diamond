@@ -1,5 +1,7 @@
 from djangoappengine.settings_base import *
 
+VERSION = 7
+
 import os
 
 DEBUG = True

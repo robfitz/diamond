@@ -13,10 +13,10 @@
 
     <tr>
         <th>First visit</th>
+        <th>First version</th>
         <th>Signup date</th>
         <th>Signup version</th>
         <th>Username</th>
-        <th>Email</th>
         <th colspan="5">Acquisition</th>
         <th colspan="3">Activation</th>
         <th colspan="8">7 day activity</th>
@@ -28,11 +28,16 @@
 
     {% for metrics in all_user_metrics %}
         <tr>
-            <td>{{ metrics.first_visit_date }}</td>
-            <td>{{ metrics.user.get_profile.signup_date }}</td>
+            <td>{{ metrics.first_visit_date|date:"M d" }}</td>
+            <td>{{ metrics.first_visit_version }}</td>
+            <td>{{ metrics.user.get_profile.signup_date|date:"M d" }}</td>
             <td>{{ metrics.signup_version }}</td>
-            <td>{{ metrics.user.username }}</td>
-            <td>{{ metrics.user.email }}</td>
+            <td>{% if metrics.user.email %}
+                    <a href="mailto:{{metrics.user.email}}">{{ metrics.user.username }}</a>
+                {% else %}
+                    {{ metrics.user.username }}
+                {% endif %} 
+            </td>
             <td> {{ metrics.acquisition_funnel_percent }}% </td>
 
             {% for i in acquisition_range %}
