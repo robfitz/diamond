@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
 {% block meta %}
+
     <link rel="stylesheet" type="text/css" href="/media/css/edit_deck.css" type="text/css" /> 
+
+    <link rel="stylesheet" type="text/css" href="/media/css/game.css" type="text/css" />
+
+    <script type="text/javascript" src="/media/js/game.js"></script>
+
 {% endblock meta %}
 
 {% block header_title %}
@@ -15,11 +21,7 @@ Deck editor
         <h2 class="ribbon">Your Army</h2> 
         <div class="triangle-ribbon"></div>
 
-        <div id="deck" class="card_list">
-
-            {% for card in deck.all_cards %}
-            <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
-            {% endfor %}
+        <div id="deck" class="card_list"> 
         </div>
     </div>
 
@@ -38,7 +40,7 @@ Deck editor
     <script>
         var card_data = {};
 
-        var unique_i = 0;
+        var unique_i = {{ deck.all_cards|length }};
 
         $(function() {
 
@@ -48,10 +50,35 @@ Deck editor
                 success: function(card_data_text) {
                     card_data = eval('(' + card_data_text + ')');
                     init_library();
+                    init_deck();
                     $("#num_remaining").text("" + ({{ deck.max_size }} - $("#deck").children().length));
                 }
             });
+
         });
+
+        function init_deck() {
+
+            var json;
+            var body;
+
+            {% for card in deck.all_cards %}
+
+                for (var i = 0; i < card_data.length; i ++) {
+                    var card_json = card_data[i];
+                    if (card_json.pk == "{{card.id}}") {
+                
+                        body = get_unit_body(card_json).attr("id", card_json.pk).addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#deck").bind('click', {'card': card_json}, on_deck_card_click ); 
+                    }
+                }
+                
+                /**
+                <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
+                */
+            {% endfor %}
+
+            init_tooltips("#deck");
+        }
 
         function init_library() {
             for (var i = 0; i < card_data.length; i ++) {
@@ -80,11 +107,15 @@ Deck editor
                         break;
                     } 
                 }
+
+                var body = get_unit_body(card).attr("id", card_id).addClass("card").addClass("unit_piece").addClass(card_id).appendTo("#deck").bind('click', {'card': card}, on_deck_card_click );
+                init_tooltips("#deck");
                 
-                $("<input class='hidden' name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass(card_id).appendTo("#save_form");
+                $("<input name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass("hidden").addClass(card_id).appendTo("#save_form");
 
+                /** 
                 $("<li class='deck_card' name='deck_card_" + unique_i + "'></li>").attr('id', card_id).addClass(card_id).appendTo("#deck").text(card.fields.name).bind( 'click', { 'card': card }, on_deck_card_click );
-
+                */ 
 
                 $("#num_remaining").text("" + ({{ deck.max_size }} - num));
             });
@@ -93,9 +124,9 @@ Deck editor
         }
         function on_deck_card_click (event) {
 
-            var card_id = event.target.id;
+            var card_id = event.currentTarget.id;
+            $(event.currentTarget).remove();
 
-            $("#deck .deck_card." + card_id).first().remove();
             $("#save_form ." + card_id).first().remove();
 
             var num = $("#deck").children().length;

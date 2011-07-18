@@ -1,5 +1,6 @@
 import random
 import logging
+import simplejson
 
 from django import forms
 from django.db import models
@@ -82,6 +83,13 @@ class Card(models.Model):
 
     # how much damage to do (or heal) a unit for
     direct_damage = models.IntegerField(default=0)
+
+
+    def json(self):
+        logging.info("%s" % simplejson.dumps(self))
+
+        return simplejson.dumps(self)
+
 
     def __unicode__(self):
 

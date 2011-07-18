@@ -13,6 +13,8 @@ def daily_activity(view):
     def inner(request, *args, **kwargs):
 
         user_agent=request.META.get('HTTP_USER_AGENT',None)
+
+        request.is_crawler=False 
                 
         if not user_agent:
             return HttpResponseForbidden('request without username are not supported. sorry')
@@ -22,7 +24,7 @@ def daily_activity(view):
             if agent in BOT_NAMES:
                 request.is_crawler=True
 
-        if not rqequest.is_crawler:
+        if not request.is_crawler:
             # don't save metrics for bots
             if request.user.is_authenticated(): 
                 # logged in user should already have metrics
