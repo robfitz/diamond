@@ -1078,6 +1078,125 @@
         }
     }, 
     {
+        "pk": 7233, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7236, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7239, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7242, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7272, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7294, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7316, 
+        "model": "d_cards.deck", 
+        "fields": {
+            "nickname": "Soldiers 'n archers", 
+            "card_ids": [
+                190, 
+                190, 
+                190, 
+                190, 
+                192, 
+                192, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
         "pk": 1231, 
         "model": "d_game.puzzle", 
         "fields": {

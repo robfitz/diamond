@@ -1,29 +1,38 @@
 {% extends 'base.html' %}
 
+{% block meta %}
+    <link rel="stylesheet" type="text/css" href="/media/css/edit_deck.css" type="text/css" /> 
+{% endblock meta %}
+
 {% block header_title %}
 Deck editor
 {% endblock %}
 
 {% block content %} 
 
-    <p>
+    <div id="my_deck">
+
+        <h2 class="ribbon">Your Army</h2> 
+        <div class="triangle-ribbon"></div>
+
+        <div id="deck" class="card_list">
+
+            {% for card in deck.all_cards %}
+            <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="library_group">
     <strong>All cards</strong>
     <ul id="library" class="card_list">
         {% for card in all_cards %}
         {% endfor %}
     </ul>
-    </p>
+    </div>
 
     <h3><span id="num_remaining"></span> spots left in deck</h3>
 
-    <p>
-    <strong>Deck</strong>
-    <ul id="deck" class="card_list">
-        {% for card in deck.all_cards %}
-        <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
-        {% endfor %}
-    </ul>
-    </p>
 
 
     <script>

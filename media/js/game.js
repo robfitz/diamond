@@ -468,7 +468,7 @@ function Unit(json_model, location_node_pk, alignment) {
 
     this.node.children(".unit_piece").remove();
     
-    var unit_piece = get_unit_body(this.model).appendTo(this.node);
+    var unit_piece = get_unit_body(this.model, this.alignment).appendTo(this.node);
     unit_piece.addClass("unit_piece");
 
     init_tooltips(".node");

@@ -31,7 +31,6 @@ def cache_user_metrics(request):
 
     for metrics in UserMetrics.objects.all():
 
-        metrics.anon_session_key
         beaten_puzzle_ids = users_util.unique_puzzles_won(metrics.user, metrics.anon_session_key)
 
         if metrics.user: 

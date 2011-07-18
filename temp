@@ -1,57 +1,3 @@
-import datetime
-
-from django.utils.functional import wraps
-from d_metrics.models import UserMetrics
-
-from django.http import HttpResponseForbidden
-
-
-def daily_activity(view):
-
-    @wraps(view)
-
-    def inner(request, *args, **kwargs):
-
-        user_agent=request.META.get('HTTP_USER_AGENT',None)
-                
-        if not user_agent:
-            return HttpResponseForbidden('request without username are not supported. sorry')
-            request.is_crawler=False
-                                    
-        for agent in user_agent:
-            if agent in BOT_NAMES:
-                request.is_crawler=True
-
-        if not rqequest.is_crawler:
-            # don't save metrics for bots
-            if request.user.is_authenticated(): 
-                # logged in user should already have metrics
-                # metrics = UserMetrics.objects.get(user=user)
-                metrics = request.user.metrics
-
-            else:
-                try:
-                    metrics = UserMetrics.objects.get(anon_session_key=request.session.session_key)
-                except:
-                    metrics = UserMetrics(anon_session_key=request.session.session_key)
-                    metrics.save()
-
-            if len(metrics.login_dates) == 0 or metrics.login_dates[-1] != datetime.date.today():
-                # if we haven't already marked the user
-                # as active for today, do so now!
-                
-                metrics.login_dates.append(datetime.date.today())
-                metrics.save()
-
-        # call the wrapped view
-        return view(request, *args, **kwargs)
-
-    # return the wrapped function, replacing
-    # the original view
-    return inner 
-
-
-
 BOT_NAMES = ["ABCdatos BotLink",
     "Acme.Spider",
     "Ahoy! The Homepage Finder",
@@ -127,6 +73,7 @@ BOT_NAMES = ["ABCdatos BotLink",
     "Wild Ferret Web Hopper #1, #2, #3",
     "FetchRover",
     "fido",
+    "Hämähäkki",
     "KIT-Fireball",
     "Fish search",
     "Fouineur",

@@ -66,6 +66,12 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: d_metrics_usermetrics
+  properties:
+  - name: user_id
+  - name: __key__
+    direction: desc
+
 - kind: d_users_userprofile
   properties:
   - name: __key__

@@ -125,7 +125,7 @@ class UserMetrics(models.Model):
 
 class UserMetricsAdmin(admin.ModelAdmin):
 
-    pass
+    list_display = ('user', 'unique_puzzles_won')
 
 
 admin.site.register(UserMetrics, UserMetricsAdmin)

@@ -1,0 +1,28 @@
+#my_deck {
+    margin-top:50px;
+    margin-left:-51px;
+
+    position:fixed;
+    width:180px;
+    border:1px solid #ccc;
+
+    background:#e5e5ff;
+
+    -webkit-border-bottom-right-radius: 30px;
+    -moz-border-radius-bottomright: 30px;
+    -webkit-border-top-right-radius: 30px;
+    -moz-border-radius-topright: 30px;
+}
+
+#my_deck .ribbon {
+    left:-13px;
+}
+#my_deck .triangle-ribbon {
+    left:-26px;
+}
+
+.library_group {
+    margin-left:200px; 
+}
+
+
