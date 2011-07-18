@@ -1,4 +1,5 @@
 import logging
+import simplejson
 
 from django.template import RequestContext
 from django.core import serializers
@@ -49,7 +50,33 @@ def get_library_cards(request):
 
     all_cards = Card.objects.all()
 
-    json = serializers.serialize("json", all_cards)
+    organized = {}
+
+    for card in all_cards:
+
+        if card.defense > 0 and card.target_alignment == "friendly" and card.target_occupant == "empty" and card.target_aiming == "chosen":
+
+            # basic summon, sort by attack type
+            try: organized[card.attack_type]
+            except: organized[card.attack_type] = []
+
+            organized[card.attack_type].append(card)
+
+        else:
+
+            # anything other than a basic summon, lump 'em all together
+            try: organized["effects"]
+            except: organized["effects"] = []
+
+            organized["effects"].append(card)
+
+    sorted_cards = []
+    for category in organized:
+        sorted_cards.append({'category': category, 'cards': serializers.serialize("json", organized[category])}) 
+
+    # json = serializers.serialize("json", all_cards)
+    # json = serializers.serialize("json", sorted_cards)
+    json = simplejson.dumps(sorted_cards)
 
     return HttpResponse(json, "application/javascript")
 

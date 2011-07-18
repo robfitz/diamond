@@ -28,11 +28,8 @@ Deck editor
     </div>
 
     <div class="library_group">
-    <strong>All cards</strong>
-    <ul id="library" class="card_list">
-        {% for card in all_cards %}
-        {% endfor %}
-    </ul>
+        <ul id="library" class="card_list">
+        </ul>
     </div>
 
     <h3><span id="num_remaining"></span> spots left in deck</h3>
@@ -64,13 +61,15 @@ Deck editor
 
             {% for card in deck.all_cards %}
 
-                for (var i = 0; i < card_data.length; i ++) {
-                    var card_json = card_data[i];
-                    if (card_json.pk == "{{card.id}}") {
+                //for (var i = 0; i < card_data.length; i ++) {
+                 //   var card_json = card_data[i];
+                 //   if (card_json.pk == "{{card.id}}") {
+
+                     card_json = eval("{{ card.json|escapejs }}")[0];
                 
                         body = get_unit_body(card_json).attr("id", card_json.pk).addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#deck").bind('click', {'card': card_json}, on_deck_card_click ); 
-                    }
-                }
+                  //  }
+                //}
                 
                 /**
                 <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
@@ -80,49 +79,45 @@ Deck editor
 
         function init_library() {
             for (var i = 0; i < card_data.length; i ++) {
+                var category = card_data[i].category;
+                $("<div class='spacer'>&nbsp;</div><h4 style='float:left;'>" + category + "</h4><div class='spacer'>&nbsp;</div>").appendTo("#library");
+                var cards = eval(card_data[i].cards);
+                for (var j = 0; j < cards.length; j ++) {
 
-                var card_json = card_data[i];
+                    var card_json = cards[j];
 
-                //$('<li class="library_card"></li>').text(card_json.fields.name).attr('id', "" + card_json.pk).appendTo("#library");
+                    //$('<li class="library_card"></li>').text(card_json.fields.name).attr('id', "" + card_json.pk).appendTo("#library");
 
-                get_unit_body(card_json).attr("id", card_json.pk).addClass("library_card").addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#library");
-            }
-
-            init_tooltips("#library"); 
-
-            $(".library_card").click( function (event) {
-                
-                var num = $("#deck").children().length + 1;
-
-                // don't allow deck to grow beyond max.
-                // this is just for the UI -- the server also checks.
-                if (num > {{ deck.max_size }}) {
-                    return;
-                } 
-
-                unique_i += 1;
-
-                var card_id = $(this).attr("id");
-                var card;
-
-                for (var i = 0; i < card_data.length; i ++) {
-                    if (card_data[i].pk == card_id) {
-                        card = card_data[i];
-                        break;
-                    } 
+                    get_unit_body(card_json).attr("id", card_json.pk).addClass("library_card").addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#library").bind('click', {'card': card_json}, on_library_card_click );
                 }
-
-                var body = get_unit_body(card).attr("id", card_id).addClass("card").addClass("unit_piece").addClass(card_id).appendTo("#deck").bind('click', {'card': card}, on_deck_card_click );
-                init_tooltips("#deck");
-                
-                $("<input name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass("hidden").addClass(card_id).appendTo("#save_form"); 
-
-                $("#num_remaining").text("" + ({{ deck.max_size }} - num));
-                save_deck();
-            });
-
-            $(".deck_card").bind( 'click', on_deck_card_click );
+            }
+            init_tooltips("#library"); 
         }
+
+        function on_library_card_click(event) {
+
+            var num = $("#deck").children().length + 1;
+
+            // don't allow deck to grow beyond max.
+            // this is just for the UI -- the server also checks.
+            if (num > {{ deck.max_size }}) {
+                return;
+            } 
+
+            unique_i += 1;
+
+            var card_id = event.currentTarget.id
+            var card = event.data.card;
+
+            var body = get_unit_body(card).attr("id", card_id).addClass("card").addClass("unit_piece").addClass(card_id).appendTo("#deck").bind('click', {'card': card}, on_deck_card_click );
+            init_tooltips("#deck");
+            
+            $("<input name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass("hidden").addClass(card_id).appendTo("#save_form"); 
+
+            $("#num_remaining").text("" + ({{ deck.max_size }} - num));
+            save_deck();
+        } 
+
         function on_deck_card_click (event) {
 
             var card_id = event.currentTarget.id;

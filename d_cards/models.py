@@ -86,9 +86,7 @@ class Card(models.Model):
 
 
     def json(self):
-        logging.info("%s" % simplejson.dumps(self))
-
-        return simplejson.dumps(self)
+        return "%s" % serializers.serialize("json", [self])
 
 
     def __unicode__(self):
