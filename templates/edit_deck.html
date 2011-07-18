@@ -21,6 +21,8 @@ Deck editor
         <h2 class="ribbon">Your Army</h2> 
         <div class="triangle-ribbon"></div>
 
+        <div class="spacer">&nbsp;</div>
+
         <div id="deck" class="card_list"> 
         </div>
     </div>
@@ -34,8 +36,6 @@ Deck editor
     </div>
 
     <h3><span id="num_remaining"></span> spots left in deck</h3>
-
-
 
     <script>
         var card_data = {};
@@ -76,15 +76,19 @@ Deck editor
                 <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
                 */
             {% endfor %}
-
-            init_tooltips("#deck");
         }
 
         function init_library() {
             for (var i = 0; i < card_data.length; i ++) {
+
                 var card_json = card_data[i];
-                $('<li class="library_card"></li>').text(card_json.fields.name).attr('id', "" + card_json.pk).appendTo("#library");
+
+                //$('<li class="library_card"></li>').text(card_json.fields.name).attr('id', "" + card_json.pk).appendTo("#library");
+
+                get_unit_body(card_json).attr("id", card_json.pk).addClass("library_card").addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#library");
             }
+
+            init_tooltips("#library"); 
 
             $(".library_card").click( function (event) {
                 
@@ -111,13 +115,10 @@ Deck editor
                 var body = get_unit_body(card).attr("id", card_id).addClass("card").addClass("unit_piece").addClass(card_id).appendTo("#deck").bind('click', {'card': card}, on_deck_card_click );
                 init_tooltips("#deck");
                 
-                $("<input name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass("hidden").addClass(card_id).appendTo("#save_form");
-
-                /** 
-                $("<li class='deck_card' name='deck_card_" + unique_i + "'></li>").attr('id', card_id).addClass(card_id).appendTo("#deck").text(card.fields.name).bind( 'click', { 'card': card }, on_deck_card_click );
-                */ 
+                $("<input name='deck_card_" + unique_i + "' value='" + card_id + "' />").attr('id', card.pk).addClass("hidden").addClass(card_id).appendTo("#save_form"); 
 
                 $("#num_remaining").text("" + ({{ deck.max_size }} - num));
+                save_deck();
             });
 
             $(".deck_card").bind( 'click', on_deck_card_click );
@@ -131,6 +132,7 @@ Deck editor
 
             var num = $("#deck").children().length;
             $("#num_remaining").text("" + ({{ deck.max_size }} - num));
+            save_deck();
         }
 
     </script>
@@ -139,11 +141,11 @@ Deck editor
 
         {% csrf_token %}
 
+        <!--
         Nickname: <input name="nickname" />
+        -->
 
         <input type="hidden" name="deck_id" value="{{ deck.id }}" />
-
-        <input type="submit" value="Save">
 
         {% for card in deck.all_cards %}
 
@@ -156,10 +158,16 @@ Deck editor
     <script>
         $(function() {
             $("#save_form").submit( function( event) {
-                $.post($(this).attr("action"), $(this).serialize(), function(event) { alert("saved"); });
+                //$.post($(this).attr("action"), $(this).serialize(), function(event) { alert("saved"); });
                 return false;
            });
-       });
+        });
+
+        function save_deck() {
+            $.post($("#save_form").attr("action"),
+                    $("#save_form").serialize()
+                );
+       }
    </script>
 
 {% endblock content %}

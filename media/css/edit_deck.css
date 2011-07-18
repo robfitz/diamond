@@ -1,12 +1,13 @@
 #my_deck {
-    margin-top:50px;
+    margin-top:-20px;
     margin-left:-51px;
 
-    position:fixed;
-    width:180px;
+    //position:fixed;
+    float:left;
+    width:300px;
     border:1px solid #ccc;
 
-    background:#e5e5ff;
+    background:#ffffff;
 
     -webkit-border-bottom-right-radius: 30px;
     -moz-border-radius-bottomright: 30px;
@@ -14,15 +15,21 @@
     -moz-border-radius-topright: 30px;
 }
 
+#deck .card, #library .card {
+    margin:40px 20px;
+    left:0;
+}
+
 #my_deck .ribbon {
     left:-13px;
 }
 #my_deck .triangle-ribbon {
     left:-26px;
+    margin-bottom:-20px;
 }
 
 .library_group {
-    margin-left:200px; 
+    margin-left:320px; 
 }
 
 
