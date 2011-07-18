@@ -202,7 +202,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     margin:2px; 
     position:absolute;
     left:-20px;
-    top:-16px;
+    //top:-16px;
 }
 .card .card_name {
     display:block !important;
@@ -254,8 +254,11 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 
 .unit_piece > img {
     //width:100%;
-    margin-top: -14px;
-    margin-left:14px;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:-20px;
+    //margin-top: expression(( 60 - this.height ) / 2); 
 }
 .unit_piece .attack {
     position:absolute;
@@ -264,9 +267,9 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 }
 .unit_piece .defense {
     position:absolute;
-    bottom:-14px;
     left:0;
     width:60px;
+    top:60px;
 }
 .unit_piece .defense .defense_point {
     width:12px;
