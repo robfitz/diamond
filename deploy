@@ -1,0 +1,17 @@
+echo -n "Next version #: "
+read version_num
+
+sed "s/^version: [0-9]*/version: $version_num/g" app.yaml > app.yaml.new
+mv app.yaml app.yaml.backup
+mv app.yaml.new app.yaml
+
+sed "s/^VERSION = [0-9]*/VERSION = $version_num/g" settings.py > settings.py.new
+mv settings.py settings.py.backup
+mv settings.py.new settings.py
+
+git add settings.py
+git add app.yaml
+git commit -m "Deploy version $version_num"
+git push
+
+python manage.py deploy
