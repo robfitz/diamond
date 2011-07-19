@@ -1,0 +1,29 @@
+application: multiplayful
+version: 10
+runtime: python
+api_version: 1
+
+default_expiration: "1m"
+
+builtins:
+- remote_api: on
+
+inbound_services:
+- warmup
+
+handlers:
+- url: /_ah/queue/deferred
+  script: djangoappengine/deferred/handler.py
+  login: admin
+
+- url: /_ah/stats/.*
+  script: djangoappengine/appstats/ui.py
+
+- url: /media/admin
+  static_dir: django/contrib/admin/media
+
+- url: /media
+  static_dir: media
+
+- url: /.*
+  script: djangoappengine/main/main.py

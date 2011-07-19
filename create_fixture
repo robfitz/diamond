@@ -1,1 +1,1 @@
-python manage.py dumpdata d_cards.Card d_cards.Deck d_game.Puzzle d_game.PuzzleStartingUnit d_board.Node --indent 4 > initial_data.yaml
+python manage.py dumpdata d_cards.Card d_cards.PuzzleDeck d_game.Puzzle d_game.PuzzleStartingUnit d_board.Node --indent 4 > initial_data.yaml

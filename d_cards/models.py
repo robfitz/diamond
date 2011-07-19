@@ -275,6 +275,14 @@ class ShuffledLibrary(models.Model):
         return self
 
 
+class PuzzleDeck(models.Model):
+
+    nickname = models.CharField(max_length=50)
+
+    card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
+    max_size = models.IntegerField(default=20)
+
+
 class Deck(models.Model):
 
     nickname = models.CharField(max_length=50)

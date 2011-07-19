@@ -360,73 +360,8 @@
         }
     }, 
     {
-        "pk": 557, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                841, 
-                841, 
-                841, 
-                841, 
-                841
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 891, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 892, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 893, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "robz deck", 
-            "card_ids": [
-                192, 
-                198, 
-                196, 
-                190, 
-                883, 
-                192, 
-                192, 
-                198, 
-                190, 
-                190, 
-                839, 
-                841, 
-                194
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1172, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1252, 
-        "model": "d_cards.deck", 
+        "pk": 7356, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -437,21 +372,11 @@
         }
     }, 
     {
-        "pk": 1256, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1257, 
-        "model": "d_cards.deck", 
+        "pk": 7357, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
-                192, 
                 190, 
                 192
             ], 
@@ -459,411 +384,19 @@
         }
     }, 
     {
-        "pk": 1259, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1260, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1261, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1534, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 1535, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 2013, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 2014, 
-        "model": "d_cards.deck", 
+        "pk": 7358, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
-                839, 
-                839, 
-                841, 
-                883, 
-                883, 
-                841, 
-                192, 
-                190, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 2774, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 2775, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                192, 
-                194, 
-                198, 
-                839, 
-                841, 
-                1173, 
-                196, 
-                192, 
-                190, 
-                190, 
-                192, 
                 190
             ], 
             "max_size": 20
         }
     }, 
     {
-        "pk": 2892, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 2893, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                192, 
-                190, 
-                192, 
-                196, 
-                192, 
-                1173, 
-                1175, 
-                194, 
-                883, 
-                194, 
-                192, 
-                190
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 3288, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 3289, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 3297, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 3301, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                196, 
-                192, 
-                190, 
-                192, 
-                194, 
-                196, 
-                196, 
-                196, 
-                194, 
-                196, 
-                200, 
-                200, 
-                747
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 3312, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4016, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4019, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4038, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4048, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4741, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4750, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                192, 
-                192, 
-                190, 
-                190, 
-                190
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4814, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                196, 
-                196
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4815, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4816, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4817, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4818, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4819, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": null, 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4820, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                196, 
-                196
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4821, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                200, 
-                200
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4822, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4823, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                839, 
-                839
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4824, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                747, 
-                747
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4825, 
-        "model": "d_cards.deck", 
+        "pk": 7359, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -875,31 +408,8 @@
         }
     }, 
     {
-        "pk": 4836, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                190, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4889, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                190
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 4950, 
-        "model": "d_cards.deck", 
+        "pk": 7360, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "3 archers", 
             "card_ids": [
@@ -911,8 +421,8 @@
         }
     }, 
     {
-        "pk": 5027, 
-        "model": "d_cards.deck", 
+        "pk": 7361, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -924,8 +434,21 @@
         }
     }, 
     {
-        "pk": 5058, 
-        "model": "d_cards.deck", 
+        "pk": 7362, 
+        "model": "d_cards.puzzledeck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                192, 
+                190, 
+                192
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7363, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -937,8 +460,8 @@
         }
     }, 
     {
-        "pk": 5075, 
-        "model": "d_cards.deck", 
+        "pk": 7364, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -952,8 +475,8 @@
         }
     }, 
     {
-        "pk": 5146, 
-        "model": "d_cards.deck", 
+        "pk": 7365, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -965,8 +488,8 @@
         }
     }, 
     {
-        "pk": 5189, 
-        "model": "d_cards.deck", 
+        "pk": 7366, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -979,8 +502,8 @@
         }
     }, 
     {
-        "pk": 5198, 
-        "model": "d_cards.deck", 
+        "pk": 7367, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
@@ -992,203 +515,13 @@
         }
     }, 
     {
-        "pk": 5212, 
-        "model": "d_cards.deck", 
+        "pk": 7368, 
+        "model": "d_cards.puzzledeck", 
         "fields": {
             "nickname": "", 
             "card_ids": [
                 192, 
                 194, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 5871, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 5877, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                4894, 
-                4894, 
-                747, 
-                747, 
-                747, 
-                4894, 
-                4894, 
-                4894
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 5986, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "", 
-            "card_ids": [
-                190, 
-                192, 
-                192, 
-                841, 
-                194, 
-                190, 
-                6258, 
-                192, 
-                6258
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7003, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7233, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7236, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7239, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7242, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7272, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7294, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
-                192, 
-                192, 
-                192
-            ], 
-            "max_size": 20
-        }
-    }, 
-    {
-        "pk": 7316, 
-        "model": "d_cards.deck", 
-        "fields": {
-            "nickname": "Soldiers 'n archers", 
-            "card_ids": [
-                190, 
-                190, 
-                190, 
-                190, 
                 192, 
                 192, 
                 192
@@ -1200,10 +533,10 @@
         "pk": 1231, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Beat puzzle levels by destroying all the enemy units. They're healed at the beginning of the turn, so you'll need to position your units to do 2 damage at the same time. Press the surrender button to try again if you get stuck!", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Angled Melee", 
-            "player_deck": 1252, 
             "order": "1.000"
         }
     }, 
@@ -1211,10 +544,10 @@
         "pk": 1237, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Ranged units can shoot over your own forces and hit the first enemy they reach. Combine melee and range to deal 2 damage to the enemy unit.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Basic ranged", 
-            "player_deck": 4836, 
             "order": "2.000"
         }
     }, 
@@ -1222,10 +555,10 @@
         "pk": 4737, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Some positions are vulnerable to being attacked from an angle. Use positioning to take out the defended archer.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Behind the lines", 
-            "player_deck": 4889, 
             "order": "3.000"
         }
     }, 
@@ -1233,10 +566,10 @@
         "pk": 1235, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "When a unit dies, it leaves rubble which stops you from re-using that space during your next turn. Combine ranged and melee units to overcome the enemy defences.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Ranged II", 
-            "player_deck": 4825, 
             "order": "4.000"
         }
     }, 
@@ -1244,10 +577,10 @@
         "pk": 4739, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "The order you play in is important -- each turn, the player can place a unit, then all of their units attack, and then they can place one more unit before the enemy's turn.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Ordering I", 
-            "player_deck": 4950, 
             "order": "5.000"
         }
     }, 
@@ -1255,10 +588,10 @@
         "pk": 5025, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "It's good practice to protect your flimsy ranged units from all possible angles of attack before placing them.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Defensive formation ", 
-            "player_deck": 5027, 
             "order": "6.000"
         }
     }, 
@@ -1266,10 +599,10 @@
         "pk": 1233, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "The first unit you cast will get to attack this turn, while the second one has to wait until next turn. The order you use your cards in can make a big difference.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Ordering II", 
-            "player_deck": 1257, 
             "order": "7.000"
         }
     }, 
@@ -1277,10 +610,10 @@
         "pk": 5028, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Remember -- whenever a unit dies, the space is covered with rubble and can't be re-used for a full turn. However, units are still able to attack through rubble. ", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Rubble I", 
-            "player_deck": 5058, 
             "order": "8.000"
         }
     }, 
@@ -1288,10 +621,10 @@
         "pk": 5030, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Overcome this powerful defensive formation while coping with rubble.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Rubble II", 
-            "player_deck": 5075, 
             "order": "9.000"
         }
     }, 
@@ -1299,10 +632,10 @@
         "pk": 5128, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "You can use spells to attack specific, problematic units -- especially useful against dangerous but low-defense archers.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Direct damage I", 
-            "player_deck": 5146, 
             "order": "10.000"
         }
     }, 
@@ -1310,10 +643,10 @@
         "pk": 5130, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Spells can also help overcome a tech disadvantage by allowing you to bring down large, threatening units.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Direct Damage II", 
-            "player_deck": 5189, 
             "order": "11.000"
         }
     }, 
@@ -1321,10 +654,10 @@
         "pk": 5132, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Certain cards can increase your tech level when they're used. Although it doesn't have any attack, the scholar's ability to give you a blocker plus tech can be very useful.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Teching I", 
-            "player_deck": 5198, 
             "order": "12.000"
         }
     }, 
@@ -1332,10 +665,10 @@
         "pk": 5134, 
         "model": "d_game.puzzle", 
         "fields": {
-            "player_life": 1, 
             "intro": "Units at the very edges are particularly tricky to kill since you can only manage to attack them from one spot. Stay alive while you tech up sufficiently to win.", 
+            "player_life": 1, 
+            "player_cards": null, 
             "name": "Teching II", 
-            "player_deck": 5212, 
             "order": "13.000"
         }
     }, 

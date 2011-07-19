@@ -9,7 +9,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models.signals import pre_save
 
-from d_cards.models import Card, ShuffledLibrary, Deck
+from d_cards.models import Card, ShuffledLibrary, PuzzleDeck
 from d_board.models import Node
 
 
@@ -58,7 +58,7 @@ class Puzzle(models.Model):
     # starting life
     player_life = models.IntegerField(default=1)
 
-    player_deck = models.ForeignKey(Deck, blank=True, null=True)
+    player_cards = models.ForeignKey(PuzzleDeck, blank=True, null=True)
 
     intro = models.TextField(blank=True)
 
@@ -181,9 +181,6 @@ def check_for_winner(sender, instance, raw, **kwargs):
 
 
 pre_save.connect(check_for_winner, sender=Match)
-
-
-
 
 
 class Unit(models.Model):
@@ -898,8 +895,8 @@ class Turn(models.Model):
 class PuzzleAdmin(admin.ModelAdmin):
 
     list_display_links = ("__unicode__",)
-    list_display = ("__unicode__", "name", "order", "player_life", "player_deck", "intro")
-    list_editable = ("name", "order", "player_life", "player_deck", "intro")
+    list_display = ("__unicode__", "name", "order", "player_life", "player_cards", "intro")
+    list_editable = ("name", "order", "player_life", "player_cards", "intro")
 
 
 admin.site.register(Puzzle, PuzzleAdmin)

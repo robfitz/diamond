@@ -69,7 +69,7 @@ def playing(request):
 
 def init_puzzle_match(request, puzzle):
 
-    deck = puzzle.player_deck 
+    deck = puzzle.player_cards 
     ai_deck = None
 
     # don't shuffle that library! card order can be

@@ -27,12 +27,12 @@ def edit_deck(request):
             deck = Deck.objects.get(id=request.GET.get("id")) 
         elif request.GET.get("p"):
             puzzle = Puzzle.objects.get(id=request.GET.get("p"))
-            if not puzzle.player_deck:
-                d = Deck()
+            if not puzzle.player_cards:
+                d = PuzzleDeck()
                 d.save()
-                puzzle.player_deck = d
+                puzzle.player_cards = d
                 puzzle.save()
-            deck = puzzle.player_deck 
+            deck = puzzle.player_cards 
         # and if none of the special params exist, get the
         # user's deck
         else: 
