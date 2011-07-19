@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
 
-{% block header_title %}Diamond{% endblock %}
+{% block header_title %}Diamond Run{% endblock %}
 
 {% block content %}
 
-<h2>A strategy board game where placement matters</h2>
-<h3>It's like Magic (the card game) meets Go (the ancient strategy game)</h3>
+<h2>A competitive board game about smart positioning</h2>
+<h3>It's like Magic (the card game) meets Go (the board game)</h3>
 
-<p>
-And it's under active development
-<ul>
+<p style="margin-bottom:8px;">
+And it's under active development, which means:
+<ul style="margin-top:0px;" >
     <li>Lots of stuff is half-baked and liable to change
     <li>You can help a ton by providing feedback & suggestions
 </ul>
 </p>
 
-<img class="featured_media" src="/media/screenshot.png" />
+<a href="/puzzles/"><img class="featured_media" style="float:left;width:600px;height:450px;" src="/media/screenshot.png" /></a>
 
-<a class="button blue c2a">Play the puzzles</a>
+<div style="width:250px;float:left;margin-left:20px;margin-top:20px;"> 
+    <p>
+        Lots of stuff is coming soon. But for now, click here and tell me what you think:
+    </p>
+    <a class="button red c2a" style="width:250px;" href="/puzzles/">Play the puzzles</a>
+</div>
 
     {% include 'utils/blog/blog_teaser.html' %} 
 
