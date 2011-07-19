@@ -1,6 +1,6 @@
 from djangoappengine.settings_base import *
 
-VERSION = 7
+VERSION = 11
 
 import os
 
