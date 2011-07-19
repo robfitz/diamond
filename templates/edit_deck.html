@@ -61,19 +61,10 @@ Deck editor
 
             {% for card in deck.all_cards %}
 
-                //for (var i = 0; i < card_data.length; i ++) {
-                 //   var card_json = card_data[i];
-                 //   if (card_json.pk == "{{card.id}}") {
+                card_json = eval("{{ card.json|escapejs }}")[0];
 
-                     card_json = eval("{{ card.json|escapejs }}")[0];
+                body = get_unit_body(card_json).attr("id", card_json.pk).addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#deck").bind('click', {'card': card_json}, on_deck_card_click ); 
                 
-                        body = get_unit_body(card_json).attr("id", card_json.pk).addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#deck").bind('click', {'card': card_json}, on_deck_card_click ); 
-                  //  }
-                //}
-                
-                /**
-                <li class="deck_card {{ card.pk }}" name="deck_card_{{forloop.counter}}" id="{{ card.pk }}">{{ card.name }}</li>
-                */
             {% endfor %}
         }
 

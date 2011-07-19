@@ -282,6 +282,19 @@ class PuzzleDeck(models.Model):
     card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
     max_size = models.IntegerField(default=20)
 
+    def all_cards(self):
+        if not self.card_ids:
+            return []
+
+        cards = Card.objects.all()
+        with_duplicates = []
+
+        for id in self.card_ids:
+            try:
+                with_duplicates.append(cards.get(id=id))
+            except:
+                continue
+        return with_duplicates 
 
 class Deck(models.Model):
 

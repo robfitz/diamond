@@ -6,7 +6,7 @@ from django.core import serializers
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
-from d_cards.models import Deck, Card
+from d_cards.models import PuzzleDeck, Deck, Card
 from d_game.models import Puzzle
 from d_cards.util import get_deck_from
 from d_game.util import daily_activity
@@ -93,7 +93,11 @@ def save_deck(request):
 
     deck_id = request.POST.get("deck_id")
     logging.info("**** got deck id: %s" % deck_id)
-    deck = Deck.objects.get(id=deck_id)
+    try:
+        deck = Deck.objects.get(id=deck_id)
+    except:
+        deck = PuzzleDeck.objects.get(id=deck_id)
+        logging.info("**** got a sweet puz deck: %s" % deck.max_size)
 
     deck.card_ids = card_ids[:deck.max_size]
     deck.nickname = request.POST.get("nickname", "")
