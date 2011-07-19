@@ -21,6 +21,17 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: blog_post
+  properties:
+  - name: __key__
+    direction: desc
+
+- kind: blog_post
+  properties:
+  - name: is_draft
+  - name: __key__
+    direction: desc
+
 - kind: d_board_node
   properties:
   - name: __key__

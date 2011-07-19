@@ -1,9 +1,24 @@
 {% extends 'base.html' %}
 
-{% block header_title %}Hallo!{% endblock %}
+{% block header_title %}Diamond{% endblock %}
 
 {% block content %}
 
-schtuff
+<h2>A strategy board game where placement matters</h2>
+<h3>It's like Magic (the card game) meets Go (the ancient strategy game)</h3>
+
+<p>
+And it's under active development
+<ul>
+    <li>Lots of stuff is half-baked and liable to change
+    <li>You can help a ton by providing feedback & suggestions
+</ul>
+</p>
+
+<img class="featured_media" src="/media/screenshot.png" />
+
+<a class="button blue c2a">Play the puzzles</a>
+
+    {% include 'utils/blog/blog_teaser.html' %} 
 
 {% endblock %}

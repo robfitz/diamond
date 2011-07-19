@@ -8,6 +8,9 @@ urlpatterns = patterns('',
 
     ('^ah/warmup$', 'djangoappengine.views.warmup'),
 
+    ('^$', 'django.views.generic.simple.direct_to_template', {'template': 'index.html'}),
+    (r'^blog/', include('utils.blog.urls')),
+
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/logout/$', 
         'django.contrib.auth.views.logout',

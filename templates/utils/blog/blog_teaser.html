@@ -1,0 +1,16 @@
+<div id="blog_teaser_container" style="float:left;width:100%;"> 
+</div>
+
+    <script>
+        $(function() {
+
+            $.get("/blog/recent/",
+                function(data) {
+                    var json = eval(data);
+                    for (i = 0; i < json.length; i ++) {
+                        var post_json = json[i];
+                        $("<div class='blog_teaser'><img src='" + post_json.fields.title + "' /><h4>" + post_json.fields.title + "</h4>" + post_json.fields.body + "</div>").appendTo("#blog_teaser_container");
+                    } 
+                }); 
+        });
+    </script>

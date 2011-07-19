@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block header_title %}
+Diamond - development blog
+{% endblock %}
+
+{% block content %}
+
+    {% for post in posts %}
+
+        <h1>
+            <a href="{{ post.title|slugify }}">{{ post.title }}</a> 
+            <span class="timestamp">Posted {{ post.timestamp|timesince }} ago</span>
+        </h1>
+
+        {% if post.thumbnail %}
+            <img src="{{ post.thumbnail }}" />
+        {% endif %}
+
+        {{ post.body|safe }}
+
+    {% endfor %}
+
+{% endblock %}

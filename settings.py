@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'd_users',
     'd_feedback',
     'd_metrics',
+    'utils.blog',
 
     'django.contrib.admin',
     'django.contrib.admindocs',
