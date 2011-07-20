@@ -153,6 +153,8 @@
 
     <script>
 
+        var match = new Match();
+
         function slider_alert(title, message, wait_for_confirm) {
             $("#slider_alert").fadeIn();
             $("#slider_alert .message_container .slider_title").text(title);
@@ -186,6 +188,8 @@
         }
 
         $(function() {
+
+
 
             {% for node in board %}
                 board_node_locs["{{ node.pk }}"] = { "row": {{ node.row }}, "x": {{ node.x }} }; 
@@ -239,27 +243,6 @@
                     }
                 });
             }); 
-        }
-
-        function show_number(target, amount) {
-            if (amount < 0) {
-                show_message(target, amount, "red");
-            }
-            else  {
-                show_message(target, "+" + amount, "green");
-            }
-        }
-
-        function show_message(target, message, color) {
-            var x = $("<h1 class='feedback'></h1>").appendTo(target);
-            x.addClass(color);
-            x.text(message); 
-
-            x.animate({ top:"-=40" },
-                { duration: 1000 });
-                x.fadeOut(1000, function() {
-                    $(this).remove();    
-                });
         }
 
     </script>

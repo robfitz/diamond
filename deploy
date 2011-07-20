@@ -7,10 +7,14 @@ mv app.yaml.new app.yaml
 
 sed "s/^VERSION = [0-9]*/VERSION = $version_num/g" settings.py > settings.py.new
 mv settings.py settings.py.backup
-mv settings.py.new settings.py
-
+mv settings.py.new settings.py 
 git add settings.py
 git add app.yaml
+
+mv initial_data.yaml initial_data.yaml.backup
+./create_fixture
+git add initial_data.yaml
+
 git commit -m "Deploy version $version_num"
 git push
 

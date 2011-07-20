@@ -20,12 +20,49 @@
 
     <script>
 
-        function on_library_card_click(card) {
-            var card_id = event.currentTarget.id;
-            var card = event.data.card; 
+        var boards = new Board();
+
+        $(function() {
+            boards.on_unit_placed = function(event) {
+                $(".board .node.unit").click(on_node_click);
+                /*
+                $(".board." + event.data.node_alignment + " .node[name='" + event.data.node_id + "']").
+                /*
+                var unit = event.data.unit;
+                unit.node.bind("click", { 'unit': event.data.unit }, on_node_click ); 
+                */
+            };
+        });
+
+        function on_node_click(event) {
+            var node = $(event.currentTarget);
+
+            var node_alignment;
+            if (node.parent().hasClass("friendly")) {
+                node_alignment = "friendly";
+            }
+            else node_alignment = "ai";
+
+            var node_id = node.attr("name");
+
+            var unit = boards[node_alignment][node_id];
+            /*
+            var unit = event.data.unit;
+            */
+
+            unit.rubble_duration = 0;
+            unit.suffer_damage(10);
+            unit.show_next_damage();
         }
 
-    </script>
+        function on_library_card_click(event) {
+            var card_id = event.currentTarget.id;
+            var card = event.data.card; 
 
+            var targets = $(".board .node.empty");
+            boards.begin_cast(card, targets);
+        }
+
+    </script> 
 
 {% endblock content %}
