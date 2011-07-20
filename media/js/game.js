@@ -975,13 +975,13 @@ function heal_units(alignment) {
 
                 targets.droppable( {
                     drop: function(event, ui) {
-                        cast($(".card.selected"), $("#" + event.currentTarget.id)); 
+                        cast($(".card.selected"), $(event.target)); 
                     },
                     over: function(event, ui) {
-                        $("#" + event.target.id).addClass("hovered");   
+                        $(event.currentTarget).addClass("hovered");   
                     },
                     out: function(event, ui) {
-                        $("#" + event.target.id).removeClass("hovered");
+                        $(event.currentTarget).removeClass("hovered");
                     },
                 });
             }
