@@ -693,6 +693,8 @@ class Board():
                     self.match.ai_tech += card_to_play.tech_change
                 else:
                     self.match.friendly_tech += card_to_play.tech_change
+                if save_to_db:
+                    self.match.save()
 
             if card_to_play.direct_damage:
                 # direct damage BOOOIOIY!!!
