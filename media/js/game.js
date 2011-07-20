@@ -667,6 +667,7 @@ function heal_units(alignment) {
         if (unit && unit['type'] == 'unit') {
             unit.heal();
             unit.node.find(".defense_point.damage").removeClass("damage").addClass("health");
+            unit.gui_life = this.remaining_life;
         }
     }
 }
