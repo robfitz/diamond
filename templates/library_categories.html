@@ -1,0 +1,33 @@
+
+    <ul id="library" class="card_list">
+    </ul>
+
+    <script>
+
+        $(function() { 
+
+            $.ajax({ url: "/deck/get_library_cards_by_category/",
+                success: function(card_data_text) {
+                    var card_data = eval('(' + card_data_text + ')');
+                    init_library(card_data);
+                    $("#num_remaining").text("" + ({{ deck.max_size }} - $("#deck").children().length));
+                }
+            });
+        });
+
+        function init_library(card_data) {
+            for (var i = 0; i < card_data.length; i ++) {
+                var category = card_data[i].category;
+                $("<div class='spacer'>&nbsp;</div><h4 style='float:left;'>" + category + "</h4><div class='spacer'>&nbsp;</div>").appendTo("#library");
+                var cards = eval(card_data[i].cards);
+                for (var j = 0; j < cards.length; j ++) {
+
+                    var card_json = cards[j];
+
+                    get_unit_body(card_json).attr("id", card_json.pk).addClass("library_card").addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#library").bind('click', {'card': card_json}, {{ on_library_card_click|default:"on_library_card_click" }} );
+                }
+            }
+            init_tooltips("#library"); 
+        }
+
+    </script> 

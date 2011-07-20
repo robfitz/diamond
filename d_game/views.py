@@ -29,9 +29,8 @@ def puzzle(request):
     if not has_permissions_for(puzzle, request.user, request.session.session_key):
         return HttpResponseRedirect('/puzzles/')
 
+    puzzles = Puzzle.objects.filter(state="approved")
 
-
-    puzzles = Puzzle.objects.all()
     i = 0
     for p in puzzles:
         if p == puzzle:

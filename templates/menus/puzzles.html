@@ -23,7 +23,7 @@ Puzzles
                 
                 {% if request.user.is_staff %}
                     <a href="/deck/?p={{ puzzle.id }}">Edit deck</a>
-                    <a href="/admin/d_game/puzzle/{{ puzzle.id }}/">Edit puzzle</a> 
+                    <a href="/edit_puzzle/?p={{ puzzle.id }}/">Edit puzzle</a> 
                 {% endif %}
 
             </div> 

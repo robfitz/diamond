@@ -21,8 +21,10 @@ urlpatterns = patterns('',
     (r'^admin/metrics/', 'd_metrics.views.user_metrics'),
     (r'^admin/', include(admin.site.urls)),
 
-    ('^deck/$', 'd_cards.views.edit_deck'),
-    ('^deck/get_library_cards/$', 'd_cards.views.get_library_cards'),
+    (r'^edit_puzzle/', 'd_editor.views.edit_puzzle'),
+
+    ('^deck/$', 'd_editor.views.edit_deck'),
+    ('^deck/get_library_cards_by_category/$', 'd_cards.views.get_library_cards'),
     ('^deck/save/$', 'd_cards.views.save_deck'),
 
     ('^playing/first_turn/$', 'd_game.views.first_turn'),

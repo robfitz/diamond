@@ -73,6 +73,11 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: d_game_puzzle
+  properties:
+  - name: state
+  - name: order
+
 - kind: d_game_puzzlestartingunit
   properties:
   - name: __key__

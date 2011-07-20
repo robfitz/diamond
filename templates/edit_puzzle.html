@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+
+    <link rel="stylesheet" type="text/css" href="/media/css/game.css" type="text/css" />
+
+    <script type="text/javascript" src="/media/js/diamond.js"></script>
+
+{% endblock meta %}
+
+{% block content %}
+
+    <div style="width:600px;height:600px;float:left;">
+        {% include 'board.html' %}
+    </div>
+
+    <div style="width:200px;float:left;">
+        {% include 'library_categories.html' %} 
+    </div>
+
+    <script>
+
+        function on_library_card_click(card) {
+            var card_id = event.currentTarget.id;
+            var card = event.data.card; 
+        }
+
+    </script>
+
+
+{% endblock content %}

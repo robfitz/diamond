@@ -15,7 +15,7 @@ def puzzle_navigator(request):
 
     beaten_puzzle_ids = users_util.unique_puzzles_won(request.user, request.session.session_key)
 
-    puzzles = Puzzle.objects.all() 
+    puzzles = Puzzle.objects.filter(state="approved") 
 
     # flag for unlocking only the first puzzle they haven't yet beaten
     unlock_next_unbeaten = True

@@ -49,6 +49,18 @@ class PuzzleStartingUnit(models.Model):
 
 class Puzzle(models.Model):
 
+    PUZZLE_STATES = (("draft", "In Development"),
+            ("submitted", "Submitted for approval"),
+            ("approved", "Approved"),
+            ("rejected", "Rejected"))
+
+    # if a user submitted this puzzle, keep track,
+    # or in case there are multiple team members working
+    # on puzzles.
+    creator = models.ForeignKey(User, blank=True, null=True)
+
+    state = models.CharField(max_length=20, default="draft", choices=PUZZLE_STATES)
+
     # naming is mostly for admin convenience
     name = models.CharField(max_length=50, default="", blank=True)
 
@@ -897,8 +909,8 @@ class Turn(models.Model):
 class PuzzleAdmin(admin.ModelAdmin):
 
     list_display_links = ("__unicode__",)
-    list_display = ("__unicode__", "name", "order", "player_life", "player_cards", "intro")
-    list_editable = ("name", "order", "player_life", "player_cards", "intro")
+    list_display = ("__unicode__", "name", "order", "player_life", "player_cards", "intro", "state")
+    list_editable = ("name", "order", "player_life", "player_cards", "intro", "state")
 
 
 admin.site.register(Puzzle, PuzzleAdmin)

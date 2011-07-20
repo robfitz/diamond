@@ -28,14 +28,12 @@ Deck editor
     </div>
 
     <div class="library_group">
-        <ul id="library" class="card_list">
-        </ul>
+        {% include 'library_categories.html' with on_library_card_click="on_library_card_click" %}
     </div>
 
     <h3><span id="num_remaining"></span> spots left in deck</h3>
 
     <script>
-        var card_data = {};
 
         var unique_i = {{ deck.all_cards|length }};
 
@@ -43,14 +41,7 @@ Deck editor
 
             banner_alert('info', 'Welcome to the deck editor', "During the intial beta, you're free to use any cards you please. Try out some variations against the ai. Remember to save the deck when you're done editing!");
 
-            $.ajax({ url: "/deck/get_library_cards/",
-                success: function(card_data_text) {
-                    card_data = eval('(' + card_data_text + ')');
-                    init_library();
-                    init_deck();
-                    $("#num_remaining").text("" + ({{ deck.max_size }} - $("#deck").children().length));
-                }
-            });
+            init_deck();
 
         });
 
@@ -68,23 +59,6 @@ Deck editor
             {% endfor %}
         }
 
-        function init_library() {
-            for (var i = 0; i < card_data.length; i ++) {
-                var category = card_data[i].category;
-                $("<div class='spacer'>&nbsp;</div><h4 style='float:left;'>" + category + "</h4><div class='spacer'>&nbsp;</div>").appendTo("#library");
-                var cards = eval(card_data[i].cards);
-                for (var j = 0; j < cards.length; j ++) {
-
-                    var card_json = cards[j];
-
-                    //$('<li class="library_card"></li>').text(card_json.fields.name).attr('id', "" + card_json.pk).appendTo("#library");
-
-                    get_unit_body(card_json).attr("id", card_json.pk).addClass("library_card").addClass("card").addClass("unit_piece").addClass(card_json.pk).appendTo("#library").bind('click', {'card': card_json}, on_library_card_click );
-                }
-            }
-            init_tooltips("#library"); 
-        }
-
         function on_library_card_click(event) {
 
             var num = $("#deck").children().length + 1;
@@ -97,7 +71,7 @@ Deck editor
 
             unique_i += 1;
 
-            var card_id = event.currentTarget.id
+            var card_id = event.currentTarget.id;
             var card = event.data.card;
 
             var body = get_unit_body(card).attr("id", card_id).addClass("card").addClass("unit_piece").addClass(card_id).appendTo("#deck").bind('click', {'card': card}, on_deck_card_click );
