@@ -32,6 +32,12 @@ class PuzzleFeedback(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
+class PuzzleFeedbackAdmin(admin.ModelAdmin):
+
+    list_display = ('difficulty', 'feedback', 'puzzle', 'timestamp') 
+    list_filter = ('puzzle',)
+
+
 class PuzzleFeedbackForm(ModelForm):
     pass
 
@@ -39,4 +45,4 @@ class PuzzleFeedbackForm(ModelForm):
         model = PuzzleFeedback
         exclude = ('match', 'puzzle', 'timestamp')
 
-admin.site.register(PuzzleFeedback)
+admin.site.register(PuzzleFeedback, PuzzleFeedbackAdmin)

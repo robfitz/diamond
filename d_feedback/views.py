@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponse
 
 from d_feedback.models import PuzzleFeedback, PuzzleFeedbackForm
@@ -13,11 +14,10 @@ def puzzle_feedback(request):
         feedback = PuzzleFeedback(match=match,
                 puzzle=match.puzzle)
         form = PuzzleFeedbackForm(request.POST, instance=feedback) 
-        feedback = form.save(commit=False)
-
+        feedback = form.save(commit=False) 
 
         # save feedback iff it's non-trivial
-        if feedback.feedback and feedback.difficulty != "no opinion": 
+        if feedback.feedback or feedback.difficulty != "no opinion": 
             # feedback.save()
             form.save() 
 
