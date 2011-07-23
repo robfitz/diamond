@@ -38,7 +38,7 @@ def edit_puzzle(request):
                     order=Puzzle.objects.all().count() + 1)
 
         player_life = int(request.POST.get("player_life", 1))
-        ai_life = int(request.POST.get("player_life", 10))
+        ai_life = int(request.POST.get("ai_life", 10))
         goal = request.POST.get("goal", "kill units")
 
         puzzle.player_life = player_life

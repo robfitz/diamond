@@ -7,7 +7,7 @@ def has_permissions_for(puzzle, user, session_key):
 
     beaten_puzzle_ids = unique_puzzles_won(user, session_key)
 
-    puzzles = Puzzle.objects.all() 
+    puzzles = Puzzle.objects.filter(state="approved") 
 
     # flag for unlocking only the first puzzle they haven't yet beaten
     unlock_next_unbeaten = True

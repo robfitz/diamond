@@ -55,6 +55,7 @@
             $("#kill_units").change(function( e ) { $(".ai_life").hide(); });
 
             {% if puzzle.goal == 'kill player' %}
+                $("#kill_player").attr("checked", "true");
                 $("#kill_player").change(); 
                 $("#ai_life").val("{{ puzzle.ai_life }}");
             {% endif %}

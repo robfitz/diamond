@@ -207,6 +207,8 @@
 
                 {% if puzzle.goal == 'kill units' %}
                     $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win."); 
+                {% else %}
+                    set_player_life("ai", "{{ puzzle.ai_life }}");
                 {% endif %}
 
                 setTimeout(function() {

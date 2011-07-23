@@ -886,7 +886,7 @@ class Board():
                 # bumped into enemy player
 
                 if alignment == "ai":
-                    if self.match.type != "puzzle":
+                    if not (self.match.puzzle and self.match.puzzle.goal == "kill units"):
                         self.match.ai_life -= unit.card.attack
                         if save_to_db:
                             self.match.save()

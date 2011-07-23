@@ -87,7 +87,9 @@ def init_puzzle_match(request, puzzle):
             player=player,
             session_key=request.session.session_key,
             friendly_library=friendly_library,
-            ai_library=None)
+            ai_library=None,
+            ai_life=puzzle.ai_life,
+            friendly_life=puzzle.player_life)
     match.save()
 
     return match 
