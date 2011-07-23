@@ -1,3 +1,33 @@
+function draw_attack_path(unit, path) { 
+
+    clear_attack_paths();
+
+    for (i = 0; i < path.length; i ++) { 
+        var node = path[i];
+        var dir = (node.alignment == unit.alignment ? "attacking_from" : "attacking_to");
+
+        if (i == path.length - 1) {
+            // last node should show action, not movement
+
+            if (node.action == "damage_unit") {
+                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " .unit_piece").addClass("hostile_targetting"); 
+            }
+            else if (node.aciton == "damage_player") {
+                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " ." + dir).show(); 
+            } 
+        }
+        else { 
+            $("." + node.alignment + " .r" + node.row + ".x" + node.x + " ." + dir).show(); 
+        }
+    } 
+}
+
+function clear_attack_paths() {
+    $(".attacking_from, .attacking_to").hide();
+    $(".unit_piece").removeClass("hostile_targetting");
+}
+
+
 function show_number(target, amount) {
     if (amount < 0) {
         show_message(target, amount, "red");
@@ -243,7 +273,6 @@ function Unit(json_model, location_node_pk, alignment) {
 
     this.node.mouseenter( function ( e ) {
 
-        $(".attacking_from, .attacking_to").hide();
 
         var node = $(e.currentTarget);
         var node_alignment = node.parent().hasClass("friendly") ? "friendly" : "ai"; 
@@ -251,23 +280,12 @@ function Unit(json_model, location_node_pk, alignment) {
         var unit = boards[node_alignment][node.attr("name")];
 
         var path = unit.get_attack_path(board_node_pks, board_node_locs, false);
-        for (i = 0; i < path.length; i ++) { 
-            var node = path[i];
-            var dir = (node.alignment == unit.alignment ? "attacking_from" : "attacking_to");
+        draw_attack_path(unit, path);
 
-            //if (node.action == "skip") continue;
-            if (node.action == "damage_unit") {
-                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " .unit_piece").addClass("hostile_targetting"); 
-            }
-            else { 
-                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " ." + dir).show(); 
-            }
-        } 
     });
 
     this.node.mouseleave(function ( e ) {
-        $(".attacking_from, .attacking_to").hide();
-        $(".unit_piece").removeClass("hostile_targetting");
+            clear_attack_paths();
     });
 
 

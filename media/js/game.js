@@ -707,6 +707,8 @@ function heal_units(alignment) {
     function begin_card_drag(event, ui, card_json) {
             cancel_cast();
 
+
+
             if (match.phase != 1 && match.phase != 3) {
                 //not in an interactive phase, so no clicky
                 return;
@@ -750,6 +752,20 @@ function heal_units(alignment) {
                 targets.addClass("targettable").click( function (event) {
                     cast($(".card.selected"), $(event.currentTarget));
                 });
+
+                /**
+                targets.mouseenter( function ( e ) {
+                        if (card_json.fields.defense >= 1) {
+                            var node_alignment = $(this).parent().hasClass("friendly") ? "friendly" : "ai"; 
+                            var unit = Unit(card_json, $(this).attr("name"), node_alignment);
+                            var path = get_attack_path(board_node_pks, board_node_locs);
+                            draw_path(unit, path); 
+                        } 
+                });
+                targets.mouseleave(function ( e ) {
+                        clear_attack_paths();
+                });
+                */
 
                 targets.droppable( {
                     drop: function(event, ui) {

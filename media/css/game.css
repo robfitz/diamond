@@ -185,6 +185,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     float:left;
     width:500px;
     height:600px; 
+    position:relative;
 }
 .board {
     float:left;
@@ -297,13 +298,13 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     display:none;
 }
 
-.node {
+.node, .attack_path_container {
     width:30px;
     height:30px;
     margin:35px;
 
     position:absolute;
-    z-index:1;
+    z-index:2;
 
     background-color:#fff;
     border:1px solid black;
@@ -364,12 +365,14 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     background: url(attack-forward.png); 
     width:20px;
     height:100px;
+    left:4px;
+    z-index:1;
 }
 .friendly .attacking_to {
-    top:0;
+    top:16px;
 }
 .ai .attacking_to {
-    top:-100px;
+    top:-84px;
 }
 
 .ai .r2.x-2 .attacking_to,
@@ -378,7 +381,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     /* up and to the right */
     background: url(attack-ne-sw.png); 
     width:100px; 
-    left:0;
+    left:12px; 
 } 
 .ai .r2.x2 .attacking_to,
 .ai .r1.x1 .attacking_to
@@ -386,7 +389,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     /* up and to the left */
     background: url(attack-nw-se.png); 
     width:100px; 
-    left:-100px;
+    left:-84px;
 }
 .friendly .r2.x2 .attacking_to,
 .friendly .r1.x1 .attacking_to
@@ -394,7 +397,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     /* up and to the right */
     background: url(attack-ne-sw.png); 
     width:100px; 
-    left:-100px;
+    left:-84;
 } 
 .friendly .r2.x-2 .attacking_to,
 .friendly .r1.x-1 .attacking_to
@@ -402,19 +405,21 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     /* up and to the left */
     background: url(attack-nw-se.png); 
     width:100px; 
-    left:0;
+    left:12px;
 }
 
 .attacking_from {
+    z-index:1;
     position:absolute;
     background: url(attack-forward.png); 
     width:20px;
     height:100px;
+    left:4px;
 }
 .friendly .attacking_from {
-    top:-100px;
+    top:-84px;
 }
 .ai .attacking_from {
-    top:0;
+    top:16px;
 }
 

@@ -1,17 +1,37 @@
 
 <div class="board_area">
 
+    <div class="ai" style="position:relative;" >
+        {% for node in board %}
+
+            <div class="attack_path_container r{{node.row}} x{{node.x}}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
+                <div class="attacking_from hidden">&nbsp;</div>
+                <div class="attacking_to hidden">&nbsp;</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="friendly" style="top:300px;position:relative;" >
+        {% for node in board %}
+
+                <div class="attack_path_container r{{node.row}} x{{node.x}}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
+                    <div class="attacking_from hidden">&nbsp;</div>
+                    <div class="attacking_to hidden">&nbsp;</div>
+                </div>
+
+        {% endfor %}
+    </div>
+
+
+
     <div class="ai board">
 
         {% block ai_nodes %}
 
-            {% for node in board %}
+            {% for node in board %} 
 
             <div class="node empty r{{node.row}} x{{node.x}}" id="ai_node_{{node.pk}}" name="{{ node.pk }}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
-
-                    <div class="attacking_from hidden"></div>
-                    <div class="attacking_to hidden"></div>
-                </div>
+            </div>
 
             {% endfor %}
 
@@ -25,9 +45,8 @@
 
             {% for node in board %}
 
+
                 <div class="node empty r{{node.row}} x{{node.x}}" name="{{ node.pk }}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
-                    <div class="attacking_from hidden">&nbsp;</div>
-                    <div class="attacking_to hidden">&nbsp;</div>
                 </div>
 
             {% endfor %}
