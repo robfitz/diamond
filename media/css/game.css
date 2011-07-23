@@ -315,6 +315,9 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     //background-color:#124;
 }
 
+.hostile_targetting { 
+    background-color:#f00 !important;
+}
 .targettable, .board.friendly .targettable .unit_piece {
    background-color:#0f0 !important;
 }
@@ -354,3 +357,64 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     clear:both;
     float:left;
 }
+
+
+.attacking_to {
+    position:absolute;
+    background: url(attack-forward.png); 
+    width:20px;
+    height:100px;
+}
+.friendly .attacking_to {
+    top:0;
+}
+.ai .attacking_to {
+    top:-100px;
+}
+
+.ai .r2.x-2 .attacking_to,
+.ai .r1.x-1 .attacking_to
+{
+    /* up and to the right */
+    background: url(attack-ne-sw.png); 
+    width:100px; 
+    left:0;
+} 
+.ai .r2.x2 .attacking_to,
+.ai .r1.x1 .attacking_to
+{
+    /* up and to the left */
+    background: url(attack-nw-se.png); 
+    width:100px; 
+    left:-100px;
+}
+.friendly .r2.x2 .attacking_to,
+.friendly .r1.x1 .attacking_to
+{
+    /* up and to the right */
+    background: url(attack-ne-sw.png); 
+    width:100px; 
+    left:-100px;
+} 
+.friendly .r2.x-2 .attacking_to,
+.friendly .r1.x-1 .attacking_to
+{
+    /* up and to the left */
+    background: url(attack-nw-se.png); 
+    width:100px; 
+    left:0;
+}
+
+.attacking_from {
+    position:absolute;
+    background: url(attack-forward.png); 
+    width:20px;
+    height:100px;
+}
+.friendly .attacking_from {
+    top:-100px;
+}
+.ai .attacking_from {
+    top:0;
+}
+

@@ -241,11 +241,199 @@ function Unit(json_model, location_node_pk, alignment) {
 
     show_message(this.node, this.model_fields.name);
 
+    this.node.mouseenter( function ( e ) {
+
+        $(".attacking_from, .attacking_to").hide();
+
+        var node = $(e.currentTarget);
+        var node_alignment = node.parent().hasClass("friendly") ? "friendly" : "ai"; 
+
+        var unit = boards[node_alignment][node.attr("name")];
+
+        var path = unit.get_attack_path(board_node_pks, board_node_locs, false);
+        for (i = 0; i < path.length; i ++) { 
+            var node = path[i];
+            var dir = (node.alignment == unit.alignment ? "attacking_from" : "attacking_to");
+
+            //if (node.action == "skip") continue;
+            if (node.action == "damage_unit") {
+                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " .unit_piece").addClass("hostile_targetting"); 
+            }
+            else { 
+                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " ." + dir).show(); 
+            }
+        } 
+    });
+
+    this.node.mouseleave(function ( e ) {
+        $(".attacking_from, .attacking_to").hide();
+        $(".unit_piece").removeClass("hostile_targetting");
+    });
+
 
     this.to_json = function() {
         return { "id": this.model.pk,
             "node_id": this.node.attr("name"),
             "alignment": this.alignment } 
+    }
+
+    this.get_attack_path = function(board_node_pks, board_node_locs, deal_damage) {
+
+        if (this.model_fields.attack_type == "na"
+            || this.model_fields.attack_type == "wall"
+            || this.model_fields.attack_type == "counterattack") {
+
+            // no attack from this unit 
+            return [];
+        }
+
+
+        var path_info = [ ];
+
+        var alignment = this.alignment;
+        var starting_alignment = this.alignment;
+        var opponent_alignment = (starting_alignment == "friendly" ? "ai" : "friendly"); 
+
+        var node_id = this.node.attr("name");
+        var row = board_node_locs[node_id].row;
+        var x = board_node_locs[node_id].x;
+
+        var is_searching = true; 
+        var d_row = 1;
+        var steps_taken = 0; 
+
+        //if (this.model_fields.attack_type == "melee") {
+            // units which start attacking from
+            // exactly where they're standing without
+            // passing over any nodes get an extra starting
+            // point for display purposes
+            path_info.push({ 
+                node_id: next_node_id,
+                'x': x,
+                'row': row,
+                'alignment': alignment,
+                'drow': "+=0",
+                'drow_reverse': '+=0',
+                'dx': "+=0",
+                'dx_reverse': "+=0" 
+            });
+        //}
+
+        while (is_searching) {
+
+            if (alignment != starting_alignment) {
+                //we've entered ai territory
+                d_row = -1;
+            }
+            else if (row == 2) {
+                //breaching ai territory, from front row to front row
+                d_row = 0;
+                alignment = (alignment == "friendly" ? "ai" : "friendly"); 
+            }
+            else {
+                //moving forward from your back[er] row
+                d_row = 1;
+            }
+
+            //check [row-1][x]
+            row = row + d_row;
+            var old_x = x;
+
+            if (Math.abs(x) > row) {
+                // keep movement inside the triangle.
+                // this is a lazy hack to avoid making a
+                // proper tree structure for this board.
+                // specifically, this maintains the sign of
+                // x while capping it at [row], so r=1, x=-2
+                // becomes r=1, x=-1
+                x = row * x / Math.abs(x);
+            }
+
+            //okay, we have our next node!
+            var next_node_id = board_node_pks[row][x];
+
+            var path_node = { 
+                node_id: next_node_id,
+                'x': x,
+                'row': row,
+                'alignment': alignment 
+            };
+
+            if (starting_alignment == "ai") {
+                path_node.drow = "+=100";
+                path_node.drow_reverse = "-=100";
+            }
+            else {
+                path_node.drow = "-=100";
+                path_node.drow_reverse = "+=100";
+            }
+
+            if (old_x < x) {
+                path_node.dx = "+=100";
+                path_node.dx_reverse = "-=100";
+            }
+            else if (old_x > x) {
+                path_node.dx = "-=100";
+                path_node.dx_reverse = "+=100";
+            }
+            else { 
+                path_node.dx = "+=0";
+                path_node.dx_reverse = "+=0";
+            }
+
+            path_info.push(path_node);
+
+            steps_taken ++;
+            if (this.model_fields.attack_type == "flying" && steps_taken < 3) {
+                // flying units always pass over the subsequent 2 nodes
+                if (steps_taken < 2) {
+                    path_node.action = "skip";
+                }
+                continue;
+            }
+            if (alignment == starting_alignment && this.model_fields.attack_type == "ranged") {
+                // ranged units always pass over friendlies
+
+                if (row < 2) {
+                    path_node.action = "skip";
+                }
+                continue;
+            }
+
+            //is there a guy there?
+            var collision_unit = get_unit_at(alignment, next_node_id)
+            if (collision_unit && collision_unit.type == "unit") {
+                if (alignment == starting_alignment) { 
+
+                    // we've already handled flying & ranged,
+                    // so i am melee -- done :*(
+                    path_node.action = "blocked";
+                    is_searching = false;
+                }
+                else {
+                    //no? ai! hit it!
+                    path_node.action = "damage_unit";
+                    path_node.damaged_unit = collision_unit;
+
+                    is_searching = false;
+                    if (deal_damage) {
+                        damage_unit(next_node_id, alignment, this.attack, this); 
+                    }
+                }
+            }
+            else if (alignment == opponent_alignment && row <= 0) {
+                //is it 0,0? hit the player!
+                is_searching = false; 
+
+                attack = this.attack;
+                path_node.action = "damage_player";
+            }
+            else {
+                //not the player and no unit there. loop
+            } 
+        } 
+        return path_info;
+
     }
 
     this.damage = function() {

@@ -345,7 +345,7 @@ function pass_turn() {
 
                 var unit = boards[alignment][node_id];
 
-                var attack_path = do_attack(unit, node_id, alignment);
+                var attack_path = unit.get_attack_path(board_node_pks, board_node_locs, true);
 
                 var opponent_alignment = (alignment == "friendly" ? "ai" : "friendly"); 
 
