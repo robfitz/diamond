@@ -78,6 +78,19 @@ class Puzzle(models.Model):
     class Meta:
         ordering = ['order']
 
+    
+    def can_be_edited_by(self, user):
+        # can only edit puzzle decks if you're the
+        # boss or if you're the user who made
+        # that puzzle and it hasn't been submitted yet
+
+        if user.is_staff:
+            return True
+        elif puzzle.creator == user and puzzle.state == "draft":
+            return True
+
+        return False
+
 
     def init(self, match):
 

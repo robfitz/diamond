@@ -55,7 +55,15 @@
             $("#board_json").val( JSON.stringify(boards.to_json()) );
             $.post("/edit_puzzle/",
                     $("form").serialize(),
-                    function() { alert('saved'); }
+                    function(puzzle_id) { 
+                        if (puzzle_id == "error") {
+                            //pass
+                            alert("failed to save puzzle"); 
+                        }
+                        else {
+                            window.location.href = "/deck/?p=" + puzzle_id;
+                        }
+                    }
                 ); 
         }
 

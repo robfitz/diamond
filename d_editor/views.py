@@ -62,7 +62,7 @@ def edit_puzzle(request):
 
             starting_unit.save() 
 
-        return HttpResponse("ok")
+        return HttpResponse("%s" % puzzle.id)
 
     try:
         puzzle = Puzzle.objects.get(id=request.GET.get('p'))
@@ -113,29 +113,28 @@ def edit_deck(request):
 
     # first check for various params which cause us
     # to load special decks...
-    if request.user.is_staff:
-        if request.GET.get("ai"):
-            # ai deck is just the first one
-            deck = Deck.objects.all()[0]
-        elif request.GET.get("id"):
-            deck = Deck.objects.get(id=request.GET.get("id")) 
-        elif request.GET.get("p"):
-            puzzle = Puzzle.objects.get(id=request.GET.get("p"))
+    if request.GET.get("ai") and request.user.is_staff:
+        # ai deck is just the first one
+        deck = Deck.objects.all()[0]
+    elif request.GET.get("id") and request.user.is_staff:
+        deck = Deck.objects.get(id=request.GET.get("id")) 
+    elif request.GET.get("p"):
+
+        puzzle = Puzzle.objects.get(id=request.GET.get("p"))
+
+        if puzzle.can_be_edited_by(request.user): 
             if not puzzle.player_cards:
                 d = PuzzleDeck()
                 d.save()
                 puzzle.player_cards = d
                 puzzle.save()
             deck = puzzle.player_cards 
-        # and if none of the special params exist, get the
-        # user's deck
-        else: 
-            deck = get_deck_from(request)
 
-    # non-staff users aren't allowed to use the special deck
-    # params, so just load their deck regardless
-    else: 
-        deck = get_deck_from(request) 
+    # and if none of the special params exist, get the
+    # user's deck
+    if not deck: 
+        logging.info("*** not deck,g etting from req")
+        deck = get_deck_from(request)
 
     return render_to_response("edit_deck.html", locals(), context_instance=RequestContext(request))
 

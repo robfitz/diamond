@@ -30,6 +30,10 @@ Puzzles
 
     {% endfor %}    
 
+    {% if request.user.is_staff %}
+        <a href="/edit_puzzle/">New puzzle</a> 
+    {% endif %}
+
     <script>
         $(function() {
             banner_alert('info', 'Welcome to puzzle mode!', "Normally you'd earn new units by beating puzzles, but that doesn't exist yet, so just enjoy [hopefully].");
