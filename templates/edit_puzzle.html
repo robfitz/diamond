@@ -10,6 +10,57 @@
 
 {% block content %}
 
+    <div style="width:800px;float:left;">
+    <form>
+        {% csrf_token %} 
+        <input type="hidden" name="p" value="{{ puzzle.id }}" />
+
+        <div style="margin:0 10px;float:left;">
+            <h4>Mission goal</h4>
+            <p>
+            <input type="radio" name="goal" value="kill units" checked id="kill_units" />
+            <label for="kill_units">Kill all enemy units</label>
+
+            <br />
+
+            <input type="radio" name="goal" value="kill player" id="kill_player" />
+            <label for="kill_player">Deal damage to enemy player</label>
+            </p>
+        </div>
+
+        <div style="margin:0 10px;float:left;">
+            <h4>Life totals</h4>
+            <p>
+            <label for="ai_life" class="ai_life hidden">AI life:</label> 
+            <input type="number" name="ai_life" class="ai_life hidden" id="ai_life" value="10" />
+            </p>
+
+            <p>
+            <label for="player_life">Player starting life:</label>
+            <input name="player_life" id="player_life" value="1" />
+            </p>
+        </div>
+
+        <input type="" name="board_json" id="board_json" class="hidden" /> 
+    </form>
+
+    <a style="margin:0 10px;float:left;" href="javascript:void(0);" onclick="save_puzzle()" class="button">Save as draft</a>
+
+    </div>
+
+    <script>
+        $(function() {
+
+            $("#kill_player").change(function( e ) { $(".ai_life").show(); });
+            $("#kill_units").change(function( e ) { $(".ai_life").hide(); });
+
+            {% if puzzle.goal == 'kill player' %}
+                $("#kill_player").change(); 
+                $("#ai_life").val("{{ puzzle.ai_life }}");
+            {% endif %}
+        });
+    </script>
+
     <div style="width:600px;height:600px;float:left;">
         {% include 'board.html' %}
     </div>
@@ -18,13 +69,8 @@
         {% include 'library_categories.html' %} 
     </div>
 
-    <a href="javascript:void(0);" onclick="save_puzzle()" class="button">Save puzzle</a>
 
-    <form>
-        {% csrf_token %} 
-        <input type="hidden" name="p" value="{{ puzzle.id }}" />
-        <input type="" name="board_json" id="board_json" /> 
-    </form>
+
 
     <script>
 

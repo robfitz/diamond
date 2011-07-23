@@ -37,6 +37,15 @@ def edit_puzzle(request):
             puzzle = Puzzle(creator=request.user,
                     order=Puzzle.objects.all().count() + 1)
 
+        player_life = int(request.POST.get("player_life", 1))
+        ai_life = int(request.POST.get("player_life", 10))
+        goal = request.POST.get("goal", "kill units")
+
+        puzzle.player_life = player_life
+        puzzle.ai_life = ai_life
+        puzzle.goal = goal
+        puzzle.save()
+
         json_str = request.POST.get("board_json")
         logging.info("getting this sweet board from json: %s" % json_str)
         board_obj = json.loads( json_str )

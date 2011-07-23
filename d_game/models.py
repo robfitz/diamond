@@ -54,6 +54,9 @@ class Puzzle(models.Model):
             ("approved", "Approved"),
             ("rejected", "Rejected"))
 
+    GOAL = (("kill units", "Destroy enemy army"),
+            ("kill player", "Kill enemy player"))
+
     # if a user submitted this puzzle, keep track,
     # or in case there are multiple team members working
     # on puzzles.
@@ -67,8 +70,16 @@ class Puzzle(models.Model):
     # sequence of puzzles you play through & progressively unlock
     order = models.DecimalField(max_digits=6, decimal_places=3)
 
+    # whether player is trying to destroy the enemy's units,
+    # kill the enemy player, or do something else (e.g. survival)
+    goal = models.CharField(max_length=20, default="kill units")
+
     # starting life
     player_life = models.IntegerField(default=1)
+
+    # ai starting life, which is only relevant if goal is set to "kill player",
+    # since AI is unkillable in the unit destruction mode
+    ai_life = models.IntegerField(default=10)
 
     player_cards = models.ForeignKey(PuzzleDeck, blank=True, null=True)
 
