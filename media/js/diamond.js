@@ -142,10 +142,16 @@ function get_unit_body(model, alignment) {
     return unit_piece;
 }
 
-function Match() {
+function Match(game_type, game_goal) {
+
+    // set to true when ready
+    this.is_init = false;
 
     // "ai", "pvp", "puzzle"
-    this.type = "ai";
+    this.type = game_type;
+
+    // "kill units" or "kill player"
+    this.goal = game_goal;
 
     this.winner = null;
 

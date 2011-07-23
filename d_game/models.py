@@ -230,7 +230,7 @@ class Unit(models.Model):
     match = models.ForeignKey(Match)
 
     # "friendly" or "ai"
-    owner_alignment = models.CharField(max_length=10)
+    owner_alignment = models.CharField(max_length=10, choices=(("friendly", "Friendly"), ("ai", "AI")))
 
     # location on the board
     row = models.IntegerField()
@@ -929,6 +929,12 @@ class Turn(models.Model):
     draw_2 = models.ForeignKey(Card, null=True, related_name="draw_2")
 
 
+class PuzzleStartingUnitAdmin(admin.ModelAdmin):
+
+    list_display_links = ("__unicode__",)
+    list_display = ("__unicode__", "owner")
+    list_editable = ("owner",)
+
 
 class PuzzleAdmin(admin.ModelAdmin):
 
@@ -937,6 +943,6 @@ class PuzzleAdmin(admin.ModelAdmin):
     list_editable = ("name", "order", "player_life", "player_cards", "intro", "state")
 
 
+admin.site.register(PuzzleStartingUnit, PuzzleStartingUnitAdmin) 
+
 admin.site.register(Puzzle, PuzzleAdmin)
-admin.site.register(PuzzleStartingUnit)
-    

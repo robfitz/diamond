@@ -143,6 +143,12 @@ function pass_turn() {
     }
 
     function test_game_over() {
+
+        if (!match.is_init) {
+            return false;
+        }
+
+
         if (match.life["ai"] <= 0) {
             win();
         }
@@ -150,7 +156,7 @@ function pass_turn() {
             lose();
         } 
 
-        if (match.type == 'puzzle') {
+        if (match.goal == 'kill units') {
             for (var node_pk in boards['ai']) { 
                 var unit = boards['ai'][node_pk]; 
                 if (unit && unit['type'] == 'unit' && unit.must_be_killed) {
@@ -167,13 +173,16 @@ function pass_turn() {
         if (match.winner || test_game_over()) return;
 
         if (is_first_turn) {
+            if (match.goal == "kill units") {
+                // mark AI as unkillable
+                // if the goal is to wipe
+                // units out 
+                $(".life.ai h1").text("∞"); 
+            }
+
             var units = match.turn_data.ai_starting_units;
             if (units) {
-
-                // TODO: this shouldn't be determined like this,
-                //       but it'll work for now.
-                match.type = "puzzle"; 
-                $(".life.ai h1").text("∞"); 
+                //create starting units
 
                 for (i = 0; i < units.length; i ++) {
                     var card = match.turn_data.ai_cards[i];
@@ -185,6 +194,8 @@ function pass_turn() {
                     boards['ai'][units[i].node].must_be_killed = units[i].must_be_killed; 
                 } 
             }
+
+            match.is_init = true;
         }
 
         match.phase ++;
@@ -657,8 +668,8 @@ function heal_units(alignment) {
 
     function damage_player(alignment, amount) {
 
-        if (match.type == "puzzle" && alignment == "ai") {
-            // enemy is immortal in puzzle mode
+        if (match.goal == "kill units" && alignment == "ai") {
+            // enemy is immortal in kill units mode
             return;
         } 
 

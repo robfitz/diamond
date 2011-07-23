@@ -153,7 +153,11 @@
 
     <script>
 
-        var match = new Match();
+        {% if puzzle %}
+            var match = new Match("puzzle", "{{ puzzle.goal }}");
+        {% else %}
+            var match = new Match("ai", "kill player");
+        {% endif %}
 
         function slider_alert(title, message, wait_for_confirm) {
             $("#slider_alert").fadeIn();
@@ -201,7 +205,9 @@
 
                 set_player_life("friendly", {{ puzzle.player_life }} ); 
 
-                $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win."); 
+                {% if puzzle.goal == 'kill units' %}
+                    $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win."); 
+                {% endif %}
 
                 setTimeout(function() {
                     slider_alert("Tips for this puzzle", "{{ puzzle.intro }}", true);

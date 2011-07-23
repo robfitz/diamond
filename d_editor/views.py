@@ -65,7 +65,7 @@ def edit_puzzle(request):
             node = Node.objects.get(id=node_id)
 
             starting_unit = PuzzleStartingUnit(puzzle=puzzle,
-                    owner=request.user,
+                    owner=node_alignment,
                     unit_card=card,
                     location=node)
 
@@ -77,7 +77,8 @@ def edit_puzzle(request):
         puzzle = Puzzle.objects.get(id=request.GET.get('p'))
     except:
         # new puzzle
-        puzzle = Puzzle() 
+        puzzle = Puzzle(creator=request.user, 
+                    order=Puzzle.objects.all().count() + 1)
 
     starting_units = PuzzleStartingUnit.objects.filter(puzzle=puzzle)
 
