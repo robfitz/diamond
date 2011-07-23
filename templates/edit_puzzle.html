@@ -18,6 +18,14 @@
         {% include 'library_categories.html' %} 
     </div>
 
+    <a href="javascript:void(0);" onclick="save_puzzle()" class="button">Save puzzle</a>
+
+    <form>
+        {% csrf_token %} 
+        <input type="hidden" name="p" value="{{ puzzle.id }}" />
+        <input type="" name="board_json" id="board_json" /> 
+    </form>
+
     <script>
 
         var boards = new Board();
@@ -25,30 +33,39 @@
         $(function() {
             boards.on_unit_placed = function(event) {
                 $(".board .node.unit").click(on_node_click);
-                /*
-                $(".board." + event.data.node_alignment + " .node[name='" + event.data.node_id + "']").
-                /*
-                var unit = event.data.unit;
-                unit.node.bind("click", { 'unit': event.data.unit }, on_node_click ); 
-                */
             };
+
+            $.ajax({ url: "/edit_puzzle/setup/?p={{puzzle.id}}",
+                    success: function(data) {
+                        var turn_data = eval('(' + data + ')');
+                        var units = turn_data.ai_starting_units;
+
+                        for (i = 0; i < units.length; i ++) {
+
+                            var card = turn_data.ai_cards[i];
+
+                            boards.place_unit(card, units[i].node, "ai");
+
+                        }
+                    }
+                });
         });
+
+        function save_puzzle() {
+            $("#board_json").val( JSON.stringify(boards.to_json()) );
+            $.post("/edit_puzzle/",
+                    $("form").serialize(),
+                    function() { alert('saved'); }
+                ); 
+        }
 
         function on_node_click(event) {
             var node = $(event.currentTarget);
-
-            var node_alignment;
-            if (node.parent().hasClass("friendly")) {
-                node_alignment = "friendly";
-            }
-            else node_alignment = "ai";
-
             var node_id = node.attr("name");
 
+            var node_alignment = node.parent().hasClass("friendly") ? node_alignment = "friendly" : node_alignment = "ai"; 
+
             var unit = boards[node_alignment][node_id];
-            /*
-            var unit = event.data.unit;
-            */
 
             unit.rubble_duration = 0;
             unit.suffer_damage(10);

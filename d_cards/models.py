@@ -166,9 +166,9 @@ def set_tooltip(sender, instance, raw, **kwargs):
     if instance.tech_change:
         instance.tooltip += "<br/>"
         if instance.tech_change > 0:
-            instance.tooltip += "Increases tech by %s when cast<br/>"
+            instance.tooltip += "Increases tech by %s when cast<br/>" % instance.tech_change
         else:
-            instance.tooltip += "Decreases tech by %s when cast<br/>"
+            instance.tooltip += "Decreases tech by %s when cast<br/>" % instance.tech_change
 
 
 pre_save.connect(set_tooltip, sender=Card)

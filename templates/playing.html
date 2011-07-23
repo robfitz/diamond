@@ -189,8 +189,6 @@
 
         $(function() {
 
-
-
             {% for node in board %}
                 board_node_locs["{{ node.pk }}"] = { "row": {{ node.row }}, "x": {{ node.x }} }; 
                 if (! board_node_pks["{{ node.row }}"] ) {
@@ -210,7 +208,7 @@
                     }, 1000);
             {% else %}
                 setTimeout(function() {
-                    slider_alert("Howdy", "AI battles are still half-baked and the computer plays *VERY* slowly (~10 sedonds for each of its turns). </p><p>Also, if you're getting whipped, don't forget to go <a href='/deck/'>edit your deck</a> and add some more powerful cards", true);
+                    slider_alert("Howdy", "AI battles are still half-baked and the computer plays *VERY* slowly (~10 seconds for each of its turns). </p><p>Also, if you're getting whipped, don't forget to go <a href='/deck/'>edit your deck</a> and add some more powerful cards", true);
                 }, 1000);
             {% endif %} 
 
@@ -230,6 +228,7 @@
 
         function action_indicator(target, message) {
 
+            // TODO: cut this function and related DOM
             return;
 
             var x = $(".cast_info");

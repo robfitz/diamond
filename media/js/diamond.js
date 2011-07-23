@@ -28,6 +28,22 @@ function Board() {
 
     this.on_unit_placed;
 
+    this.to_json = function() {
+
+        var json = [];
+        for (key in this.friendly) {
+            if (this.friendly[key] && this.friendly[key].type == "unit") {
+                json.push( this.friendly[key].to_json() );
+            }
+        }
+        for (key in this.ai) {
+            if (this.ai[key] && this.ai[key].type == "unit") {
+                json.push( this.ai[key].to_json() );
+            }
+        }
+        return json; 
+    }
+
     this.cancel_cast = function() {
         $(".card").removeClass("selected");
 
@@ -49,11 +65,7 @@ function Board() {
                 var node = $(event.currentTarget);
                 var node_id = node.attr("name");
 
-                var node_alignment;
-                if (node.parent().hasClass("friendly")) {
-                    node_alignment = "friendly";
-                }
-                else node_alignment = "ai";
+                var node_alignment = node.parent().hasClass("friendly") ? node_alignment = "friendly" : node_alignment = "ai"; 
 
                 board.place_unit(card_json, node_id, node_alignment);
         });
@@ -222,6 +234,13 @@ function Unit(json_model, location_node_pk, alignment) {
             });
 
     show_message(this.node, this.model_fields.name);
+
+
+    this.to_json = function() {
+        return { "id": this.model.pk,
+            "node_id": this.node.attr("name"),
+            "alignment": this.alignment } 
+    }
 
     this.damage = function() {
         return this.total_life - this.remaining_life;

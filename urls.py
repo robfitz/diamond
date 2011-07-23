@@ -21,7 +21,8 @@ urlpatterns = patterns('',
     (r'^admin/metrics/', 'd_metrics.views.user_metrics'),
     (r'^admin/', include(admin.site.urls)),
 
-    (r'^edit_puzzle/', 'd_editor.views.edit_puzzle'),
+    (r'^edit_puzzle/$', 'd_editor.views.edit_puzzle'),
+    (r'^edit_puzzle/setup/$', 'd_editor.views.get_puzzle_data'),
 
     ('^deck/$', 'd_editor.views.edit_deck'),
     ('^deck/get_library_cards_by_category/$', 'd_cards.views.get_library_cards'),
