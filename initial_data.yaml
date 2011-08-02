@@ -389,9 +389,9 @@
         "fields": {
             "nickname": "", 
             "card_ids": [
-                190, 
                 192, 
-                190
+                190, 
+                194
             ], 
             "max_size": 20
         }
@@ -530,157 +530,303 @@
         }
     }, 
     {
+        "pk": 7913, 
+        "model": "d_cards.puzzledeck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                6258, 
+                839, 
+                192, 
+                198, 
+                194, 
+                190, 
+                4900
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
+        "pk": 7981, 
+        "model": "d_cards.puzzledeck", 
+        "fields": {
+            "nickname": "", 
+            "card_ids": [
+                190, 
+                6258, 
+                4900
+            ], 
+            "max_size": 20
+        }
+    }, 
+    {
         "pk": 1231, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Beat puzzle levels by destroying all the enemy units. They're healed at the beginning of the turn, so you'll need to position your units to do 2 damage at the same time. Press the surrender button to try again if you get stuck!", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7371, 
-            "name": "Angled Melee", 
-            "order": "1.000"
+            "ai_life": 10, 
+            "order": "1.000", 
+            "name": "Angled Melee"
         }
     }, 
     {
         "pk": 1237, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Ranged units can shoot over your own forces and hit the first enemy they reach. Combine melee and range to deal 2 damage to the enemy unit.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7433, 
-            "name": "Basic ranged", 
-            "order": "2.000"
+            "ai_life": 10, 
+            "order": "2.000", 
+            "name": "Basic ranged"
         }
     }, 
     {
         "pk": 4737, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Some positions are vulnerable to being attacked from an angle. Use positioning to take out the defended archer.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7439, 
-            "name": "Behind the lines", 
-            "order": "3.000"
+            "ai_life": 10, 
+            "order": "3.000", 
+            "name": "Behind the lines"
         }
     }, 
     {
         "pk": 1235, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "When a unit dies, it leaves rubble which stops you from re-using that space during your next turn. Combine ranged and melee units to overcome the enemy defences.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7449, 
-            "name": "Ranged II", 
-            "order": "4.000"
+            "ai_life": 10, 
+            "order": "4.000", 
+            "name": "Ranged II"
         }
     }, 
     {
         "pk": 4739, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "The order you play in is important -- each turn, the player can place a unit, then all of their units attack, and then they can place one more unit before the enemy's turn.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7461, 
-            "name": "Ordering I", 
-            "order": "5.000"
+            "ai_life": 10, 
+            "order": "5.000", 
+            "name": "Ordering I"
         }
     }, 
     {
         "pk": 5025, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "It's good practice to protect your flimsy ranged units from all possible angles of attack before placing them.", 
-            "player_life": 1, 
+            "player_life": 15, 
+            "state": "approved", 
             "player_cards": 7473, 
-            "name": "Defensive formation ", 
-            "order": "6.000"
+            "ai_life": 15, 
+            "order": "6.000", 
+            "name": "Defensive formation "
         }
     }, 
     {
         "pk": 1233, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "The first unit you cast will get to attack this turn, while the second one has to wait until next turn. The order you use your cards in can make a big difference.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7489, 
-            "name": "Ordering II", 
-            "order": "7.000"
+            "ai_life": 10, 
+            "order": "7.000", 
+            "name": "Ordering II"
         }
     }, 
     {
         "pk": 5028, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Remember -- whenever a unit dies, the space is covered with rubble and can't be re-used for a full turn. However, units are still able to attack through rubble. ", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7501, 
-            "name": "Rubble I", 
-            "order": "8.000"
+            "ai_life": 10, 
+            "order": "8.000", 
+            "name": "Rubble I"
         }
     }, 
     {
         "pk": 5030, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Overcome this powerful defensive formation while coping with rubble.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7514, 
-            "name": "Rubble II", 
-            "order": "9.000"
+            "ai_life": 10, 
+            "order": "9.000", 
+            "name": "Rubble II"
         }
     }, 
     {
         "pk": 5128, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "You can use spells to attack specific, problematic units -- especially useful against dangerous but low-defense archers.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7541, 
-            "name": "Direct damage I", 
-            "order": "10.000"
+            "ai_life": 10, 
+            "order": "10.000", 
+            "name": "Direct damage I"
         }
     }, 
     {
         "pk": 5130, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Spells can also help overcome a tech disadvantage by allowing you to bring down large, threatening units.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7551, 
-            "name": "Direct Damage II", 
-            "order": "11.000"
+            "ai_life": 10, 
+            "order": "11.000", 
+            "name": "Direct Damage II"
         }
     }, 
     {
         "pk": 5132, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Certain cards can increase your tech level when they're used. Although it doesn't have any attack, the scholar's ability to give you a blocker plus tech can be very useful.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7565, 
-            "name": "Teching I", 
-            "order": "12.000"
+            "ai_life": 10, 
+            "order": "12.000", 
+            "name": "Teching I"
         }
     }, 
     {
         "pk": 5134, 
         "model": "d_game.puzzle", 
         "fields": {
+            "goal": "kill units", 
+            "creator": null, 
             "intro": "Units at the very edges are particularly tricky to kill since you can only manage to attack them from one spot. Stay alive while you tech up sufficiently to win.", 
             "player_life": 1, 
+            "state": "approved", 
             "player_cards": 7576, 
-            "name": "Teching II", 
-            "order": "13.000"
+            "ai_life": 10, 
+            "order": "13.000", 
+            "name": "Teching II"
         }
     }, 
     {
-        "pk": 1241, 
-        "model": "d_game.puzzlestartingunit", 
+        "pk": 7841, 
+        "model": "d_game.puzzle", 
         "fields": {
-            "owner": "ai", 
-            "must_be_killed_for_victory": true, 
-            "puzzle": 1231, 
-            "location": 137, 
-            "unit_card": 190
+            "goal": "kill units", 
+            "creator": 5807, 
+            "intro": "", 
+            "player_life": 1, 
+            "state": "draft", 
+            "player_cards": null, 
+            "ai_life": 10, 
+            "order": "14.000", 
+            "name": ""
+        }
+    }, 
+    {
+        "pk": 7852, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "goal": "kill units", 
+            "creator": 5807, 
+            "intro": "", 
+            "player_life": 1, 
+            "state": "draft", 
+            "player_cards": null, 
+            "ai_life": 10, 
+            "order": "15.000", 
+            "name": ""
+        }
+    }, 
+    {
+        "pk": 7859, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "goal": "kill units", 
+            "creator": 5807, 
+            "intro": "", 
+            "player_life": 1, 
+            "state": "draft", 
+            "player_cards": null, 
+            "ai_life": 10, 
+            "order": "16.000", 
+            "name": ""
+        }
+    }, 
+    {
+        "pk": 7910, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "goal": "kill units", 
+            "creator": 5807, 
+            "intro": "", 
+            "player_life": 1, 
+            "state": "draft", 
+            "player_cards": 7913, 
+            "ai_life": 10, 
+            "order": "17.000", 
+            "name": ""
+        }
+    }, 
+    {
+        "pk": 7979, 
+        "model": "d_game.puzzle", 
+        "fields": {
+            "goal": "kill player", 
+            "creator": 5807, 
+            "intro": "", 
+            "player_life": 2, 
+            "state": "approved", 
+            "player_cards": 7981, 
+            "ai_life": 2, 
+            "order": "18.000", 
+            "name": ""
         }
     }, 
     {
@@ -728,17 +874,6 @@
         }
     }, 
     {
-        "pk": 4837, 
-        "model": "d_game.puzzlestartingunit", 
-        "fields": {
-            "owner": "ai", 
-            "must_be_killed_for_victory": true, 
-            "puzzle": 1237, 
-            "location": 147, 
-            "unit_card": 190
-        }
-    }, 
-    {
         "pk": 4892, 
         "model": "d_game.puzzlestartingunit", 
         "fields": {
@@ -779,28 +914,6 @@
             "must_be_killed_for_victory": true, 
             "puzzle": 4739, 
             "location": 137, 
-            "unit_card": 192
-        }
-    }, 
-    {
-        "pk": 5034, 
-        "model": "d_game.puzzlestartingunit", 
-        "fields": {
-            "owner": "ai", 
-            "must_be_killed_for_victory": true, 
-            "puzzle": 5025, 
-            "location": 149, 
-            "unit_card": 190
-        }
-    }, 
-    {
-        "pk": 5036, 
-        "model": "d_game.puzzlestartingunit", 
-        "fields": {
-            "owner": "ai", 
-            "must_be_killed_for_victory": true, 
-            "puzzle": 5025, 
-            "location": 151, 
             "unit_card": 192
         }
     }, 
@@ -923,6 +1036,116 @@
             "puzzle": 5132, 
             "location": 139, 
             "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 7842, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 7841, 
+            "location": 149, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 7853, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 7852, 
+            "location": 149, 
+            "unit_card": 4900
+        }
+    }, 
+    {
+        "pk": 7860, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 7859, 
+            "location": 147, 
+            "unit_card": 4900
+        }
+    }, 
+    {
+        "pk": 7884, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1231, 
+            "location": 137, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 7897, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 1237, 
+            "location": 147, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 7911, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 7910, 
+            "location": 137, 
+            "unit_card": 1173
+        }
+    }, 
+    {
+        "pk": 7912, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 7910, 
+            "location": 145, 
+            "unit_card": 1173
+        }
+    }, 
+    {
+        "pk": 7928, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5025, 
+            "location": 149, 
+            "unit_card": 190
+        }
+    }, 
+    {
+        "pk": 7929, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 5025, 
+            "location": 151, 
+            "unit_card": 192
+        }
+    }, 
+    {
+        "pk": 8003, 
+        "model": "d_game.puzzlestartingunit", 
+        "fields": {
+            "owner": "ai", 
+            "must_be_killed_for_victory": true, 
+            "puzzle": 7979, 
+            "location": 141, 
+            "unit_card": 1173
         }
     }, 
     {
