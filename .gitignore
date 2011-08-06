@@ -4,3 +4,5 @@ media/uploads/*
 *~
 .gae*
 ga_*
+*.backup
+*.swo

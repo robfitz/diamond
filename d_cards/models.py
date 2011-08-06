@@ -5,6 +5,7 @@ import simplejson
 from django import forms
 from django.db import models
 from django.core import serializers
+from django.core.cache import cache
 from django.contrib import admin
 from djangotoolbox.fields import ListField 
 from django.db.models.signals import pre_save
@@ -189,12 +190,20 @@ class ShuffledLibrary(models.Model):
 
     def hand_cards(self):
 
-        all_cards = Card.objects.all()
-        cards = []
+        cards = cache.get("%s_hand_cards" % self.pk, [])
+        if cards:
+            logging.info("^^^ TODO returning hand cards from cache %s" % cards)
+            # return cards
 
-        for card_id in self.hand_card_ids:
-            card = Card.objects.get(id=card_id)
-            cards.append(card)
+        else: 
+            all_cards = Card.objects.all()
+
+            for card_id in self.hand_card_ids:
+                card = Card.objects.get(id=card_id)
+                cards.append(card)
+
+            cache.set("%s_hand_cards" % self.pk, cards)
+            logging.info("^^^ returning hand cards, NO cache %s" % cache.get("%s_hand_cards" % self.pk))
 
         return cards
 
@@ -206,9 +215,10 @@ class ShuffledLibrary(models.Model):
         if card_id in self.hand_card_ids:
 
             index = self.hand_card_ids.index(card_id)
-            logging.info("$$$ %s" % index)
+
             del(self.hand_card_ids[index])
-            logging.info("$$$ after del: %s" % self.hand_card_ids)
+            logging.info("^^^ cache hand: %s" % cache.get("%s_hand_cards" % self.pk, []))
+
             self.save() 
 
             # successfully removed the card from our hand

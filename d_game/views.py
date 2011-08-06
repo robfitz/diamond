@@ -11,7 +11,7 @@ from django.contrib.sessions.backends.db import SessionStore
 
 from d_board.models import Node
 from d_cards.models import Card, ShuffledLibrary, Deck
-from d_game.models import Turn, Match, Board, Unit, AI, Puzzle
+from d_game.models import Turn, Match, Board, AI, Puzzle
 from d_game.util import daily_activity
 from d_cards.util import get_deck_from
 from d_feedback.models import PuzzleFeedbackForm
