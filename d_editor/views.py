@@ -3,7 +3,7 @@ import json, logging, simplejson
 from d_cards.util import get_deck_from
 from d_game.util import daily_activity 
 
-from d_cards.models import PuzzleDeck, Deck, Card, ShuffledLibrary
+from d_cards.models import PuzzleDeck, Deck, Card
 from d_game.models import Puzzle, PuzzleStartingUnit
 from d_board.models import Node
 
@@ -95,11 +95,7 @@ def get_puzzle_data(request):
     puzzle = Puzzle.objects.get(id=puzzle_id)
     ai_turn = puzzle.get_setup_turn() 
 
-    friendly_library = ShuffledLibrary().init(puzzle.player_cards, False)
-    deck_json = friendly_library.draw_as_json(1000)
-
-    # TODO: creating then immediately deleting it cannot be proper...
-    friendly_library.delete()
+    deck = cached.get_cards(puzzle.player_cards)
 
     play_cards = []
     for play in ai_turn:
@@ -109,7 +105,7 @@ def get_puzzle_data(request):
             'player_deck': %s,
             'ai_starting_units': %s,
             'ai_cards': %s,
-            }""" % (deck_json,
+            }""" % (simplejson.dumps(deck),
                     simplejson.dumps(ai_turn),
                     serializers.serialize("json", play_cards))
 

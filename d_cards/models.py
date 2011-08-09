@@ -53,6 +53,8 @@ class Card(models.Model):
     # how much playing this card changes your current tech level (usually ranging from -2 to +2)
     tech_change = models.IntegerField(default=0, help_text="If non-zero, it will change the player's current tech level by that positive or negative amount.")
 
+    rubble_duration = models.IntegerField(default=1)
+
     ALIGNMENT_CHOICES = (
             ("friendly", "Friendly"), 
             ("enemy", "Enemy"),
@@ -60,9 +62,7 @@ class Card(models.Model):
         )
     OCCUPANT_CHOICES = (
             ("unit", "Unit"),
-            ("rubble", "Rubble"),
             ("empty", "Empty"),
-            ("any", "Any")
         )
     LOCATION_CHOICES = (
             ("chosen", "Chosen"),
@@ -179,110 +179,6 @@ class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
     list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage', 'icon_url', 'icon_url_back')
     list_editable = ('name', 'tech_level', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage', 'icon_url', 'icon_url_back')
-
-
-class ShuffledLibrary(models.Model):
-
-    undrawn_card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True, default=[])
-
-    hand_card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True, default=[])
-
-
-    def hand_cards(self):
-
-        cards = cache.get("%s_hand_cards" % self.pk, [])
-        if cards:
-            logging.info("^^^ TODO returning hand cards from cache %s" % cards)
-            # return cards
-
-        else: 
-            all_cards = Card.objects.all()
-
-            for card_id in self.hand_card_ids:
-                card = Card.objects.get(id=card_id)
-                cards.append(card)
-
-            cache.set("%s_hand_cards" % self.pk, cards)
-            logging.info("^^^ returning hand cards, NO cache %s" % cache.get("%s_hand_cards" % self.pk))
-
-        return cards
-
-
-    def play(self, card_id):
-
-        logging.info("$$$ lib.play() %s, %s" % (card_id, self.hand_card_ids))
-
-        if card_id in self.hand_card_ids:
-
-            index = self.hand_card_ids.index(card_id)
-
-            del(self.hand_card_ids[index])
-            logging.info("^^^ cache hand: %s" % cache.get("%s_hand_cards" % self.pk, []))
-
-            self.save() 
-
-            # successfully removed the card from our hand
-            return True
-
-        # the card that was played isn't actually
-        # in our hand, so return failure
-        return False
-
-
-    def draw_as_json(self, num):
-
-        card_ids = self.draw(num)
-        logging.info("** library.draw json: %s" % card_ids)
-
-        hand = []
-
-        for id in card_ids:
-            try:
-                card = Card.objects.get(id=id)
-                hand.append(card) 
-            except:
-                continue
-
-        hand_json = serializers.serialize("json", hand)
-
-        return hand_json
-        
-
-    def draw(self, num):
-
-        if num <= 0:
-            return []
-
-        to_draw = self.undrawn_card_ids[:num]
-
-        # remove cards from undrawn pile
-        self.undrawn_card_ids = self.undrawn_card_ids[num:]
-
-        # add cards to hand
-        for card in to_draw:
-            self.hand_card_ids.append(card) 
-
-
-        self.save()
-
-        return to_draw 
-
-    
-    def init(self, deck, is_shuffled=True):
-
-        # create a clean copy
-        if deck:
-            self.undrawn_card_ids = list(deck.card_ids) 
-        else:
-            self.undrawn_card_ids = []
-
-        if is_shuffled:
-            # shuffle
-            random.shuffle(self.undrawn_card_ids)
-
-        self.save()
-
-        return self
 
 
 class PuzzleDeck(models.Model):

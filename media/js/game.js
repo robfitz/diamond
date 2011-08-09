@@ -6,21 +6,15 @@ function surrender() {
 }
 
 function pass_turn() {
-    if (match.phase == 1) {
-        $("input[name='card1']").val('pass');
-        $("input[name='node1']").val('pass'); 
-        $("input[name='align1']").val('pass'); 
 
-        next_phase(false); 
-    }
-    else if (match.phase == 3) {
-        $("input[name='card2']").val('pass');
-        $("input[name='node2']").val('pass'); 
-        $("input[name='align2']").val('pass'); 
+    var turn = $("textarea[name='player_turn']");
+    turn.val(turn.val() + player_name + " pass\n");
 
-        next_phase(false);
-    }
+    next_phase(false); 
 }
+
+var player_name;
+var enemy_name;
 
     var UNIT_R = 25;
 
@@ -63,50 +57,58 @@ function pass_turn() {
             }
         );
 
-        $("input[name='card1']").val("");
-        $("input[name='node1']").val("");
-        $("input[name='align1']").val("");
-        $("input[name='card2']").val("");
-        $("input[name='node2']").val("");
-        $("input[name='align2']").val("");
+        $("textarea[name='player_turn']").val("");
     }
 
     function verify_board_state(server_board) {
 
+        var p1, p2;
+        for (name in server_board['players']) {
+            if (name != "ai") {
+                p1 = name;
+            }
+            else {
+                p2 = name;
+            }
+        }
 
-        if (server_board["life"]["friendly"] != match["life"]["friendly"]) {
-            alert("different life totals, friendly (server v local): " + server_board['life']['friendly'] + "," + match['life']['friendly']);
+        if (server_board['players'][p1]['life'] != match["life"]["friendly"]) {
+            alert("different life totals, friendly (server v local): " + server_board['players'][p1]['life'] + "," + match['life']['friendly']);
         } 
-        if (server_board["life"]["ai"] != match["life"]["ai"]) {
-            alert("different life totals, ai (server v local): " + server_board['life']['ai'] + "," + match['life']['ai']);
+        if (server_board['players'][p2]["life"] != match["life"]["ai"]) {
+            alert("different life totals, ai (server v local): " + server_board['players'][p2]['life'] + "," + match['life']['ai']);
         }
 
 
-        if (server_board["tech"]["friendly"] != match["tech"]["friendly"]) {
-            alert("different tech totals, friendly (server v local): " + server_board['tech']['friendly'] + "," + match['tech']['friendly']);
+        if (server_board['players'][p1]["tech"] != match["tech"]["friendly"]) {
+            alert("different tech totals, friendly (server v local): " + server_board['players'][p1]['tech'] + "," + match['tech']['friendly']);
         } 
-        if (server_board["tech"]["ai"] != match["tech"]["ai"]) {
-            alert("different tech totals, ai (server v local): " + server_board['tech']['ai'] + "," + match['tech']['ai']);
+        if (server_board['players'][p2]["tech"] != match["tech"]["ai"]) {
+            alert("different tech totals, ai (server v local): " + server_board['players'][p2]['tech'] + "," + match['tech']['ai']);
         }
 
-        verify_board_state_for(server_board, "ai");
-        verify_board_state_for(server_board, "friendly");
+        verify_board_state_for(server_board, p1);
+        verify_board_state_for(server_board, p2);
     }
     function verify_board_state_for(server_board, align) {
 
-        var board = server_board['boards'][align];
+        var temp_align = align;
+        if (align != 'ai') temp_align = 'friendly';
+
+        var board = server_board['players'][align]['board'];
         for (node_key in board) { 
             
             var s_node = board[node_key];
-            var node = boards[align]["" + s_node.node];
+            var row = node_key.split('_')[0]
+            var x = node_key.split('_')[1]
 
-            if (!s_node && !node) {
+            var node_pk = board_node_pks[row][x] 
+            var node = boards[temp_align]["" + node_pk];
+
+            if ((!s_node || !s_node["type"] || s_node["type"] == "empty") && (!node || node["type"] == "empty")) {
                 //both are null, that's okay
             }
-            else if ((!s_node || s_node["type"] == "empty") && (!node || node['type'] == "empty")) {
-                //both are null (or empty), that's okay
-            } 
-            else if (!s_node || !node) {
+            else if ((!s_node || !s_node["type"] || s_node["type"] == "empty") || (!node || node["type"] == "empty")) {
                 alert("either server,local node is null: " + s_node + "," + node + ". stype=" + s_node["type"] + " at key: " + node_key + "," + align);
             }
             else if (s_node['type'] != node['type']) {
@@ -122,8 +124,8 @@ function pass_turn() {
                 }
                 else if (node.type == "unit") {
                     // same card PK?
-                    if (node.model.pk != s_node.card) {
-                        alert("server (" + s_node.card + ") and local (" + node.model.pk + ") unit card PKs don't match");
+                    if (node.model.pk != s_node.pk) {
+                        alert("server (" + s_node.pk + ") and local (" + node.model.pk + ") unit card PKs don't match");
 
                     }
                     
@@ -134,8 +136,8 @@ function pass_turn() {
                 }
                 else if (node.type == "rubble") {
                     // same rubble amount?
-                    if (s_node.amount != node.amount) {
-                        alert("server (" + s_node.amount + ") and local (" + node.amount + ") rubble amounts don't match on " + node_key + "," + align);
+                    if (s_node['fields']['rubble_duration'] != node.amount) {
+                        alert("server (" + s_node['fields']['rubble_duration'] + ") and local (" + node.amount + ") rubble amounts don't match on " + node_key + "," + align);
                     } 
                 }
             } 
@@ -293,38 +295,61 @@ function pass_turn() {
     }
 
     function do_ai_play_1() { 
+
         if (match.turn_data.ai_turn[0]) {
-            //ai play 1
-            if (match.turn_data.ai_turn[0].fields.is_tech_1) {
+
+            var action = match.turn_data.ai_turn[0]['action'];
+
+            if (action == 'pass') {
+
+            }
+            else if (action == 'tech') {
                 ai_tech_up(1); 
             }
-            else if (match.turn_data.ai_cards[0]) {
-                var target = match.turn_data.ai_turn[0].fields.target_node_1;
-                var align = match.turn_data.ai_turn[0].fields.target_alignment_1; 
-                //ai summons
-                var node = $(".board." + align + " .node[name='" + target + "']");
-                ai_cast(match.turn_data.ai_cards[0], node, align);
+            else if (action == 'play') {
+                var card_info = match.turn_data.ai_turn[0].card;
+                var node_info = match.turn_data.ai_turn[0].node;
+
+                var align = node_info['player'];
+
+                var node_pk = board_node_pks[node_info.row][node_info.x];
+                var node = $(".board." + node_info['player'] + " .node[name='" + node_pk + "']");
+
+                ai_cast(card_info, node, align);
             }
             else {
                 //nothing to cast or tech up
+                alert("do_ai_play_1: unexpected ai action: " + action);
             }
         }
     }
 
     function do_ai_play_2() {
-        if (match.turn_data.ai_turn[0]) {
-            //ai play 2
-            if (match.turn_data.ai_turn[0].fields.is_tech_2) {
+        if (match.turn_data.ai_turn[1]) {
+
+            var action = match.turn_data.ai_turn[1]['action'];
+
+            if (action == 'pass') {
+
+            }
+            else if (action == 'tech') {
                 ai_tech_up(1); 
             }
-            else if (match.turn_data.ai_cards[1]) {
-                var target = match.turn_data.ai_turn[0].fields.target_node_2;
-                var align = match.turn_data.ai_turn[0].fields.target_alignment_2; 
-                var node = $(".board." + align + " .node[name='" + target + "']");
-                ai_cast(match.turn_data.ai_cards[1], node, align);
+            else if (action == 'play') {
+
+                var card_info = match.turn_data.ai_turn[1].card;
+                var node_info = match.turn_data.ai_turn[1].node;
+
+                var align = node_info['player'];
+
+                var node_pk = board_node_pks[node_info.row][node_info.x];
+                var node = $(".board." + node_info['player'] + " .node[name='" + node_pk + "']");
+
+                ai_cast(card_info, node, align);
             }
             else {
                 //nothing to cast or tech up
+                alert("do_ai_play_2: unexpected ai action: " + action);
             }
         }
     } 
@@ -802,16 +827,8 @@ function heal_units(alignment) {
 
         tech_up(1);
 
-        if (match.phase == 1) {
-            $("input[name='card1']").val(hand_card.attr("id")); 
-            $("input[name='node1']").val('tech'); 
-            $("input[name='align1']").val("friendly"); 
-        }
-        else if (match.phase == 3) {
-            $("input[name='card2']").val(hand_card.attr("id")); 
-            $("input[name='node2']").val('tech'); 
-            $("input[name='align2']").val("friendly"); 
-        }
+        var turn = $("textarea[name='player_turn']");
+        turn.val(turn.val() + player_name + " tech " + hand_card.attr('id') + "\n"); 
 
         next_phase(false);
     }
@@ -850,39 +867,33 @@ function heal_units(alignment) {
 
         //convert jquery element into json w/ game logic
         var card = match.hand_cards[hand_card.attr("id")];
-        var align = "";
+        var align;
+        var temp_align;
 
-        //record it for sending to server
-        if (match.phase == 1) {
-            $("input[name='card1']").val(hand_card.attr("id")); 
-            $("input[name='node1']").val(node.attr("name")); 
-            if (node.parent().hasClass("friendly")) {
-                $("input[name='align1']").val("friendly"); 
-                align="friendly";
-            }
-            else {
-                $("input[name='align1']").val("ai"); 
-                align="ai";
-            }
+        var turn = $("textarea[name='player_turn']");
+
+        var node_id = (node.attr("name"));
+        var node_loc = board_node_locs[node_id];
+
+        if (node.parent().hasClass("friendly")) {
+            align = player_name;
+            temp_align = 'friendly';
         }
-        else if (match.phase == 3) {
-            $("input[name='card2']").val(hand_card.attr("id")); 
-            $("input[name='node2']").val(node.attr("name")); 
-            if (node.parent().hasClass("friendly")) {
-                $("input[name='align2']").val("friendly"); 
-                align = "friendly";
-            }
-            else {
-                $("input[name='align2']").val("ai"); 
-                align = "ai";
-            }
+        else {
+            align = "ai";
+            temp_align = 'ai';
         }
+
+        // turn format: player action [card [node_owner row x]]
+        var this_turn = player_name + " play " + hand_card.attr('id') + " " + align + " " + node_loc.row + " " + node_loc.x + "\n"; 
+
+        turn.val(turn.val() + this_turn);
 
         //visually remove from hand
         hand_card.remove(); 
         var card_id = hand_card.attr("id");
 
-        cast_card('friendly', align, card, node);
+        cast_card('friendly', temp_align, card, node);
 
         setTimeout( function() { next_phase(false) }, 800);
     }

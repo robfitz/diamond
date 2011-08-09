@@ -1,0 +1,1 @@
+find . -type f -name '*.py' -exec awk 'END {print NR}' '{}' + 2>/dev/null | awk '{ total+=$1 }END{print total}'

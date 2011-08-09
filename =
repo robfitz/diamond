@@ -10,8 +10,8 @@ from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 
 from d_board.models import Node
-from d_cards.models import Card, Deck
-from d_game.models import Turn, Match, Puzzle, PuzzleStartingUnit
+from d_cards.models import Card, ShuffledLibrary, Deck
+from d_game.models import Turn, Match, Board, AI, Puzzle
 from d_game.util import daily_activity
 from d_cards.util import get_deck_from
 from d_feedback.models import PuzzleFeedbackForm
@@ -27,12 +27,6 @@ from d_game import game_master, ai
 def puzzle(request):
 
     puzzle = Puzzle.objects.get(id=request.GET.get('p'))
-
-    if request.user.is_authenticated():
-        player_name = request.user.username
-    else:
-        player_name = game_master.ANON_PLAYER_NAME
-    enemy_name = "ai"
 
     # check perms
     if not has_permissions_for(puzzle, request.user, request.session.session_key):
@@ -63,12 +57,6 @@ def puzzle(request):
 
 @daily_activity
 def playing(request): 
-
-    if request.user.is_authenticated():
-        player_name = request.user.username
-    else:
-        player_name = game_master.ANON_PLAYER_NAME
-    enemy_name = "ai"
 
     # init
     match = init_match(request) 
@@ -108,6 +96,9 @@ def init_match(request):
 
     ai_deck = Deck.objects.all()[0]
 
+    # starting hand, to be filled to 5 on first AI turn
+    ai_library.draw(3)
+
     if request.user.is_authenticated():
         player = request.user
     else:
@@ -122,53 +113,136 @@ def init_match(request):
     return match 
 
 
-def end_turn(request):
+def process_player_turn(request):
 
-    # grab game info
-    match_id = request.session['match'] 
-    game = cached.get_game(match_id) 
+
+    match_id = request.session['match']
+    game = cached.get_game(match_id)
+
+    logging.info("()()( process player turn for %s" % match_id)
 
     if request.user.is_authenticated():
         player_name = request.user.username
     else:
-        player_name = game_master.ANON_PLAYER_NAME 
+        player_name = game_master.ANON_PLAYER_NAME
 
-    # turn init
-    game_master.heal(game, player_name) 
+    # heal player's units
+    game_master.heal(game, player_name)
 
-    # logging.info("^^^ %s hand before draw %s" % (player_name, get_player(game, player_name)['hand']))
+    logging.info("  healed")
 
-    game_master.draw_up_to(game, player_name, 5)
+    card = None
+    node = None
 
-    # logging.info("^^^ %s hand after draw %s" % (player_name, get_player(game, player_name)['hand']))
+    # first player cast
+    node_id = request.POST.get("node1")
 
-    player_moves = request.POST.get("player_turn").strip().split('\n')
-    game_master.do_turn(game, player_name, player_moves)
+    logging.info("  first node %s" % node_id)
+
+    if node_id == "surrender":
+        logging.info("TODO: player surrender")
+        return
+
+    elif node_id == "pass":
+        # do nothing. player has passed this phase
+        pass
+
+    try:
+        node = Node.objects.get(id=node_id)
+    except:
+        # node_id could be 'pass' or 'surrender' or 'tech'...
+        pass
+
+    card_id = request.POST.get("card1")
+    logging.info("  first card %s" % card_id)
+
+    if card and node: 
+        logging.info("  card and node, playing")
+        game_master.play(game, player_name, card_id, request.POST.get("align1"), node.row, node.x) 
+
+    elif node_id == "tech": 
+        if game_master.discard(game, player_name, card_id):
+            game_master.tech(game, player_name, 1)
+
+    else:
+        logging.info("  no player action")
+        # no player action
+        pass
+
+    #attack!
+    game_master.do_attack_phase(game, player_name)
+
+    # second player cast
+    node = None
+    card = None
+
+    node_id = request.POST.get("node2")
+
+    if node_id == "surrender":
+        logging.info("TODO: player surrender 2")
+        return
+
+    elif node_id == "pass":
+        # do nothing. player has passed this phase
+        pass
+
+    try:
+        node = Node.objects.get(id=node_id)
+    except:
+        # node_id could be 'pass' or 'surrender' or 'tech'...
+        pass
+
+    card_id = request.POST.get("card2")
+
+    if card_id and node:
+        game_master.play(game, player_name, card_id, request.POST.get("align2"), node.row, node.x)
+
+    elif node_id == "tech":
+        if game_master.discard(game, player_name, card_id):
+            game_master.tech(game, player_name, 1)
+    else:
+        # no player action
+        pass
+
+    # remove player rubble
+    game_master.remove_rubble(game, player_name)
+
+
+def end_turn(request):
+
+    match_id = request.session['match']
+    game = cached.get_game(match_id)
+
+    logging.info("()()( end_turn %s" % match_id)
+
+    if request.user.is_authenticated():
+        player_name = request.user.username
+    else:
+        player_name = game_master.ANON_PLAYER_NAME
+
+    # process what the player has just done & update board state 
+    # TODO
+    process_player_turn(request) 
+    player_turn = []
+    game_master.do_turn(game, player_turn)
+
+    cached.save(game)
 
     # if board.match.winner:
     # player has won. yaaaaay!!
     # return HttpResponse("") 
 
-    game_before_ai = simplejson.dumps(game) 
+    game_before_ai = simplejson.dumps(game)
 
     # let the computer play its turn
-    game_master.heal(game, 'ai') 
-    # logging.info("^^^ %s hand before draw %s" % ('ai', get_player(game, 'ai')['hand'] ))
-    game_master.draw_up_to(game, 'ai', 5)
-
-    # logging.info("^^^ %s hand after draw %s" % ('ai', get_player(game, 'ai')['hand']))
     ai_turn = ai.get_turn(game, 'ai') 
-    ai_moves = [ ai_turn[0]['shorthand'], ai_turn[1]['shorthand'] ]
-    game_master.do_turn(game, 'ai', ai_moves)
+    game_master.do_turn(game, ai_turn)
+    cached.save(game)
 
     game_after_ai = simplejson.dumps(game)
 
     #get 2 new cards for player 
     draw_cards = game_master.draw_up_to(game, player_name, 5)
-
-
-    # save turn changes on server
-    cached.save(game)
 
     #serialize and ship it
     hand_and_turn_json = """{
@@ -181,7 +255,7 @@ def end_turn(request):
                     game_before_ai,
                     game_after_ai)
 
-    # logging.info(hand_and_turn_json);
+    logging.info(hand_and_turn_json);
 
     return HttpResponse(hand_and_turn_json, "application/javascript")
 
@@ -202,19 +276,15 @@ def begin_puzzle_game(request):
     game['players'][player_name]['life'] = match.puzzle.player_life
 
     # draw 5 for player
-    hand = game_master.draw_up_to(game, player_name, 5)
+    hand = game_master.draw(game, player_name, 5)
 
     # puzzle starting units
-    starting_units = PuzzleStartingUnit.objects.filter(puzzle=match.puzzle)
-
-    for starting_unit in starting_units:
-        game_master.play(game, 'ai', starting_unit.unit_card.pk, 'ai', starting_unit.location.row, starting_unit.location.x, ignore_hand=True)
-        logging.info("_______ added starting unit to ai board")
+    # starting_units = PuzzleStartingUnit.objects.filter(puzzle=match.puzzle)
+    # for starting_unit in starting_units:
+    # unit = starting_unit.create_unit(match) 
 
     # save changes
     cached.save(game)
-
-    logging.info(simplejson.dumps(game))
 
     ai_turn = match.puzzle.get_setup_turn() 
 
@@ -250,22 +320,14 @@ def first_turn(request):
 def begin_ai_game(request):
     
     match = Match.objects.get(id=request.session["match"])
-    game = cached.get_game(match.id)
 
-    if request.user.is_authenticated():
-        player_name = request.user.username
-    else:
-        player_name = game_master.ANON_PLAYER_NAME
-
-    hand = game_master.draw_up_to(game, player_name, 5)
-
-    cached.save(game)
+    hand_json = match.friendly_library.draw_as_json(5)
 
     hand_and_turn_json = """{
             'player_draw': %s,
             'ai_turn': { },
             'ai_cards': { },
-            }""" % simplejson.dumps(hand)
+            }""" % hand_json
 
     logging.info(hand_and_turn_json);
 

@@ -137,13 +137,8 @@
     <form id="current_turn" method="post" action="/playing/end_turn/">
         {% csrf_token %}
 
-        <input name="card1" />
-        <input name="node1" />
-        <input name="align1" />
+        <textarea name="player_turn"></textarea>
 
-        <input name="card2" />
-        <input name="node2" />
-        <input name="align2" />
     </form>
 
     <div class="cast_info hidden">
@@ -192,6 +187,9 @@
         }
 
         $(function() {
+
+            player_name = "{{ player_name }}";
+            enemy_name = "{{ enemy_name }}";
 
             {% for node in board %}
                 board_node_locs["{{ node.pk }}"] = { "row": {{ node.row }}, "x": {{ node.x }} }; 
