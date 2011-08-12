@@ -215,35 +215,6 @@ def check_for_winner(sender, instance, raw, **kwargs):
 pre_save.connect(check_for_winner, sender=Match)
 
 
-class Turn(models.Model):
-
-    ALIGNMENT_CHOICES = (
-            ("friendly", "Friendly"), 
-            ("ai", "AI"),
-        )
-
-    play_1 = models.ForeignKey(Card, null=True, related_name="play_1")
-
-    #this might be ignored, e.g. in the case of "all" targetting
-    target_node_1 = models.ForeignKey(Node, null=True, related_name="target_node_1")
-
-    is_tech_1 = models.BooleanField(default=False)
-
-    target_alignment_1 = models.CharField(max_length=10, choices=ALIGNMENT_CHOICES)
-
-    play_2 = models.ForeignKey(Card, null=True, related_name="play_2")
-
-    #this might be ignored, e.g. in the case of "all" targetting
-    target_node_2 = models.ForeignKey(Node, null=True, related_name="target_node_2")
-
-    is_tech_2 = models.BooleanField(default=False)
-
-    target_alignment_2 = models.CharField(max_length=10, choices=ALIGNMENT_CHOICES, null=True)
-
-
-    draw_1 = models.ForeignKey(Card, null=True, related_name="draw_1")
-    draw_2 = models.ForeignKey(Card, null=True, related_name="draw_2")
-
 
 class PuzzleStartingUnitAdmin(admin.ModelAdmin):
 

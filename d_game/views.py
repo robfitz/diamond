@@ -11,7 +11,7 @@ from django.contrib.sessions.backends.db import SessionStore
 
 from d_board.models import Node
 from d_cards.models import Card, Deck
-from d_game.models import Turn, Match, Puzzle, PuzzleStartingUnit
+from d_game.models import Match, Puzzle, PuzzleStartingUnit
 from d_game.util import daily_activity
 from d_cards.util import get_deck_from
 from d_feedback.models import PuzzleFeedbackForm
@@ -191,18 +191,15 @@ def begin_puzzle_game(request):
     match = Match.objects.get(id=request.session['match'])
     game = cached.get_game(match.id)
 
-    logging.info("()()( begin puzzle game %s" % match.id)
-
     if request.user.is_authenticated():
         player_name = request.user.username
     else:
         player_name = game_master.ANON_PLAYER_NAME
 
+    hand = game_master.draw_up_to(game, player_name, 5)
+
     # init puzzle life
     game['players'][player_name]['life'] = match.puzzle.player_life
-
-    # draw 5 for player
-    hand = game_master.draw_up_to(game, player_name, 5)
 
     # puzzle starting units
     starting_units = PuzzleStartingUnit.objects.filter(puzzle=match.puzzle)
@@ -216,24 +213,12 @@ def begin_puzzle_game(request):
 
     logging.info(simplejson.dumps(game))
 
-    ai_turn = match.puzzle.get_setup_turn() 
-
-    play_cards = []
-    for play in ai_turn:
-        play_cards.append(Card.objects.get(id=play['card']))
-
     for card in hand:
         logging.info("5678 hand card: %s" % card)
 
-    hand_and_turn_json = """{
-            'player_draw': %s,
-            'ai_starting_units': %s,
-            'ai_cards': %s,
-            }""" % (simplejson.dumps(hand), 
-                simplejson.dumps(ai_turn),
-                serializers.serialize("json", play_cards))
+    censored = game_master.get_censored(game, player_name)
 
-    return HttpResponse(hand_and_turn_json, "application/javascript")
+    return HttpResponse(simplejson.dumps(censored), "application/javascript")
 
 
 def first_turn(request):
@@ -261,10 +246,14 @@ def begin_ai_game(request):
 
     cached.save(game)
 
+    # censor it so sensitive information about enemy's hands
+    # and both players' decks is hidden from player
+    censored = game_master.get_censored(game, playegamer_name)
+    game_json = simplejson.dumps(censored) 
+
     hand_and_turn_json = """{
             'player_draw': %s,
             'ai_turn': { },
-            'ai_cards': { },
             }""" % simplejson.dumps(hand)
 
     logging.info(hand_and_turn_json);

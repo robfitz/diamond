@@ -19,7 +19,7 @@ def init_game(match):
             'pk': match.pk,
             'type': match.type,
             'goal': match.goal,
-            'current_phase': 'draw',
+            'current_phase': 1,
             'current_player': player,
             'players': {
                 player: {
@@ -42,8 +42,8 @@ def init_game(match):
     # init board
     for row in range(0, 3):
         for col in range(-row, row + 1):
-            node = get_board(game, player)["%s_%s" % (row, col)] = {}
-            node = get_board(game, 'ai')["%s_%s" % (row, col)] = {} 
+            set_node(game, player, row, col, {})
+            set_node(game, 'ai', row, col, {})
 
     # shuffle if appropriate
     if game['type'] != "puzzle":
@@ -53,10 +53,28 @@ def init_game(match):
     return game
 
 
+def get_censored(game, player):
+
+    # avoid changing the old one
+    game = copy.deepcopy(game)
+
+    game['player'] = player
+
+    opponent = game['players'][get_opponent_name(game, player)]
+
+    # censor enemy hand
+    opponent['hand'] = { 'length': len(opponent['hand']) }
+
+    # censor enemy library
+    opponent['library'] = { 'length': len(opponent['library']) }
+
+    # censor own library so can't look ahead
+    game['players'][player]['library'] = { 'length': len(game['players'][player]['library']) } 
+
+    return game
+
+
 def do_turn(game, player, moves, is_ai=False):
-
-    logging.info("^^^ doing turn for %s with moves: %s" % (player, moves))
-
 
     # first play
     do_turn_move(game, player, moves[0])
@@ -121,10 +139,10 @@ def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
         nodes.append({ 'row': row, 'x': x})
 
     elif card['fields']['target_aiming'] == 'all': 
-        for node_row in range(3):
-            for node_x in range(-row, row+1): 
-                if not get_board(game, node_owner)["%s_%s" % (node_row, node_x)]: 
-                    nodes.append({ 'row': node_row, 'x': node_x }); 
+        for row in range(3):
+            for col in range(-row, row+1): 
+                if not get_board(game, node_owner)["%s_%s" % (row, col)]: 
+                    nodes.append({ 'row': row, 'x': col }); 
 
     for node in nodes:
         # loop to support 'all node' targetting as well as 'chosen'
@@ -259,17 +277,11 @@ def do_attack(game, attacking_player, unit):
             return 
 
 
-def get_ai_turn(game, ai_player):
-
-    pass
-
-
 def get_player(game, player): 
     return game['players'][player]
 
 
-def get_opponent_name(game, player):
-
+def get_opponent_name(game, player): 
     for player_name in game['players']:
         if player_name != player:
             return player_name 
@@ -279,6 +291,14 @@ def get_board(game, player):
     return get_player(game, player)['board']
 
 
+def get_node(game, player, row, x):
+    return get_board(game, player)["%s_%s" % (row, x)]
+
+
+def set_node(game, player, row, x, val):
+    get_board(game, player)["%s_%s" % (row, x)] = val
+
+
 def each_type(game, player, type):
 
     types = []
@@ -286,7 +306,7 @@ def each_type(game, player, type):
     board = get_board(game, player) 
     for row in range(0, 3):
         for col in range(-row, row + 1):
-            node = board["%s_%s" % (row, col)]
+            node = get_node(game, player, row, col)
             node_type = None
             try:
                 node_type = node['type']
@@ -315,7 +335,7 @@ def for_each_type(game, player, type, callback):
     board = get_board(game, player) 
     for row in range(0, 3):
         for col in range(-row, row + 1):
-            node = board["%s_%s" % (row, col)]
+            node = get_node(game, player, row, col)
             node_type = None
             try:
                 node_type = node['type']
@@ -338,7 +358,7 @@ def remove_rubble_from_node(game, player, node):
 
     if node['fields']['rubble_duration'] <= 0: 
         # if all rubble is removed, clear from board
-        get_board(game, player)["%s_%s" % (node['row'], node['x'])] = {} 
+        set_node(game, player, node['row'], node['x'], {})
 
 
 def heal(game, player):
@@ -370,4 +390,19 @@ def kill_unit(game, target):
     else:
         # remove from game
         board = get_board(game, player)
-        board["%s_%s" % (target['row'], target['x'])] = {}
+        set_node(game, player, target['row'], target['x'], {})
+
+# returns name of winner, or false if noone has won
+def is_game_over(game):
+
+    for player in game['players']:
+        if player['life'] <= 0:
+            return get_opponent_name(game, player)
+        
+    if game['goal'] == 'kill units':
+        opp = get_opponent_name(game, game['player'])
+        if each_unit(game, opp).length == 0:
+            return game['player']
+        
+    return False
+

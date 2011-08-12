@@ -1,36 +1,52 @@
-
-function surrender() { 
-    // jump to 0 life
-    damage_player("friendly", match.life['friendly']);
-    test_game_over(); 
-}
-
 function pass_turn() {
 
     var turn = $("textarea[name='player_turn']");
     turn.val(turn.val() + player_name + " pass\n");
 
     next_phase(false); 
-}
+} 
 
+var UNIT_R = 25;
+
+var phases = ["draw", "play_1", "attack", "play_2", "ai_draw", "ai_play_1", "ai_attack", "ai_play_2"];
+
+// everything!
+var game;
 var player_name;
-var enemy_name;
-
-    var UNIT_R = 25;
-
-    var phases = ["draw", "play_1", "attack", "play_2", "ai_draw", "ai_play_1", "ai_attack", "ai_play_2"];
-
-    var MAX_TECH = 5; 
-
-    var boards = new Board();
-    var board_node_locs = {};
-    var board_node_pks = {};
+var opponent_name;
 
     function draw_starting_hand() { 
         $.ajax({ url: "/playing/first_turn/",
                 success: function(data) {
-                    match.turn_data = eval('(' + data + ')');
-                    next_phase(true);
+
+                    // get model from server
+                    game = eval('(' + data + ')');
+
+                    player_name = game['player'];
+                    opponent_name = get_opponent_name(game, player_name)
+
+                    // update UI to match new game state
+                    if (game['goal'] == "kill units") {
+                        // mark AI as unkillable
+                        // if the goal is to wipe
+                        // units out 
+                        $(".life.ai h1").text("∞"); 
+                    }
+
+                    for (player_name in game['players']) {
+                        for_each_unit(game, 
+                            player_name, 
+                            function(game, player, unit) { 
+                                //play(game, player, unit, player, unit.row, unit.x, true);
+                                show_unit(unit);
+                        });
+                    }
+
+                    // draw starting cards 
+                    delay = add_cards_to_hand( game['players'][player_name]['hand'] )
+
+                    // kick things off w/ regular turns
+                    setTimeout( do_phase, delay )
                 }
             }); 
     }
@@ -41,18 +57,15 @@ var enemy_name;
             function(data) {
 
                 if (match.winner) {
-                    // if the match has already been won or
+                    // if the match has been won or
                     // lost, ignore how the AI responds
                     return;
                 }
 
-                match.turn_data = eval('(' + data + ')');
+                turn_data = eval('(' + data + ')');
 
                 verify_board_state(match["turn_data"]["verify_board_state_before_ai"]);
 
-                // TODO: this probably shouldn't be here. clean up
-                // the end of my turn/beginning of their turn ordering
-                heal_units("ai");
                 next_phase(false);
             }
         );
@@ -91,6 +104,8 @@ var enemy_name;
         verify_board_state_for(server_board, p2);
     }
     function verify_board_state_for(server_board, align) {
+
+        return;
 
         var temp_align = align;
         if (align != 'ai') temp_align = 'friendly';
@@ -144,115 +159,59 @@ var enemy_name;
         }
     }
 
-    function test_game_over() {
 
-        if (!match.is_init) {
-            return false;
-        }
+function next_phase(is_first_turn) {
 
-
-        if (match.life["ai"] <= 0) {
-            win();
-        }
-        else if (match.life["friendly"] <= 0) {
-            lose();
-        } 
-
-        if (match.goal == 'kill units') {
-            for (var node_pk in boards['ai']) { 
-                var unit = boards['ai'][node_pk]; 
-                if (unit && unit['type'] == 'unit' && unit.must_be_killed) {
-                    return;
-                }
-            }
-            // all required units are dead, player won puzzle
-            win();
-        } 
+    game['current_phase'] ++
+    if (game['current_phase'] >= phases.length) {
+        game['current_phase'] = 0;
     }
 
-    function next_phase(is_first_turn) {
+    do_phase();
+}
 
-        if (match.winner || test_game_over()) return;
+function do_phase() {
 
-        if (is_first_turn) {
-            if (match.goal == "kill units") {
-                // mark AI as unkillable
-                // if the goal is to wipe
-                // units out 
-                $(".life.ai h1").text("∞"); 
-            }
+        if (is_game_over(game)) {
+            var winner = is_game_over(game)
+            return
+        } 
 
-            var units = match.turn_data.ai_starting_units;
-            if (units) {
-                //create starting units
-
-                for (i = 0; i < units.length; i ++) {
-                    var card = match.turn_data.ai_cards[i];
-                    var node = $(".board.ai [name='" + units[i].node + "']");
-                    ai_cast(card,
-                            node,
-                            'ai',
-                            is_first_turn); 
-                    boards['ai'][units[i].node].must_be_killed = units[i].must_be_killed; 
-                } 
-            }
-
-            match.is_init = true;
-        }
-
-        match.phase ++;
         cancel_cast();
 
-        if (match.phase >= phases.length) {
-            match.phase = 0;
-            match.turn_num ++; 
-        }
 
+        // highlight current phase UI
         $("#phases").find("li.active").removeClass("active");
-        $("#phases").find("#" + match.phase).addClass("active");
+        $("#phases").find("#" + game['current_phase']).addClass("active");
 
-        if (match.phase == 0 ) {
-            if (match.turn_data) {
-                //draw cards
-                var i = 0;
-                while (i < match.turn_data.player_draw.length) {
-                    setTimeout ( function() {
-                        var card = match.turn_data.player_draw.pop();
-                        add_card_to_hand( card );
-                    }, 200 * (i+1));
-                    i ++; 
-                }
-                setTimeout ( function() {
-                    heal_units("friendly");
-                    next_phase(false);
-                }, 200 * i); 
-            }
-            else {
-                next_phase(false);
-            }
+        if (game['current_phase'] == 0 ) {
+
+            heal_units(player);
+            var delay = add_cards_to_hand(turn_data['player_draw'])
+            setTimeout ( function() {
+                next_phase();
+            }, delay); 
         }
-        else if (match.phase == 1) {
-            if ($("#friendly_hand").children().length <= 2) {
-                setTimeout( function() { next_phase(false); }, 400); 
+        else if (game['current_phase'] == 1) {
+            if (game['players'][player_name]['hand'].length == 0) {
+                // no hand cards, skip phase
+                setTimeout( function() { next_phase(); }, 200); 
             }
             else {
-                if ( match.turn_num > 1) {
-                    slider_alert("It's the first half of your turn!",
+                // cards in hand, wait for player to choose
+                slider_alert("It's the first half of your turn!",
                             "Pick a card to play, tech up, or skip your turn",
                             false); 
-                }
-                //do nothing.
-                //wait for player to play card
             }
         }
-        else if (match.phase == 2) {
+        else if (game['current_phase'] == 2) {
             //begin logic for auto-attacking
-            var delay = do_attack_phase("friendly");
-            setTimeout(function() { next_phase(false); }, delay + 1000);
+            var delay = do_attack_phase(game, player_name);
+            setTimeout(function() { next_phase(); }, delay);
         }
-        else if (match.phase == 3) {
-            if ($("#friendly_hand").children().length <= 2) {
-                setTimeout( function() { next_phase(false); }, 400); 
+        else if (game['current_phase'] == 3) {
+            if (game['players'][player_name]['hand'].length == 0) {
+                setTimeout( function() { next_phase(); }, 200); 
             }
             else {
                 slider_alert("It's the second half of your turn!",
@@ -262,34 +221,42 @@ var enemy_name;
                 //wait for player to play card
             }
         }
-        else if (match.phase == 4) {
+        else if (game['current_phase'] == 4) {
             //ai draw & heal
             remove_one_rubble("friendly"); 
             end_turn();
 
+            heal_units("ai");
         }
-        else if (match.phase == 5 ) {
-            do_ai_play_1();
+        else if (game['current_phase'] == 5 ) { 
+            do_turn_move(game, 'ai', turn_data['ai_turn'][0]);
+            show_turn_move(game, 'ai', turn_data['ai_turn'][0]);
+
             setTimeout ( function() {
                 next_phase(false);
-            }, 1000); 
+            }, 500); 
         } 
-        else if (match.phase == 6) {
+        else if (game['current_phase'] == 6) {
             //ai attack
-            var delay = do_attack_phase("ai");
+            var delay = do_attack_phase(game, opponent_name);
             setTimeout( function() {
                     next_phase(false);
-                }, delay + 1000);
+                }, delay);
         }
-        else if (match.phase == 7 ) {
-            do_ai_play_2();
-            remove_one_rubble("ai");
-
-            verify_board_state(match.turn_data["verify_board_state_after_ai"]);
+        else if (game['current_phase'] == 7 ) {
+            do_turn_move(game, 'ai', turn_data['ai_turn'][1]);
+            show_turn_move(game, 'ai', turn_data['ai_turn'][1]);
 
             setTimeout ( function() {
                 next_phase(false);
-            }, 1000); 
+            }, 500); 
+            remove_one_rubble("ai");
+
+            verify_board_state(turn_data["verify_board_state_after_ai"]);
+
+            setTimeout ( function() {
+                next_phase(false);
+            }, 400); 
 
         }
     }
@@ -312,8 +279,7 @@ var enemy_name;
 
                 var align = node_info['player'];
 
-                var node_pk = board_node_pks[node_info.row][node_info.x];
-                var node = $(".board." + node_info['player'] + " .node[name='" + node_pk + "']");
+                var node = $(".board." + node_info['player'] + " .node[name='" + node_info.row + "_" + node_info.x + "']");
 
                 ai_cast(card_info, node, align);
             }
@@ -342,8 +308,7 @@ var enemy_name;
 
                 var align = node_info['player'];
 
-                var node_pk = board_node_pks[node_info.row][node_info.x];
-                var node = $(".board." + node_info['player'] + " .node[name='" + node_pk + "']");
+                var node = $(".board." + node_info['player'] + " .node[name='" + node_info.row + "_" + node_info.x + "']");
 
                 ai_cast(card_info, node, align);
             }
@@ -355,7 +320,10 @@ var enemy_name;
     } 
 
     /** returns the number of milliseconds this attack phase will require to animate */
-    function do_attack_phase(alignment) { 
+    function deprecated___do_attack_phase(alignment) { 
+        alert ('skipping game.js do attack phase ');
+        return;
+
         var i = 0;
         var animation_ms = 0;
         $(".board." + alignment + " .node.unit .unit_piece").each( 
@@ -441,6 +409,9 @@ var enemy_name;
 
 function win() { 
 
+    alert("skipping game.js win()");
+    return;
+
     if (!match.winner) {
         setTimeout(function() { 
             $("#win_screen").show("slide", "slow"); 
@@ -450,6 +421,9 @@ function win() {
     }
 }
 function lose() {
+    alert("skipping game.js lose()");
+    return;
+
     if (!match.winner) {
         setTimeout(function() {
             $("#lose_screen").show("slide", "slow");
@@ -505,56 +479,14 @@ function heal_units(alignment) {
         });
     }
 
-    function cast_card(caster_alignment, target_alignment, card, node, skip_side_effects) {
-
-        if (card.fields.target_aiming == "all") {
-            nodes = node.parent().children(".empty");
-        }
-        else if (card.fields.target_aiming == "chosen") {
-            nodes = node;
-        }
-        else {
-            alert('unknown card target aiming: ' + card.fields.target_aiming);
-        }
-
-        for (var i = 0; i < nodes.length; i ++) {
-            node = nodes.eq(i);
-
-            if (card.fields.direct_damage) {
-                var node_pk = node.attr("name");
-                var unit = boards[target_alignment][node_pk]; 
-
-                damage_unit(node.attr('name'), target_alignment, card.fields.direct_damage, card); 
-                unit.show_next_damage();
-
-            }
-            if (card.fields.defense) { 
-
-                var unit = new Unit(card, node.attr('name'), target_alignment);
-
-                match.played_cards[card.pk] = card.fields; 
-                boards[target_alignment][node.attr("name")] = unit; 
-            }
-            if (!skip_side_effects && card.fields.tech_change) {
-                if (caster_alignment == "ai") {
-                    ai_tech_up(card.fields.tech_change);
-                }
-                else {
-                    tech_up(card.fields.tech_change);
-                } 
-            }
-        } 
-    }
-
-    function get_unit_at(alignment, next_node_id) {
-        return boards[alignment][next_node_id];
-    }
-
     /** 
      * returns a list of node points in format: 
      * { dx:XXX, drow:XXX, [action:damage_unit/damage_player/blocked], node_id:node_pk } 
      */ 
     function do_attack(unit, node_id, alignment) {
+
+        alert("skipping game.js do_attack");
+        return;
 
         if (!unit) {
             alert('attempted attack from non-existant unit at node ' + node_id + " of alignment " + alignment);
@@ -730,94 +662,68 @@ function heal_units(alignment) {
     }
 
     function begin_card_drag(event, ui, card_json) {
-            cancel_cast();
 
+        cancel_cast(); 
 
+        if (game['current_phase'] != 1 && game['current_phase'] != 3) {
+            //not in an interactive phase, so no clicky
+            return;
+        }
 
-            if (match.phase != 1 && match.phase != 3) {
-                //not in an interactive phase, so no clicky
-                return;
-            }
-            if (match["tech"]["friendly"] < card_json.fields.tech_level
-                && match["tech"]["friendly"] >= MAX_TECH) {
+        ui.addClass("selected");
 
-                //we can neither play nor tech up with this
-                //card, so don't allow it to be clicked
-                return;
-            }
+        // if the tech level is high enough, select the places
+        // on the board we can use this card
+        if (game['players'][player_name]["tech"] >= card_json.fields.tech_level) {
+            // find valid targets based on card targetting type
+            // e.g. summoning is: friendly board > empty nodes
 
-            ui.addClass("selected");
+            var targets;
+            var board_selector = ".board"; 
+            var node_selector = ".node";
 
-            // if the tech level is high enough, select the places
-            // on the board we can use this card
-            if (match["tech"]["friendly"] >= card_json.fields.tech_level) {
-                // find valid targets based on card targetting type
-                // e.g. summoning is: friendly board > empty nodes
-
-                var targets;
-                var board_selector = ".board"; 
-                var node_selector = ".node";
-
-                if (card_json.fields.target_alignment != 'any') {
-                    var align = (card_json.fields.target_alignment == "enemy" ? "ai" : "friendly");
-                    board_selector += "." + align;
-                }
-
-                var occ = card_json.fields.target_occupant;
-                if (occ == "unit" || occ == "occupied") {
-                    node_selector += ".unit"; 
-                }
-                else if (occ == "empty") {
-                    node_selector += ".empty";
-                }
-
-                targets = $(board_selector + " " + node_selector); 
-
-                // highlight valid targets and allow them to respond to click
-                targets.addClass("targettable").click( function (event) {
-                    cast($(".card.selected"), $(event.currentTarget));
-                });
-
-                /**
-                targets.mouseenter( function ( e ) {
-                        if (card_json.fields.defense >= 1) {
-                            var node_alignment = $(this).parent().hasClass("friendly") ? "friendly" : "ai"; 
-                            var unit = Unit(card_json, $(this).attr("name"), node_alignment);
-                            var path = get_attack_path(board_node_pks, board_node_locs);
-                            draw_path(unit, path); 
-                        } 
-                });
-                targets.mouseleave(function ( e ) {
-                        clear_attack_paths();
-                });
-                */
-
-                targets.droppable( {
-                    drop: function(event, ui) {
-                        cast($(".card.selected"), $(event.target)); 
-                    },
-                    over: function(event, ui) {
-                        $(event.currentTarget).addClass("hovered");   
-                    },
-                    out: function(event, ui) {
-                        $(event.currentTarget).removeClass("hovered");
-                    },
-                });
+            if (card_json.fields.target_alignment != 'any') {
+                var align = (card_json.fields.target_alignment == "enemy" ? "ai" : "friendly");
+                board_selector += "." + align;
             }
 
-            // and if we have already teched fully, 
-            // don't allow it to go higher
-            if (match["tech"]["friendly"] < MAX_TECH) {
-                $("#friendly_tech").addClass("targettable").click( function (event) {
-                    trash($(".card.selected"));
-                });
+            var occ = card_json.fields.target_occupant;
+            if (occ == "unit" || occ == "occupied") {
+                node_selector += ".unit"; 
             }
+            else if (occ == "empty") {
+                node_selector += ".empty";
+            }
+
+            targets = $(board_selector + " " + node_selector); 
+
+            // highlight valid targets and allow them to respond to click
+            targets.addClass("targettable").click( function (event) {
+                cast($(".card.selected"), $(event.currentTarget));
+            });
+
+            targets.droppable( {
+                drop: function(event, ui) {
+                    cast($(".card.selected"), $(event.target)); 
+                },
+                over: function(event, ui) {
+                    $(event.currentTarget).addClass("hovered");   
+                },
+                out: function(event, ui) {
+                    $(event.currentTarget).removeClass("hovered");
+                },
+            });
+        }
+
+        $("#friendly_tech").addClass("targettable").click( function (event) {
+            trash($(".card.selected"));
+        });
     }
 
 
     function trash(hand_card) {
 
-        if (match.phase != 1 && match.phase != 3) {
+        if (game['current_phase'] != 1 && game['current_phase'] != 3) {
             //not in an interactive phase, so no clicky
             return;
         }
@@ -860,42 +766,34 @@ function heal_units(alignment) {
 
     function cast(hand_card, node) { 
 
-        if (match.phase != 1 && match.phase != 3) {
+        if (game['current_phase'] != 1 && game['current_phase'] != 3) {
             //not in an interactive phase, so no clicky
             return;
         }
 
-        //convert jquery element into json w/ game logic
-        var card = match.hand_cards[hand_card.attr("id")];
-        var align;
-        var temp_align;
-
-        var turn = $("textarea[name='player_turn']");
-
-        var node_id = (node.attr("name"));
-        var node_loc = board_node_locs[node_id];
+        var card = get_hand_card(game, player_name, hand_card.attr("id"));
+        var target_owner;
 
         if (node.parent().hasClass("friendly")) {
-            align = player_name;
-            temp_align = 'friendly';
+            target_owner = player_name;
         }
         else {
-            align = "ai";
-            temp_align = 'ai';
+            target_owner = opponent_name;
         }
 
-        // turn format: player action [card [node_owner row x]]
-        var this_turn = player_name + " play " + hand_card.attr('id') + " " + align + " " + node_loc.row + " " + node_loc.x + "\n"; 
+        var node_loc = node.attr("name")
+        var r = parseInt(node_loc.split("_")[0])
+        var x = parseInt(node_loc.split("_")[1])
 
+        // turn format: player action [card [node_owner row x]]
+        var this_turn = player_name + " play " + hand_card.attr('id') + " " + target_owner + " " + row + " " + x + "\n"; 
+
+        var turn = $("textarea[name='player_turn']");
         turn.val(turn.val() + this_turn);
 
-        //visually remove from hand
-        hand_card.remove(); 
-        var card_id = hand_card.attr("id");
+        play(game, player_name, card, target_owner, r, x, false);
 
-        cast_card('friendly', temp_align, card, node);
-
-        setTimeout( function() { next_phase(false) }, 800);
+        next_phase();
     }
 
     function cancel_cast() {

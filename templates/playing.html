@@ -6,6 +6,8 @@
 
     <script type="text/javascript" src="/media/js/diamond.js"></script>
     <script type="text/javascript" src="/media/js/game.js"></script>
+    <script type="text/javascript" src="/media/js/game_master.js"></script>
+    <script type="text/javascript" src="/media/js/view.js"></script>
 
 {% endblock meta %}
 
@@ -148,11 +150,6 @@
 
     <script>
 
-        {% if puzzle %}
-            var match = new Match("puzzle", "{{ puzzle.goal }}");
-        {% else %}
-            var match = new Match("ai", "kill player");
-        {% endif %}
 
         function slider_alert(title, message, wait_for_confirm) {
             $("#slider_alert").fadeIn();
@@ -168,7 +165,6 @@
                 setTimeout(function() {
                         hide_slider_alert();
                     }, 2500); 
-                /*
                 $("#closing_in").text("Closing in 2...");
                 setTimeout(function() {
                     $("#closing_in").text("Closing in 1...");
@@ -176,7 +172,6 @@
                 setTimeout(function() {
                     $("#closing_in").text("Closing in 0...");
                 }, 1600);
-                */
             }
             $("#slider_alert .message_container").show("slide"); 
         }
@@ -191,22 +186,10 @@
             player_name = "{{ player_name }}";
             enemy_name = "{{ enemy_name }}";
 
-            {% for node in board %}
-                board_node_locs["{{ node.pk }}"] = { "row": {{ node.row }}, "x": {{ node.x }} }; 
-                if (! board_node_pks["{{ node.row }}"] ) {
-                    board_node_pks["{{ node.row }}"] = {};
-                }
-                board_node_pks["{{ node.row }}"]["{{ node.x }}"] = "{{ node.pk }}";
-            {% endfor %} 
-
             {% if puzzle %}
 
-                set_player_life("friendly", {{ puzzle.player_life }} ); 
-
-                {% if puzzle.goal == 'kill units' %}
+                {% if match.goal == 'kill units' %}
                     $("#ai_life").attr("title", "You can't directly hurt the enemy in puzzle mode. Instead, kill their units to win."); 
-                {% else %}
-                    set_player_life("ai", "{{ puzzle.ai_life }}");
                 {% endif %}
 
                 setTimeout(function() {

@@ -2,6 +2,18 @@
 
 {% block header_title %}Diamond Run{% endblock %}
 
+{% block script %}
+
+$(function() {
+    a1 = ['a', 'b', 'c'];
+    a2 = ['x', 'y', 'z'];
+
+    a1.splice(a1.length, 0, a2);
+    alert(a1);
+});
+
+{% endblock %}
+
 {% block content %}
 
 <h2>A competitive board game about smart positioning</h2>
