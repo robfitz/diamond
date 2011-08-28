@@ -14,12 +14,20 @@ var DEFAULT_DELAY = 200;
 var durations = { 
     'discard': 200,
     'draw': 200,
-    'damage_unit': 0,
-    'heal_unit': 0,
+    'damage_unit': 200,
+    'heal_unit': 200,
     'draw': 200,
     'move': 200,
+    'lose': 0,
+    'win': 0,
+    'next_phase': 0,
 } 
+function get_jq(effect) { 
 
+    return get_node_view(effect['target']['player'],
+            effect['target']['row'],
+            effect['target']['x']); 
+}
 
 function get_node_view(player, row, x) { 
 
@@ -87,6 +95,13 @@ function play_remaining_effects() {
         return;
     } 
 
+    var node_jq;
+    try {
+        node_jq = get_jq(effect);
+    } catch(error) {
+        node_jq = null;
+    }
+
     switch (action) {
         case 'discard':
             // remove visuals from hand view
@@ -113,18 +128,35 @@ function play_remaining_effects() {
                         "z-index": 2 
                     },
                     { duration: get_delay(effect) }
-                    );
-
-            //alert('delaying for: ' + get_delay(effect));
-
+                ); 
             break;
         case 'damage_unit':
             // -1 on target
-            // shake target
+            show_number(node_jq, -1 * effect['delta']); 
+            // shake
+            node_jq.effect("bounce", "fast"); 
+            // fill in damage bubbles
+            for (var i = 0; i < effect['delta']; i ++) {
+                node_jq.find(".defense_point:first").removeClass('defense_point').addClass('damage_point');
+            }
             break;
+        case 'heal_unit':
+            show_number(node_jq, effect['delta']);
+            //clear damage bubbles
+            node_jq.find(".damage_point").each( function () {
+                    $(this).removeClass("damage_point").addClass("defense_point");
+            });
+            break; 
         case 'remove_unit':
             // explode target
-            // remove target from screen
+            node_jq.hide("explode", function() {
+                    // remove target from screen
+                    $(this).remove();
+                });
+            break;
+        case 'remove_rubble':
+            // remove rubble
+            show_message(node_jq, "" + (-1 * effect['delta']));
             break;
         case 'add_rubble':
             // place rubble w/ animation ( handled by unit? )
@@ -133,11 +165,19 @@ function play_remaining_effects() {
             // place unit w/ animation
             show_unit(effect['value']);
             break;
+        case 'win':
+            $("#win_screen").show("slide", "slow");
+            break;
+        case 'lose':
+            $("#lose_screen").show("slide", "slow");
+            break;
+        case 'next_phase':
+            next_phase();
+            break;
         default:
             alert('unknown action while doing FX: ' + action);
     } 
 
-    
     setTimeout( play_remaining_effects, get_delay(effect) ); 
 }
 
@@ -248,31 +288,82 @@ function add_cards_to_hand(cards) {
     var i = 0;
     while (i < cards.length) {
         var card = cards[i] // necessary local for
-            // proper state in the timeout closure
-            
-        setTimeout ( function() {
-            add_card_to_hand( card );
-        }, 200 * (i+1));
+        add_card_to_hand( card, 200 * i + 1);
         i ++; 
     }
 }
 
-function add_card_to_hand(card_model) {
+function add_card_to_hand(card_model, delay) {
 
-    var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
+    setTimeout( function () { 
+            var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
 
-    init_tooltips("#friendly_hand");
+            init_tooltips("#friendly_hand");
 
-    card.draggable({ 
-        start: function(event, ui) { 
-            begin_card_drag(event, card, card_model); 
-        },
-        revert: "invalid",
-        //snap: ".node",
-        //snapMode: "inner",
-    });
+            card.draggable({ 
+                start: function(event, ui) { 
+                    begin_card_drag(event, card, card_model); 
+                },
+                revert: "invalid",
+                //snap: ".node",
+                //snapMode: "inner",
+            });
 
-    card.click( function(event) {
-        begin_card_drag(event, card, card_model); 
-    });
+            card.click( function(event) {
+                begin_card_drag(event, card, card_model); 
+            });
+        }, delay);
 }
+
+
+function draw_attack_path(unit, path) { 
+
+    clear_attack_paths();
+
+    for (i = 0; i < path.length; i ++) { 
+        var node = path[i];
+        var dir = (node.alignment == unit.alignment ? "attacking_from" : "attacking_to");
+
+        if (i == path.length - 1) {
+            // last node should show action, not movement
+
+            if (node.action == "damage_unit") {
+                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " .unit_piece").addClass("hostile_targetting"); 
+            }
+            else if (node.aciton == "damage_player") {
+                $("." + node.alignment + " .r" + node.row + ".x" + node.x + " ." + dir).show(); 
+            } 
+        }
+        else { 
+            $("." + node.alignment + " .r" + node.row + ".x" + node.x + " ." + dir).show(); 
+        }
+    } 
+}
+
+function clear_attack_paths() {
+    $(".attacking_from, .attacking_to").hide();
+    $(".unit_piece").removeClass("hostile_targetting");
+}
+
+
+function show_number(target, amount) {
+    if (amount < 0) {
+        show_message(target, amount, "red");
+    }
+    else  {
+        show_message(target, "+" + amount, "green");
+    }
+}
+
+
+function show_message(target, message, color) {
+    var x = $("<h1 class='feedback'></h1>").appendTo(target);
+    x.addClass(color);
+    x.text(message); 
+
+    x.animate({ top:"-=40" },
+        { duration: 1000 });
+        x.fadeOut(1000, function() {
+            $(this).remove();    
+        });
+} 

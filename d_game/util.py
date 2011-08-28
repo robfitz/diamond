@@ -29,7 +29,11 @@ def daily_activity(view):
             if request.user.is_authenticated(): 
                 # logged in user should already have metrics
                 # metrics = UserMetrics.objects.get(user=user)
-                metrics = request.user.metrics
+                try:
+                    metrics = request.user.metrics
+                except:
+                    metrics = UserMetrics(user=request.user)
+                    metrics.save() 
 
             else:
                 try:

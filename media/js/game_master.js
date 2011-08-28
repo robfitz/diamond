@@ -19,18 +19,26 @@ function do_turn(game, player, moves) {
     // attack!
     do_attack_phase(game, player)
 
+    if (is_game_over(game)) {
+        var winner = is_game_over(game);
+        if (winner == player_name) {
+            qfx({ 'action': 'win' });
+        }
+        else {
+            qfx({ 'action': 'lose' });
+        } 
+        return;
+    }
+
     // second play
     do_turn_move(game, player, moves[1])
 
     // cleanup
     remove_rubble(game, player)
-
-    return actions
 }
 
 
-function do_turn_move(game, player, move) {
-
+function do_turn_move(game, player, move) { 
 
     action = move['action'] 
 
@@ -81,7 +89,7 @@ function play(game, player, card, node_owner, row, x, ignore_hand) {
     else if (card['fields']['target_aiming'] == 'all') { 
         for (row = 0; row < 3; row ++) {
             for (col = -row; col < row + 1; col ++) {
-                if ( ! get_board(game, node_owner)["%s_%s" % (row, col)] ) { 
+                if ( ! get_node(game, node_owner, row, col) ) { 
                     nodes.push({ 'row' : row, 'x' : col }); 
                 }
             }
@@ -157,15 +165,15 @@ function do_attack_phase(game, attacking_player) {
 
 function do_attack(game, attacking_player, unit) {
 
-    attacked_player = get_opponent_name(game, attacking_player)
+    var attacked_player = get_opponent_name(game, attacking_player);
 
-    row = parseInt(unit['row'])
-    x = parseInt(unit['x'])
+    var row = parseInt(unit['row']);
+    var x = parseInt(unit['x']);
 
-    alignment = attacking_player
-    steps_taken = 0 
+    var alignment = attacking_player;
+    var steps_taken = 0;
 
-    fields = unit['fields']
+    var fields = unit['fields'];
 
     if (fields['attack_type'] == "na" || fields['attack_type'] == "counterattack") {
         // some types of units don't do anything during an active attack
@@ -217,13 +225,7 @@ function do_attack(game, attacking_player, unit) {
             continue
         }
 
-        try {
-            next_node = board["%s_%s" % (row, col)]
-        }
-        catch (KeyError) {
-            next_node = null;
-            break;
-        }
+        var next_node = get_node(game, alignment, row, x);
 
         if (next_node && next_node['type'] == "unit") {
             if (alignment == attacking_player) {
@@ -247,9 +249,13 @@ function do_attack(game, attacking_player, unit) {
             }
             else {
                 get_player(game, attacked_player)['life'] -= fields['attack'];
+                qfx({
+                        'action': 'damage_player',
+                        'delta': fields['attack'],
+                        'target': attacked_player
+                        });
                 break;
-            }
-
+            } 
         }
     }
     for (var i = move_effects.length - 1; i >= 0; i --) {
@@ -410,7 +416,14 @@ function remove_rubble(game, player) {
 function remove_rubble_from_node(game, player, node) {
 
     // remove one rubble
-    node['fields']['rubble_duration'] -= 1
+    node['fields']['rubble_duration'] -= 1;
+
+    qfx({
+            'action': 'remove_rubble',
+            'target': node,
+            });
+
+
 
     if (node['fields']['rubble_duration'] <= 0) { 
         // if all rubble is removed, clear from board
@@ -426,7 +439,13 @@ function heal(game, player) {
 
 
 function heal_unit(game, player, unit) {
-    unit['damage'] = 0
+    var healed = unit['damage'];
+    unit['damage'] = 0;
+    qfx({
+            'action': 'heal_unit',
+            'target': unit,
+            'delta': healed
+        });
 }
 
 

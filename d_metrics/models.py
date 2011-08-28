@@ -19,7 +19,7 @@ class UserMetrics(models.Model):
     signup_date = models.DateTimeField(null=True)
 
     first_visit_version = models.IntegerField(default=VERSION) 
-    signup_version = models.IntegerField(default=0)
+    signup_version = models.IntegerField(default=VERSION)
 
     login_dates = ListField(models.DateField(), default=[])
 

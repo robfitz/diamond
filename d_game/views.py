@@ -248,7 +248,7 @@ def begin_ai_game(request):
 
     # censor it so sensitive information about enemy's hands
     # and both players' decks is hidden from player
-    censored = game_master.get_censored(game, playegamer_name)
+    censored = game_master.get_censored(game, player_name)
     game_json = simplejson.dumps(censored) 
 
     hand_and_turn_json = """{

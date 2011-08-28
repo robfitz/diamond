@@ -76,11 +76,23 @@ def get_censored(game, player):
 
 def do_turn(game, player, moves, is_ai=False):
 
+    # check win condition
+    if is_game_over(game):
+        winner = is_game_over(game) 
+        logging.info("********** game over, winner=%s" % is_game_over(game))
+        return
+
     # first play
     do_turn_move(game, player, moves[0])
 
     # attack!
     do_attack_phase(game, player)
+
+    # check win condition
+    if is_game_over(game):
+        winner = is_game_over(game) 
+        logging.info("********** game over, winner=%s" % is_game_over(game))
+        return
 
     # second play
     do_turn_move(game, player, moves[1])
@@ -396,7 +408,7 @@ def kill_unit(game, target):
 def is_game_over(game):
 
     for player in game['players']:
-        if player['life'] <= 0:
+        if game['players'][player]['life'] <= 0:
             return get_opponent_name(game, player)
         
     if game['goal'] == 'kill units':
