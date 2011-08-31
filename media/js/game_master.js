@@ -1,25 +1,49 @@
-/** js differences from python
- *
- * comments
- * block formatting
- * if/else/for
- * and/or
- * import
- * Card
- */
+// This var holds a function which is called
+// after the player makes a play or skips their turn.
+// it strings together the multiple automated bits
+// of the player turn.
+//
+// This was originally handled by a state machine,
+// but the turns are very linear so this code should
+// be simpler and more maintainable.
+var on_next_player_action = null;
 
-// initial board obj is sent && evald from server
+function do_player_turn_1(game, player, draw_cards) {
 
+    heal(game, player); 
+    draw(game, player, draw_cards); 
 
-function do_turn(game, player, moves) {
+    // wait for player to make play 1 
+    on_next_player_action = do_player_turn_2;
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
 
-    // first play
-    do_turn_move(game, player, moves[0])
+    // if no cards in player hand, skip UI phase
+    if (game['players'][player]['hand'].length == 0) {
+        // no hand cards, skip phase
+        game['current_phase'] ++; 
+        qfx({'action': 'next_phase'});
+        on_next_player_action(game, player);
+    }
+    else {
+        qfx({
+                'action': 'alert',
+                'target': { 
+                    'title': "It's the first half of your turn!",
+                    'contents': "Pick a card to play, tech up, or skip your turn",
+                    'wait_for_confirm': true
+                }
+            }); 
+    }
+}
+
+function do_player_turn_2(game, player) {
 
     // attack!
     do_attack_phase(game, player)
 
     if (is_game_over(game)) {
+        alert("game over from game master");
         var winner = is_game_over(game);
         if (winner == player_name) {
             qfx({ 'action': 'win' });
@@ -27,14 +51,112 @@ function do_turn(game, player, moves) {
         else {
             qfx({ 'action': 'lose' });
         } 
+        qfx_game_over();
+        $.post("/playing/end_turn/",
+            $("#current_turn").serialize(),
+            function(data) {
+                alert('game over i think: ' + data);
+            });
+        return;
+    } 
+
+    // wait for player to make play 2 
+    on_next_player_action = do_player_turn_3;
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
+
+    // if no cards in player hand, skip UI phase
+    if (game['players'][player]['hand'].length == 0) {
+        // no hand cards, skip phase
+        game['current_phase'] ++; 
+        qfx({'action': 'next_phase'});
+        on_next_player_action(game, player);
+    }
+    else {
+        qfx({
+                'action': 'alert',
+                'target': { 
+                    'title': "It's the second half of your turn!",
+                    'contents': "Pick a card to play, tech up, or skip your turn",
+                    'wait_for_confirm': true
+                }
+            }); 
+    }
+}
+
+function do_player_turn_3(game, player) {
+
+    remove_rubble(game, player);
+
+    // end turn
+    on_next_player_action = null;
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
+
+    $.post("/playing/end_turn/",
+        $("#current_turn").serialize(),
+        function(data) {
+            turn_data = eval('(' + data + ')');
+
+            //do AI turn 
+            do_turn(game, opponent_name, turn_data['ai_turn']);
+            do_player_turn_1(game, player_name, turn_data['player_draw']);
+        }
+    ); 
+    $("textarea[name='player_turn']").val("");
+}
+
+function do_turn(game, player, moves) { 
+
+    // heal
+    heal(game, player);
+
+    // ai doesn't need to draw
+
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'}); 
+
+    // first play
+    do_turn_move(game, player, moves[0])
+
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
+
+    // attack!
+    do_attack_phase(game, player)
+
+    if (is_game_over(game)) {
+        alert("game over from game master");
+        var winner = is_game_over(game);
+        if (winner == player_name) {
+            qfx({ 'action': 'win' });
+        }
+        else {
+            qfx({ 'action': 'lose' });
+        } 
+        qfx_game_over();
+        $.post("/playing/end_turn/",
+            $("#current_turn").serialize(),
+            function(data) {
+                alert('game over i think: ' + data);
+            });
         return;
     }
+
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
 
     // second play
     do_turn_move(game, player, moves[1])
 
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
+
     // cleanup
     remove_rubble(game, player)
+
+    game['current_phase'] ++; 
+    qfx({'action': 'next_phase'});
 }
 
 
@@ -43,13 +165,13 @@ function do_turn_move(game, player, move) {
     action = move['action'] 
 
     if (action == 'pass') {
-        return
+        return;
     }
 
     else if (action == "surrender") {
-        alert("TODO surrender")
+        alert("TODO surrender");
         
-        return
+        return;
     }
 
     else if (action == 'tech') {
@@ -72,6 +194,17 @@ function do_turn_move(game, player, move) {
     }
 }
 
+
+function draw(game, player, cards) {
+    for (var i = 0; i < cards.length; i ++) {
+        get_player(game, player)['hand'].push(cards[i]);
+        qfx({
+                'action': 'draw',
+                'target': player,
+                'delta': cards[i]
+                }); 
+    }
+}
 
 // return False if was an illegal play
 function play(game, player, card, node_owner, row, x, ignore_hand) {
@@ -432,8 +565,7 @@ function remove_rubble_from_node(game, player, node) {
 }
 
 
-function heal(game, player) {
-
+function heal(game, player) { 
     for_each_unit(game, player, heal_unit)
 }
 

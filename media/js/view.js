@@ -43,7 +43,6 @@ function get_node_view(player, row, x) {
         alignment = 'enemy';
     }
     else {
-        alert("unknown player alignment in get_node_view: " + player);
     }
 
     return $(".board." + alignment + " .node[name='" + row + "_" + x + "']");
@@ -53,8 +52,20 @@ function get_node_view(player, row, x) {
 var effects_queue = [];
 var is_effects_playing = false;
 
+var is_qfx_prevent_enqueues = false;
+
+function qfx_game_over() {
+    is_qfx_prevent_enqueues = true;
+} 
+
 // qfx == queue fx == queue effects
 function qfx(effect) {
+
+    if (is_qfx_prevent_enqueues) {
+        return;
+    }
+
+    $(".debug").text(effect['action'] + "\n" + $(".debug").text());
 
     effects_queue.splice(effects_queue.length, 0, effect); 
 
@@ -108,6 +119,28 @@ function play_remaining_effects() {
             $("#friendly_hand #" + effect['value']['pk']).remove();
             $("#friendly_hand .card").removeClass("selected"); 
             break;
+        case 'draw':
+            // add visuals to hand
+            if (effect['target'] != player_name) { 
+                alerT("someone other than player tryign to draw");
+            }
+            else { 
+                var card_model = effect['delta'];
+                var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
+
+                init_tooltips("#friendly_hand");
+
+                card.draggable({ 
+                    start: function(event, ui) { 
+                        begin_card_drag(event, card, card_model); 
+                    },
+                    revert: "invalid",
+                }); 
+                card.click( function(event) {
+                    begin_card_drag(event, card, card_model); 
+                });
+            }
+            break;
         case 'tech': 
             // +1 message on player tech
             // increase tech #
@@ -121,6 +154,7 @@ function play_remaining_effects() {
 
             var node = get_node_view(effect['target']['player'], effect['target']['row'], effect['target']['x']);
 
+            node.stop(true, true);
             node.animate( 
                     {
                         top: d_row,
@@ -134,6 +168,7 @@ function play_remaining_effects() {
             // -1 on target
             show_number(node_jq, -1 * effect['delta']); 
             // shake
+            node_jq.stop(true, true);
             node_jq.effect("bounce", "fast"); 
             // fill in damage bubbles
             for (var i = 0; i < effect['delta']; i ++) {
@@ -149,6 +184,7 @@ function play_remaining_effects() {
             break; 
         case 'remove_unit':
             // explode target
+            node_jq.stop(true, true);
             node_jq.hide("explode", function() {
                     // remove target from screen
                     $(this).remove();
@@ -166,16 +202,24 @@ function play_remaining_effects() {
             show_unit(effect['value']);
             break;
         case 'win':
+            $("#slider_alert").hide();
             $("#win_screen").show("slide", "slow");
             break;
         case 'lose':
+            $("#slider_alert").hide();
             $("#lose_screen").show("slide", "slow");
             break;
         case 'next_phase':
-            next_phase();
+            show_next_phase();
             break;
+        case 'alert':
+            slider_alert(effect['target']['title'],
+                    effect['target']['contents'],
+                    effect['target']['wait_for_confirm']);
+            break; 
         default:
             alert('unknown action while doing FX: ' + action);
+            break;
     } 
 
     setTimeout( play_remaining_effects, get_delay(effect) ); 
@@ -185,9 +229,9 @@ function play_remaining_effects() {
 function get_delay(effect) { 
     var delay = DEFAULT_DELAY;
     try {
-        delay = durations[action]
+        delay = durations[effect['action']];
     } catch (error) {
-        alert("found no delay for " + delay);
+        alert("found no delay for " + effect['action']);
         delay = DEFAULT_DELAY;
     }
     return delay;
@@ -282,39 +326,6 @@ function get_unit_body(model, alignment) {
 
     return unit_piece;
 }
-
-function add_cards_to_hand(cards) {
-    //draw cards
-    var i = 0;
-    while (i < cards.length) {
-        var card = cards[i] // necessary local for
-        add_card_to_hand( card, 200 * i + 1);
-        i ++; 
-    }
-}
-
-function add_card_to_hand(card_model, delay) {
-
-    setTimeout( function () { 
-            var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
-
-            init_tooltips("#friendly_hand");
-
-            card.draggable({ 
-                start: function(event, ui) { 
-                    begin_card_drag(event, card, card_model); 
-                },
-                revert: "invalid",
-                //snap: ".node",
-                //snapMode: "inner",
-            });
-
-            card.click( function(event) {
-                begin_card_drag(event, card, card_model); 
-            });
-        }, delay);
-}
-
 
 function draw_attack_path(unit, path) { 
 

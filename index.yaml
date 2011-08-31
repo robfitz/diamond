@@ -68,6 +68,11 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: d_game_match
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: d_game_puzzle
   properties:
   - name: __key__

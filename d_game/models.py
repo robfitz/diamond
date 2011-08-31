@@ -138,6 +138,8 @@ class Match(models.Model):
             ("kill units", "Kill units"),
         )
 
+    log = models.TextField(default="")
+
     type = models.CharField(max_length=20, choices=MATCH_TYPES)
     goal = models.CharField(max_length=20, choices=GOAL_TYPES)
 
@@ -233,3 +235,4 @@ class PuzzleAdmin(admin.ModelAdmin):
 admin.site.register(PuzzleStartingUnit, PuzzleStartingUnitAdmin) 
 
 admin.site.register(Puzzle, PuzzleAdmin)
+admin.site.register(Match)

@@ -1,4 +1,4 @@
-import random, logging, copy
+import random, logging, copy, simplejson
 
 from django.core import serializers
 from d_game import cached
@@ -7,6 +7,57 @@ from django.core.cache import cache
 
 
 ANON_PLAYER_NAME = "guest"
+
+
+def log_board(game, log_note):
+
+    player = game['player']
+    opp = get_opponent_name(game,game['player'])
+
+    opp_str = ""
+
+    for row in range(0, 3):
+        line = ""
+        for col in range(-2, row + 1):
+            id = ''
+            if col >= 0 or abs(col) <= row:
+                node = get_node(game, opp, row, col)
+                if node and node['type'] == 'unit':
+                    id = "%s[%s]" % (node['fields']['name'][:3], node['damage'])
+                elif node and node['type'] == 'rubble':
+                    id = 'rubble'
+                else:
+                    id = '------'
+            else:
+                id = '      '
+            line = "%s %s" % (line, id)
+        opp_str = "%s \n%s" % ( opp_str, line )
+
+    player_str = ""
+    for row in range(0, 3):
+        line = ""
+        for col in range(-2, row + 1):
+            id = ''
+            if col >= 0 or abs(col) <= row:
+                node = get_node(game, player, row, col)
+                if node and node['type'] == 'unit':
+                    id = "%s[%s]" % (node['fields']['name'][:3], node['damage'])
+                elif node and node['type'] == 'rubble':
+                    id = 'rubble'
+                else:
+                    id = '------'
+            else:
+                id = '      '
+            line = "%s %s" % (line, id)
+        player_str = "%s \n%s" % ( line, player_str )
+
+    board_str = "%s \n\n%s\n" % (opp_str, player_str)
+
+    from d_game.models import Match
+    match = Match.objects.get(id=game['pk'])
+    match.log = "".join([log_note, board_str, match.log])
+    match.save()
+
 
 def init_game(match):
 
@@ -19,7 +70,8 @@ def init_game(match):
             'pk': match.pk,
             'type': match.type,
             'goal': match.goal,
-            'current_phase': 1,
+            'current_phase': 0,
+            'player': player,
             'current_player': player,
             'players': {
                 player: {
@@ -74,6 +126,57 @@ def get_censored(game, player):
     return game
 
 
+def do_turns(game, player_moves):
+
+    from d_game import ai
+
+    logging.info("XX game master doing turn for player moves; %s" % player_moves)
+
+    player_name = game['player']
+    opponent_name = get_opponent_name(game, player_name)
+
+    # turn init
+    heal(game, player_name) 
+
+    do_turn(game, player_name, player_moves)
+
+    # AI turn init
+    heal(game, opponent_name) 
+    draw_up_to(game, opponent_name, 5) 
+
+    # AI decides what to do (but doens't actually affect the 
+    # game state yet
+    ai_turn = ai.get_turn(game, opponent_name) 
+    ai_moves = [ ai_turn[0]['shorthand'], ai_turn[1]['shorthand'] ]
+
+    # log the turn for client-server verification purposes
+    # and process its decisions.
+    game_before_ai = simplejson.dumps(game) 
+    do_turn(game, opponent_name, ai_moves) 
+    game_after_ai = simplejson.dumps(game) 
+
+    # get 2 new cards for player 
+    # this is out of order because we're actually drawing
+    # for the player's next turn, not the current one just processed
+    draw_cards = draw_up_to(game, player_name, 5)
+
+    # save turn changes on server
+    cached.save(game)
+
+    #serialize and ship it
+    hand_and_turn_json = """{
+            'player_draw': %s,
+            'ai_turn': %s,
+            'verify_board_state_before_ai': %s,
+            'verify_board_state_after_ai': %s,
+            }""" % (simplejson.dumps(draw_cards),
+                    simplejson.dumps(ai_turn),
+                    game_before_ai,
+                    game_after_ai)
+
+    return hand_and_turn_json
+
+
 def do_turn(game, player, moves, is_ai=False):
 
     # check win condition
@@ -82,11 +185,18 @@ def do_turn(game, player, moves, is_ai=False):
         logging.info("********** game over, winner=%s" % is_game_over(game))
         return
 
+
+    log_board(game, "%s, before first play" % player)
+
     # first play
     do_turn_move(game, player, moves[0])
 
+    log_board(game, "%s, after first play" % player)
+
     # attack!
     do_attack_phase(game, player)
+
+    log_board(game, "%s, after attack" % player)
 
     # check win condition
     if is_game_over(game):
@@ -97,15 +207,22 @@ def do_turn(game, player, moves, is_ai=False):
     # second play
     do_turn_move(game, player, moves[1])
 
+    log_board(game, "%s, after second play" % player)
+
     # cleanup
     remove_rubble(game, player)
+
+    log_board(game, "%s, after rubble cleanup" % player)
 
 
 def do_turn_move(game, player, move):
 
     toks = move.split(' ')
 
-    action = toks[1]
+    try:
+        action = toks[1]
+    except:
+        action = 'pass'
 
     if action == 'pass':
         pass
@@ -119,6 +236,7 @@ def do_turn_move(game, player, move):
             tech(game, player, 1)
 
     elif action == 'play':
+        logging.info("WWW player %s playing card for move: %s" % (player, move))
         card_id = toks[2]
         node_owner = toks[3]
         row = toks[4]
@@ -133,6 +251,7 @@ def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
     if not ignore_hand:
         # remove card from hand
         card = discard(game, player, card_id) 
+        logging.info("WWW tried discarding: %s" % card)
     else:
         from d_cards.models import Card
         card = Card.objects.get(id=card_id)
@@ -180,6 +299,7 @@ def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
 
             # deep copy in case of multiple targets for same card
             get_board(game, player)["%s_%s" % (node["row"], node["x"])] = copy.deepcopy(card)
+            logging.info("YYY added unit to board for %s at %s_%s" % (player, node["row"], node["x"]))
 
 
 def discard(game, player, card_id):
@@ -217,11 +337,13 @@ def draw(game, player, num):
 
 def do_attack_phase(game, attacking_player):
 
+    logging.info("XXX do attack phase by %s" % attacking_player)
     for_each_unit(game, attacking_player, do_attack)
 
 
 def do_attack(game, attacking_player, unit):
 
+    logging.info("XXX do attack by %s" % attacking_player)
     attacked_player = get_opponent_name(game, attacking_player)
 
     row = int(unit['row'])
@@ -280,6 +402,8 @@ def do_attack(game, attacking_player, unit):
         elif row == 0 and x == 0:
             # bumped into enemy player
 
+            logging.info("XXX bumped into player %s with goal %s" % (attacked_player, game['goal']))
+
             if attacked_player == "ai" and game['goal'] == 'kill units':
                 # in puzzle mode where trying to kill all units, AI is invulnerable
                 pass
@@ -326,6 +450,7 @@ def each_type(game, player, type):
                 # blank nodes have no type
                 continue
             if node and node_type == type: 
+                logging.info("RRR got node of type (%s) %s for player %s" % (type, node, player))
                 types.append(node)
 
     return types 
@@ -375,6 +500,8 @@ def remove_rubble_from_node(game, player, node):
 
 def heal(game, player):
 
+    logging.info("UUU healed for %s" % player)
+
     for_each_unit(game, player, heal_unit)
 
 
@@ -388,16 +515,20 @@ def damage_unit(game, amount, target, source):
         target['damage'] = 0
 
     target['damage'] += amount
+    logging.info("ZZ damaged unit to: %s" % target['damage'])
 
     if target['damage'] >= target['fields']['defense']:
+        logging.info("ZZ and it's dead")
         kill_unit(game, target)
 
 
 def kill_unit(game, target):
+    logging.info("ZZ killing unit")
 
     if target['fields']['rubble_duration'] > 0:
         # leave rubble
         target['type'] = 'rubble'
+        logging.info("ZZ set type to rubble")
 
     else:
         # remove from game
@@ -409,12 +540,16 @@ def is_game_over(game):
 
     for player in game['players']:
         if game['players'][player]['life'] <= 0:
-            return get_opponent_name(game, player)
+            logging.info("*** game is over from loss of life: %s" % player)
+            return player
         
     if game['goal'] == 'kill units':
         opp = get_opponent_name(game, game['player'])
-        if each_unit(game, opp).length == 0:
+        if len(each_unit(game, opp)) == 0:
+            logging.info("*** game is over from puzzle condition kill units: %s" % player)
             return game['player']
+        else:
+            logging.info("*** goal is to kill units, but not empty because:%s has %s" % (opp, len(each_unit(game, opp))))
         
     return False
 

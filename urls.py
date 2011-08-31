@@ -12,6 +12,9 @@ urlpatterns = patterns('',
 
     (r'^blog/', include('utils.blog.urls')),
 
+    (r'^log/$', 'd_game.views.log'),
+    (r'^log/(?P<match_id>.*)/$', 'd_game.views.log'),
+
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/logout/$', 
         'django.contrib.auth.views.logout',
