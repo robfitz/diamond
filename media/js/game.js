@@ -113,6 +113,21 @@ function do_phase() {
                 cast($(".card.selected"), $(event.currentTarget));
             });
 
+            if (card_json['fields']['defense'] > 0) {
+                targets.mouseenter( function ( e ) { 
+
+                    var name = $(this).attr("name");
+                    var row = parseInt(name.split("_")[0]);
+                    var x = parseInt(name.split("_")[1]);
+
+                    var node = $(e.currentTarget);
+
+                    var path = get_attack_path(game, player_name, card_json['fields']['attack_type'], row, x);
+
+                    draw_attack_path(player_name, path); 
+                });
+            }
+
             targets.droppable( {
                 drop: function(event, ui) {
                     cast($(".card.selected"), $(event.target)); 
@@ -200,13 +215,15 @@ function do_phase() {
         game['current_phase'] ++; 
         qfx({'action': 'next_phase'});
         on_next_player_action(game, player_name);
+
+        cancel_cast();
     }
 
     function cancel_cast() {
         $(".card").removeClass("selected");
 
         //clear old targetting events 
-        $(".node").removeClass("targettable").unbind("click");
+        $(".node").removeClass("targettable").unbind("click").unbind("mouseenter");
 
         $("#friendly_tech").removeClass("targettable").unbind("click");
     }

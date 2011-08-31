@@ -51,7 +51,7 @@ def unique_puzzles_won(user, session_key):
         # probably an anonymous user, so no profile
         beaten_matches = Match.objects.filter(session_key=session_key)
         for match in beaten_matches:
-            if match.type == "puzzle" and match.winner == "friendly" and match.puzzle.id not in beaten_puzzle_ids:
+            if match.type == "puzzle" and match.winner != "ai" and match.puzzle.id not in beaten_puzzle_ids:
                 beaten_puzzle_ids.append(match.puzzle.id)
 
     return beaten_puzzle_ids

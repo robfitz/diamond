@@ -282,8 +282,9 @@ function show_unit(model) {
     node.mouseenter( function ( e ) { 
         var node = $(e.currentTarget);
 
-        var path = get_attack_path(game, model);
-        draw_attack_path(unit, path); 
+        var path = get_attack_path(game, alignment, model['fields']['attack_type'], model.row, model.x);
+
+        draw_attack_path(alignment, path); 
     });
 
     node.mouseleave(function ( e ) {
@@ -318,7 +319,7 @@ function get_unit_body(model, alignment) {
 
     //life bubbles, one per defense, which display life & damage
     var def = $("<div class='defense'></div>").appendTo(unit_piece); 
-    for (i = 0; i < model_fields.defense; i ++) {
+    for (var i = 0; i < model_fields.defense; i ++) {
         $("<div class='defense_point health'></div>").appendTo(def); 
     }
 
@@ -327,13 +328,17 @@ function get_unit_body(model, alignment) {
     return unit_piece;
 }
 
-function draw_attack_path(unit, path) { 
+function draw_attack_path(alignment, path) { 
 
     clear_attack_paths();
-
-    for (i = 0; i < path.length; i ++) { 
+    
+    for (var i = 0; i < path.length; i ++) { 
         var node = path[i];
-        var dir = (node.alignment == unit.alignment ? "attacking_from" : "attacking_to");
+        var dir = (node.alignment == alignment ? "attacking_from" : "attacking_to");
+
+        if (node.alignment != "ai") {
+            node.alignment = "friendly";
+        }
 
         if (i == path.length - 1) {
             // last node should show action, not movement

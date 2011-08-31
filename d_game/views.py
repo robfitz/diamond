@@ -146,9 +146,20 @@ def end_turn(request):
     # process the game turn and get data to give back to client
     hand_and_turn_json = game_master.do_turns(game, player_moves) 
 
+    logging.info("))))) end turn, did do_turns")
+
     # did the game end this turn?
     winner = game_master.is_game_over(game)
+    logging.info("))))) end turn, winner? %s" % winner)
     if winner:
+        match = Match.objects.get(id=match_id)
+        logging.info("))))) trying to set winner: %s for %s" % (winner, match.puzzle))
+        if match.puzzle:
+            if request.user.is_authenticated():
+                request.user.get_profile().beaten_puzzle_ids.append(match.puzzle.id)
+                request.user.get_profile().save()
+        match.winner = winner 
+
         return HttpResponse("game over, winner: %s" % winner)
 
     # send appropriate hand & AI info back to client

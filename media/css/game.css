@@ -398,7 +398,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     /* up and to the right */
     background: url(attack-ne-sw.png); 
     width:100px; 
-    left:-84;
+    left:-88px;
 } 
 .friendly .r2.x-2 .attacking_to,
 .friendly .r1.x-1 .attacking_to

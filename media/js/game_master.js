@@ -126,7 +126,6 @@ function do_turn(game, player, moves) {
     do_attack_phase(game, player)
 
     if (is_game_over(game)) {
-        alert("game over from game master");
         var winner = is_game_over(game);
         if (winner == player_name) {
             qfx({ 'action': 'win' });
@@ -138,7 +137,7 @@ function do_turn(game, player, moves) {
         $.post("/playing/end_turn/",
             $("#current_turn").serialize(),
             function(data) {
-                alert('game over i think: ' + data);
+                alert('game over from server: ' + data);
             });
         return;
     }
@@ -295,6 +294,77 @@ function do_attack_phase(game, attacking_player) {
     }
 }
 
+function get_attack_path(game, attacking_player, attack_type, row, x) {
+
+    var attacked_player = get_opponent_name(game, attacking_player);
+
+    var alignment = attacking_player;
+    var steps_taken = 0;
+
+    path = [];
+    path.push( { 'alignment': alignment, 'row': row, 'x': x } ); 
+
+    if (attack_type == "na" || attack_type == "counterattack") {
+        // some types of units don't do anything during an active attack
+        return
+    }
+
+    while (true) {
+        if (alignment != attacking_player) {
+            d_row = -1
+        }
+        else if (row == 2) {
+            d_row = 0
+            alignment = attacked_player
+        }
+        else {
+            d_row = 1
+        }
+
+        var row_dir = (attacking_player == game['player'] ? -1 : 1);
+
+        row += d_row
+        old_x = x
+
+        if (x != 0 && Math.abs(x) > row) {
+            x = row * x / Math.abs(x)
+        }
+
+        path.push( { 'alignment': alignment, 'row': row, 'x': x } );
+
+        steps_taken += 1
+
+        if (attack_type == "flying" && steps_taken < 3) {
+            // flying units skip the 2 spots in front of them
+            continue
+        }
+
+        if (alignment == attacking_player && attack_type == "ranged") {
+            // ranged units always pass over friendly tiles, so
+            // don't even worry about checking collisions
+            continue
+        }
+
+        var next_node = get_node(game, alignment, row, x);
+
+        if (next_node && next_node['type'] == "unit") {
+            if (alignment == attacking_player) {
+                // bumped into friendly
+                break;
+            }
+            else if (next_node && next_node['type'] == "unit") {
+                // bumped into enemy unit
+                break;
+            }
+        }
+                
+        else if (row == 0 && x == 0) {
+            // bumped into enemy player
+            break;
+        }
+    }
+    return path;
+}
 
 function do_attack(game, attacking_player, unit) {
 
@@ -412,7 +482,7 @@ function do_attack(game, attacking_player, unit) {
 
 function get_player(game, player) { 
     if (!game || !player) {
-        alert("hm");
+        alert("unknown game or player in game_master hm");
     }
     return game['players'][player]
 }

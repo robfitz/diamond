@@ -180,11 +180,10 @@ def do_turns(game, player_moves):
 def do_turn(game, player, moves, is_ai=False):
 
     # check win condition
-    if is_game_over(game):
-        winner = is_game_over(game) 
-        logging.info("********** game over, winner=%s" % is_game_over(game))
-        return
-
+    winner = is_game_over(game) 
+    if winner:
+        logging.info("********** game over, winner=%s" % winner)
+        return 
 
     log_board(game, "%s, before first play" % player)
 
@@ -199,8 +198,8 @@ def do_turn(game, player, moves, is_ai=False):
     log_board(game, "%s, after attack" % player)
 
     # check win condition
-    if is_game_over(game):
-        winner = is_game_over(game) 
+    winner = is_game_over(game) 
+    if winner:
         logging.info("********** game over, winner=%s" % is_game_over(game))
         return
 
