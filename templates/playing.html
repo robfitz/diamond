@@ -90,12 +90,12 @@ padding:0;
             <div class="left_column">
 
                 <div class="ribbon_gui">
-                    <div id="ai_life" title="The enemy's life. Reduce it to 0 to win." class="top ai life">
+                    <div id="ai_life" title="The enemy's life. Reduce it to 0 to win." class="top ai life {{ opponent_name }}_life">
                         <h1>10</h1> 
                     </div>
 
 
-                    <div id="friendly_life" title="Your life. Protect it with strategic unit placement." class="bottom friendly life">
+                    <div id="friendly_life" title="Your life. Protect it with strategic unit placement." class="{{ player_name }}_life bottom friendly life">
                         <h1>10</h1> 
                     </div>
 
@@ -114,12 +114,12 @@ padding:0;
 
             <div class="right_column">
                 <div class="ribbon_gui">
-                    <div id="ai_tech" title="The enemy's tech level allows tem to use more powerful cards." class="top ai tech" name="tech">
-                        <h1>T1</h1>
+                    <div id="ai_tech" title="The enemy's tech level allows tem to use more powerful cards." class="{{ opponent_name }}_tech top ai tech" name="tech">
+                        <h1>1</h1>
                     </div> 
 
-                    <div id="friendly_tech" title="Increase your tech by dragging a card here during your turn. Certain cards need higher tech." class="bottom tech" name="tech">
-                        <h1>T1</h1>
+                    <div id="friendly_tech" title="Increase your tech by dragging a card here during your turn. Certain cards need higher tech." class="{{ player_name}}_tech bottom tech" name="tech">
+                        <h1>1</h1>
                     </div>
 
                     <h2 class="ribbon">Tech</h2>
@@ -191,7 +191,7 @@ padding:0;
         $(function() {
 
             player_name = "{{ player_name }}";
-            opponent_name = "{{ enemy_name }}";
+            opponent_name = "{{ opponent_name }}";
 
             {% if puzzle %}
 

@@ -41,7 +41,7 @@ def puzzle(request):
         player_name = request.user.username
     else:
         player_name = game_master.ANON_PLAYER_NAME
-    enemy_name = "ai"
+    opponent_name = "ai"
 
     # check perms
     if not has_permissions_for(puzzle, request.user, request.session.session_key):
@@ -77,7 +77,7 @@ def playing(request):
         player_name = request.user.username
     else:
         player_name = game_master.ANON_PLAYER_NAME
-    enemy_name = "ai"
+    opponent_name = "ai"
 
     # init
     match = init_match(request) 
@@ -166,39 +166,6 @@ def end_turn(request):
     return HttpResponse(hand_and_turn_json, "application/javascript")
 
 
-def begin_puzzle_game(request):
-
-    match = Match.objects.get(id=request.session['match'])
-    game = cached.get_game(match.id)
-
-    if request.user.is_authenticated():
-        player_name = request.user.username
-    else:
-        player_name = game_master.ANON_PLAYER_NAME
-
-    hand = game_master.draw_up_to(game, player_name, 5)
-
-    # init puzzle life
-    game['players'][player_name]['life'] = match.puzzle.player_life
-
-    # puzzle starting units
-    starting_units = PuzzleStartingUnit.objects.filter(puzzle=match.puzzle)
-
-    for starting_unit in starting_units:
-        game_master.play(game, 'ai', starting_unit.unit_card.pk, 'ai', starting_unit.location.row, starting_unit.location.x, ignore_hand=True)
-        logging.info("_______ added starting unit to ai board")
-
-    # save changes
-    cached.save(game)
-
-    logging.info(simplejson.dumps(game))
-
-    for card in hand:
-        logging.info("5678 hand card: %s" % card)
-
-    censored = game_master.get_censored(game, player_name)
-
-    return HttpResponse(simplejson.dumps(censored), "application/javascript")
 
 
 def first_turn(request):
@@ -225,17 +192,33 @@ def begin_ai_game(request):
     hand = game_master.draw_up_to(game, player_name, 5)
 
     cached.save(game)
-
-    # censor it so sensitive information about enemy's hands
-    # and both players' decks is hidden from player
     censored = game_master.get_censored(game, player_name)
-    game_json = simplejson.dumps(censored) 
 
-    hand_and_turn_json = """{
-            'player_draw': %s,
-            'ai_turn': { },
-            }""" % simplejson.dumps(hand)
+    return HttpResponse(simplejson.dumps(censored), "application/javascript")
 
-    logging.info(hand_and_turn_json);
 
-    return HttpResponse(hand_and_turn_json, "application/javascript")
+def begin_puzzle_game(request):
+
+    match = Match.objects.get(id=request.session['match'])
+    game = cached.get_game(match.id)
+
+    if request.user.is_authenticated():
+        player_name = request.user.username
+    else:
+        player_name = game_master.ANON_PLAYER_NAME
+
+    hand = game_master.draw_up_to(game, player_name, 5)
+
+    # init puzzle life
+    game['players'][player_name]['life'] = match.puzzle.player_life
+
+    # puzzle starting units
+    starting_units = PuzzleStartingUnit.objects.filter(puzzle=match.puzzle)
+
+    for starting_unit in starting_units:
+        game_master.play(game, 'ai', starting_unit.unit_card.pk, 'ai', starting_unit.location.row, starting_unit.location.x, ignore_hand=True)
+
+    cached.save(game) 
+    censored = game_master.get_censored(game, player_name)
+
+    return HttpResponse(simplejson.dumps(censored), "application/javascript")

@@ -21,6 +21,7 @@ var durations = {
     'lose': 0,
     'win': 0,
     'next_phase': 0,
+    'tech': 0,
 } 
 function get_jq(effect) { 
 
@@ -122,7 +123,7 @@ function play_remaining_effects() {
         case 'draw':
             // add visuals to hand
             if (effect['target'] != player_name) { 
-                alerT("someone other than player tryign to draw");
+                alert("someone other than player tryign to draw");
             }
             else { 
                 var card_model = effect['delta'];
@@ -142,8 +143,12 @@ function play_remaining_effects() {
             }
             break;
         case 'tech': 
+            var tech_h1 = $("." + effect['target'] + "_tech h1");
+            var current_shown = parseInt(tech_h1.text());
             // +1 message on player tech
+            show_number(tech_h1.parent(), effect['delta']);
             // increase tech #
+            tech_h1.text(current_shown + effect['delta']); 
             break;
         case 'move':
             // scoot the unit by delta * step size
@@ -210,13 +215,26 @@ function play_remaining_effects() {
             $("#lose_screen").show("slide", "slow");
             break;
         case 'next_phase':
-            show_next_phase();
+            $("#phases").find("li.active").removeClass("active");
+            $("#phases").find("#" + game['current_phase']).addClass("active");
             break;
         case 'alert':
             slider_alert(effect['target']['title'],
                     effect['target']['contents'],
                     effect['target']['wait_for_confirm']);
             break; 
+        case 'damage_player':
+            if (effect['target'] == 'ai'
+                    && game['goal'] == 'kill units') {
+                alert("trying to damage invuln ai in puzzle");
+            }
+            else {
+                var life = $("." + effect['target'] + "_life h1");
+                var current_shown_life = parseInt(life.text());
+                life.text(current_shown_life - effect['delta']); 
+                show_number(life.parent(), -1 * effect['delta']); 
+            }
+            break;
         default:
             alert('unknown action while doing FX: ' + action);
             break;

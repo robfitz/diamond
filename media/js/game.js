@@ -38,39 +38,8 @@ function draw_starting_hand() {
                 // draw starting cards 
                 do_player_turn_1(game, player_name, hand);
             }
-        }); 
+    }); 
 }
-
-
-function show_next_phase() { 
-    // highlight current phase UI
-    $("#phases").find("li.active").removeClass("active");
-    $("#phases").find("#" + game['current_phase']).addClass("active");
-}
-
-function do_phase() {
-    continue; 
-}
-
-
-    function set_player_life(alignment, amount) { 
-        match.life[alignment] = amount;
-        var str = "" + amount;
-        if (amount < 10) str = " " + str;
-        $(".life." + alignment + " h1").text(str);
-    }
-
-    function damage_player(alignment, amount) {
-
-        alert("damage_player in game.js");
-
-        var str = "" + match.life[alignment];
-        if (amount < 10) str = " " + str;
-        $(".life." + alignment + " h1").text(str);
-
-        show_number($(".life." + alignment), -1 * amount);
-
-    } 
 
     function begin_card_drag(event, ui, card_json) {
 
@@ -154,15 +123,20 @@ function do_phase() {
             return;
         }
 
-        //visually remove from hand
-        hand_card.remove();
+        var player = player_name;
+        var card = get_hand_card(game, player, hand_card.attr("id"));
 
-        tech_up(1);
+        discard(game, player, card);
+        tech(game, player, 1);
 
         var turn = $("textarea[name='player_turn']");
         turn.val(turn.val() + player_name + " tech " + hand_card.attr('id') + "\n"); 
 
         qfx({'action': 'next_phase'});
+        game['current_phase'] ++; 
+        on_next_player_action(game, player_name);
+
+        cancel_cast(); 
     }
 
     function ai_tech_up(amount) {
@@ -212,8 +186,8 @@ function do_phase() {
 
         play(game, player_name, card, target_owner, r, x, false);
 
-        game['current_phase'] ++; 
         qfx({'action': 'next_phase'});
+        game['current_phase'] ++; 
         on_next_player_action(game, player_name);
 
         cancel_cast();

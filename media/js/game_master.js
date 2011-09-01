@@ -10,6 +10,9 @@ var on_next_player_action = null;
 
 function do_player_turn_1(game, player, draw_cards) {
 
+    game['current_phase'] = 0;
+    qfx({'action': 'next_phase'});
+
     heal(game, player); 
     draw(game, player, draw_cards); 
 
@@ -161,7 +164,7 @@ function do_turn(game, player, moves) {
 
 function do_turn_move(game, player, move) { 
 
-    action = move['action'] 
+    var action = move['action'] 
 
     if (action == 'pass') {
         return;
@@ -174,13 +177,11 @@ function do_turn_move(game, player, move) {
     }
 
     else if (action == 'tech') {
-        card_id = move['card']['pk']
+        var card_id = move['card']['pk']
 
-        discarded = discard(game, player, card_id) 
+        discard(game, player, card_id) 
 
-        if (discarded) {
-            tech(game, player, 1);
-        }
+        tech(game, player, 1);
     }
 
     else if (action == 'play') {
@@ -189,7 +190,7 @@ function do_turn_move(game, player, move) {
         row = move['node']['row']
         x = move['node']['x']
 
-        play(game, player, card_id, node_owner, row, x)
+        play(game, player, card, node_owner, row, x)
     }
 }
 
@@ -280,9 +281,9 @@ function discard(game, player, card) {
 
 
 function tech(game, player, amount) {
-    get_player(game, player)['tech'] += amount 
+    get_player(game, player)['tech'] += amount;
 
-    return [{'action': 'tech', 'target': player, 'delta': amount }]
+    qfx({'action': 'tech', 'target': player, 'delta': amount });
 }
 
 
