@@ -514,7 +514,11 @@ def damage_unit(game, amount, target, source):
         target['damage'] = 0
 
     target['damage'] += amount
-    logging.info("ZZ damaged unit to: %s" % target['damage'])
+
+    if target['fields']['attack_type'] == 'counterattack':
+        if source['fields']['attack_type'] != 'flying': 
+            # retaliation from counterattackers to non-flying attackers
+            damage_unit(game, target['fields']['attack'], source, target)
 
     if target['damage'] >= target['fields']['defense']:
         logging.info("ZZ and it's dead")

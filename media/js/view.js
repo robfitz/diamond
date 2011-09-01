@@ -229,10 +229,10 @@ function play_remaining_effects() {
                 alert("trying to damage invuln ai in puzzle");
             }
             else {
-                var life = $("." + effect['target'] + "_life h1");
-                var current_shown_life = parseInt(life.text());
-                life.text(current_shown_life - effect['delta']); 
-                show_number(life.parent(), -1 * effect['delta']); 
+                var life_h1 = $("." + effect['target'] + "_life h1");
+                var current_shown_life = parseInt(life_h1.text());
+                life_h1.text(current_shown_life - effect['delta']); 
+                show_number(life_h1.parent(), -1 * effect['delta']); 
             }
             break;
         default:
@@ -316,12 +316,17 @@ function get_unit_body(model, alignment) {
     var unit_piece = $("<div title='" + model_fields.tooltip + "' class='attack_" + model_fields.attack + "' id='" + model.pk + "'></div>");
 
     var url = "";
-    if (alignment == game['player'] && model_fields.icon_url_back) {
-        url = model_fields.icon_url_back;
-    } 
-    else {
-        url = model_fields.icon_url;
+    try {
+        if (alignment == game['player'] && model_fields.icon_url_back) {
+            url = model_fields.icon_url_back;
+        } 
+        else {
+            url = model_fields.icon_url;
+        }
+    } catch (error) {
+            url = model_fields.icon_url; 
     }
+
     $("<img src='" + url + "' />").appendTo(unit_piece).load(function() {
         var x_off = (60 - $(this).width()) / 2;
         $(this).css("left", x_off); 
