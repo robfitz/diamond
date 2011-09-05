@@ -278,8 +278,7 @@ function discard(game, player, card) {
 
 
 function tech(game, player, amount) {
-    get_player(game, player)['tech'] += amount;
-
+    get_player(game, player)['tech'] += amount; 
     qfx({'action': 'tech', 'target': player, 'delta': amount });
 }
 

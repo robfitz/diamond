@@ -166,14 +166,13 @@ function play_remaining_effects() {
             var tech = $("." + effect['target'] + "_tech"); 
 
             //increase both the current and total tech levels
-            tech.find(".total, .remaining").each( function () { 
-                var current_shown = parseInt($(this).text());
-                $(this).text(current_shown + effect['delta']); 
-            });
+            var current_shown = parseInt(tech.find(".total").text());
+            tech.find(".total").text(current_shown + effect['delta']); 
 
             // +1 message on player tech
             show_number(tech, effect['delta']);
             break;
+
         case 'move':
             // scoot the unit by delta * step size
             var row = effect['delta']['row'];
@@ -190,6 +189,7 @@ function play_remaining_effects() {
                     { duration: get_delay(effect) }
                 ); 
             break;
+
         case 'damage_unit':
             
             if (effect['delta'] != 0) {
@@ -204,6 +204,7 @@ function play_remaining_effects() {
                 node_jq.effect("bounce", "fast"); 
             }
             break;
+
         case 'heal_unit':
             if (effect['delta'] != 0) {
                 show_number(node_jq, effect['delta']);
@@ -213,6 +214,7 @@ function play_remaining_effects() {
                 });
             }
             break; 
+
         case 'remove_unit':
             // explode target
             // node_jq.stop(true, true);
@@ -222,6 +224,7 @@ function play_remaining_effects() {
                 });
             node_jq.removeClass("unit").removeClass("occupied").addClass("empty");
             break;
+
         case 'remove_rubble':
             // remove rubble
             // node_jq.stop(true, true);
@@ -231,33 +234,40 @@ function play_remaining_effects() {
             node_jq.removeClass("rubble").removeClass("occupied").addClass("empty");
             show_message(node_jq, "-1");
             break;
+
         case 'add_rubble':
             // node_jq.stop(true, true);
             node_jq.addClass("rubble").addClass("occupied").removeClass("unit").removeClass("empty");
             node_jq.children().remove();
             $("<div title='Rubble appears when units dies and blocks new units from being placed for a turn' class='rubble r_1'><img src='/media/units/rubble.png'></div>").appendTo(node_jq);
             break;
+
         case 'add_unit': 
             // place unit w/ animation
             show_unit(effect['value']);
             break;
+
         case 'win':
             $("#slider_alert").hide();
             $("#win_screen").show("slide", "slow");
             break;
+
         case 'lose':
             $("#slider_alert").hide();
             $("#lose_screen").show("slide", "slow");
             break;
+
         case 'next_phase':
             $("#phases").find("li.active").removeClass("active");
             $("#phases").find("#" + game['current_phase']).addClass("active");
             break;
+
         case 'alert':
             slider_alert(effect['target']['title'],
                     effect['target']['contents'],
                     effect['target']['wait_for_confirm']);
             break; 
+
         case 'damage_player':
             if (effect['target'] == 'ai'
                     && game['goal'] == 'kill units') {
@@ -270,6 +280,7 @@ function play_remaining_effects() {
                 show_number(life_h1.parent(), -1 * effect['delta']); 
             }
             break;
+
         default:
             alert('unknown action while doing FX: ' + action);
             break;
