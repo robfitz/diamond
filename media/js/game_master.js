@@ -14,6 +14,7 @@ function do_player_turn_1(game, player, draw_cards) {
     qfx({'action': 'next_phase'});
 
     heal(game, player); 
+    refill_tech(game, player);
     draw(game, player, draw_cards); 
 
     // wait for player to make play 1 
@@ -27,16 +28,6 @@ function do_player_turn_1(game, player, draw_cards) {
         game['current_phase'] ++; 
         qfx({'action': 'next_phase'});
         on_next_player_action(game, player);
-    }
-    else {
-        qfx({
-                'action': 'alert',
-                'target': { 
-                    'title': "It's the first half of your turn!",
-                    'contents': "Pick a card to play, tech up, or skip your turn",
-                    'wait_for_confirm': true
-                }
-            }); 
     }
 }
 
@@ -75,16 +66,6 @@ function do_player_turn_2(game, player) {
         qfx({'action': 'next_phase'});
         on_next_player_action(game, player);
     }
-    else {
-        qfx({
-                'action': 'alert',
-                'target': { 
-                    'title': "It's the second half of your turn!",
-                    'contents': "Pick a card to play, tech up, or skip your turn",
-                    'wait_for_confirm': true
-                }
-            }); 
-    }
 }
 
 function do_player_turn_3(game, player) {
@@ -113,6 +94,7 @@ function do_turn(game, player, moves) {
 
     // heal
     heal(game, player);
+    refill_tech(game, player);
 
     // ai doesn't need to draw
 
@@ -206,12 +188,33 @@ function draw(game, player, cards) {
     }
 }
 
-// return False if was an illegal play
-function play(game, player, card, node_owner, row, x, ignore_hand) {
+function refill_tech(game, player_name) { 
+    var player = get_player(game, player_name);
+    var delta = player['tech'] - player['current_tech'];
+    player['current_tech'] = player['tech'];
+    qfx({
+            'action': 'refill_tech',
+            'target': player_name,
+            'delta': delta
+    });
+}
 
-    if (!ignore_hand) {
+function use_tech(game, player, delta) { 
+    get_player(game, player)['current_tech'] -= delta;
+    qfx({ 
+            'action': 'use_tech',
+            'target': player,
+            'delta': delta 
+    }); 
+}
+
+// return False if was an illegal play
+function play(game, player, card, node_owner, row, x, ignore_constraints) {
+
+    if (!ignore_constraints) {
         // remove card from hand
-        discard(game, player, card)
+        discard(game, player, card);
+        use_tech(game, player, card['fields']['tech_level']);
     }
             
     nodes = []
@@ -220,13 +223,7 @@ function play(game, player, card, node_owner, row, x, ignore_hand) {
     }
 
     else if (card['fields']['target_aiming'] == 'all') { 
-        for (row = 0; row < 3; row ++) {
-            for (col = -row; col < row + 1; col ++) {
-                if ( ! get_node(game, node_owner, row, col) ) { 
-                    nodes.push({ 'row' : row, 'x' : col }); 
-                }
-            }
-        }
+        nodes = each_empty(game, node_owner);
     } 
 
     for (var i = 0; i < nodes.length; i ++) {
@@ -240,7 +237,7 @@ function play(game, player, card, node_owner, row, x, ignore_hand) {
 
         if (card['fields']['direct_damage']) {
             // direct damage 
-            target = get_node(game, player, node["row"], node['x'])
+            target = get_node(game, node_owner, node["row"], node['x'])
             if (target && target['type'] == "unit") {
                 damage_unit(game, card['fields']['direct_damage'], target, card)
             } 
@@ -256,11 +253,11 @@ function play(game, player, card, node_owner, row, x, ignore_hand) {
             card['row'] = parseInt(node['row'])
             card['x'] = parseInt(node['x'])
 
-            set_node(game, player, node["row"], node["x"], card)
+            var card_copy = $.extend(true, {}, card);
+            set_node(game, player, node["row"], node["x"], card_copy)
         }
     }
 }
-
 
 function discard(game, player, card) {
     for (var i = 0; i < get_player(game, player)['hand'].length; i ++) {
@@ -491,7 +488,7 @@ function get_player(game, player) {
 function get_hand_card(game, player, card_id) {
 
     var hand = get_player(game, player)['hand'];
-    for (i in hand) {
+    for (var i in hand) {
         if (hand[i]['pk'] == card_id) {
             return hand[i];
         }
@@ -542,30 +539,35 @@ function set_node(game, player, row, x, val) {
                 value: val
             }); 
     }
-    else {
-        alert("unknown value type in set_node: " + val['type']);
-    } 
 }
 
 
 function each_type(game, player, type) {
 
-    types = []
+    types = [];
 
-    board = get_board(game, player) 
-    for (row = 0; row < 3; row ++) {
-        for (col = -row; col < row + 1; col ++) {
-            node = get_node(game, player, row, col)
-            node_type = null
+    board = get_board(game, player);
+    for (var row = 0; row < 3; row ++) {
+        for (var col = -row; col < row + 1; col ++) {
+            node = get_node(game, player, row, col);
+            node_type = null;
             try {
-                node_type = node['type']
+                node_type = node['type'];
             }
             catch (KeyError) {
                 // blank nodes have no type
-                continue
+                continue;
             }
             if ((!type && !node) || (node && node_type == type)) { 
-                types.push(node)
+                // blank nodes don't have location info attached,
+                // which causes a mess. fix it!
+                if (!node['row']) {
+                    node['row'] = row;
+                }
+                if (!node['x']) {
+                    node['x'] = col;
+                }
+                types.push(node);
             }
         }
     } 
@@ -574,6 +576,7 @@ function each_type(game, player, type) {
 
 
 function each_empty(game, player) {
+
     return each_type(game, player, undefined)
 }
 
@@ -592,8 +595,8 @@ function for_each_unit(game, player, callback) {
 function for_each_type(game, player, type, callback) {
 
     board = get_board(game, player) 
-    for (row = 0; row < 3; row ++) {
-        for (col = -row; col < row + 1; col ++) {
+    for (var row = 0; row < 3; row ++) {
+        for (var col = -row; col < row + 1; col ++) {
             node = get_node(game, player, row, col)
             node_type = null
             try {
@@ -667,8 +670,8 @@ function damage_unit(game, amount, target, source) {
             });
 
     if (target['fields']['attack_type'] == 'counterattack') {
-        if (source['fields']['attack_type'] != 'flying') {
-            // retaliation from counterattackers to non-flying attackers
+        if (source['fields']['attack_type'] != 'ranged') {
+            // retaliation from counterattackers to non-ranged attackers
             damage_unit(game, target['fields']['attack'], source, target);
         }
     }
@@ -707,7 +710,7 @@ function kill_unit(game, target) {
 // returns name of winner, or false if noone has won
 function is_game_over(game) {
 
-    for (player in game['players']) {
+    for (var player in game['players']) {
         if (game['players'][player]['life'] <= 0) {
             return get_opponent_name(game, player)
         }

@@ -41,7 +41,7 @@ def get_all_possible_moves(game, player):
         # use each card to tech up
         moves.append("%s tech %s" % (player, card['pk']))
 
-        if card['fields']['tech_level'] <= game['players'][player]['tech']:
+        if card['fields']['tech_level'] <= game['players'][player]['current_tech']:
             # only consider casting it if we have enough tech
 
             for node_str in get_valid_targets(game, player, card): 

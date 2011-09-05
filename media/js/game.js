@@ -54,7 +54,7 @@ function draw_starting_hand() {
 
         // if the tech level is high enough, select the places
         // on the board we can use this card
-        if (game['players'][player_name]["tech"] >= card_json.fields.tech_level) {
+        if (game['players'][player_name]["current_tech"] >= card_json.fields.tech_level) {
             // find valid targets based on card targetting type
             // e.g. summoning is: friendly board > empty nodes
 

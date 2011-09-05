@@ -12,7 +12,7 @@ ANON_PLAYER_NAME = "guest"
 def log_board(game, log_note):
 
     player = game['player']
-    opp = get_opponent_name(game,game['player'])
+    opp = get_opponent_name(game, game['player'])
 
     opp_str = ""
 
@@ -77,6 +77,7 @@ def init_game(match):
                 player: {
                     'life': match.friendly_life,
                     'tech': match.friendly_tech,
+                    'current_tech': match.friendly_tech,
                     'hand': [],
                     'library': cached.get_cards(match.friendly_deck_cards),
                     'board': { },
@@ -84,6 +85,7 @@ def init_game(match):
                 'ai': {
                     'life': match.ai_life,
                     'tech': match.ai_tech,
+                    'current_tech': match.ai_tech,
                     'hand': [],
                     'library': cached.get_cards(match.ai_deck_cards),
                     'board': { },
@@ -130,18 +132,19 @@ def do_turns(game, player_moves):
 
     from d_game import ai
 
-    logging.info("XX game master doing turn for player moves; %s" % player_moves)
 
     player_name = game['player']
     opponent_name = get_opponent_name(game, player_name)
 
     # turn init
     heal(game, player_name) 
+    refill_tech(game, player_name)
 
     do_turn(game, player_name, player_moves)
 
     # AI turn init
     heal(game, opponent_name) 
+    refill_tech(game, opponent_name)
     draw_up_to(game, opponent_name, 5) 
 
     # AI decides what to do (but doens't actually affect the 
@@ -244,13 +247,26 @@ def do_turn_move(game, player, move):
         play(game, player, card_id, node_owner, row, x) 
 
 
-# return False if was an illegal play
-def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
+def refill_tech(game, player):
+    get_player(game, player)['current_tech'] = get_player(game, player)['tech'];
+        
 
-    if not ignore_hand:
+# return False if was an illegal play
+def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
+
+    if not ignore_constraints:
         # remove card from hand
         card = discard(game, player, card_id) 
-        logging.info("WWW tried discarding: %s" % card)
+        if not card:
+            # fail if requested card was not in hand
+            return False 
+
+        if get_player(game, player)['current_tech'] >= card['fields']['tech_level']:
+            # remove casting cost from available tech resources
+            get_player(game, player)['current_tech'] -= card['fields']['tech_level']
+        else:
+            # didn't have enough resources to cast it
+            return False
     else:
         from d_cards.models import Card
         card = Card.objects.get(id=card_id)
@@ -259,10 +275,7 @@ def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
         card = { 'pk': card.pk,
                 'fields': model_to_dict(card, fields=[], exclude=[]) 
             }
-            
-    if not card:
-        # fail if requested card was not in hand
-        return False
+
 
     nodes = []
     if card['fields']['target_aiming'] == 'chosen': 
@@ -282,7 +295,7 @@ def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
 
         if card['fields']['direct_damage']:
             # direct damage 
-            target = get_board(game, player)["%s_%s" % (node["row"], node['x'])]
+            target = get_board(game, node_owner)["%s_%s" % (node["row"], node['x'])]
             if target and target['type'] == "unit":
                 damage_unit(game, card['fields']['direct_damage'], target, card)
 
@@ -298,7 +311,6 @@ def play(game, player, card_id, node_owner, row, x, ignore_hand=False):
 
             # deep copy in case of multiple targets for same card
             get_board(game, player)["%s_%s" % (node["row"], node["x"])] = copy.deepcopy(card)
-            logging.info("YYY added unit to board for %s at %s_%s" % (player, node["row"], node["x"]))
 
 
 def discard(game, player, card_id):
@@ -336,13 +348,11 @@ def draw(game, player, num):
 
 def do_attack_phase(game, attacking_player):
 
-    logging.info("XXX do attack phase by %s" % attacking_player)
     for_each_unit(game, attacking_player, do_attack)
 
 
 def do_attack(game, attacking_player, unit):
 
-    logging.info("XXX do attack by %s" % attacking_player)
     attacked_player = get_opponent_name(game, attacking_player)
 
     row = int(unit['row'])
@@ -401,7 +411,6 @@ def do_attack(game, attacking_player, unit):
         elif row == 0 and x == 0:
             # bumped into enemy player
 
-            logging.info("XXX bumped into player %s with goal %s" % (attacked_player, game['goal']))
 
             if attacked_player == "ai" and game['goal'] == 'kill units':
                 # in puzzle mode where trying to kill all units, AI is invulnerable
@@ -449,7 +458,6 @@ def each_type(game, player, type):
                 # blank nodes have no type
                 continue
             if node and node_type == type: 
-                logging.info("RRR got node of type (%s) %s for player %s" % (type, node, player))
                 types.append(node)
 
     return types 
@@ -499,7 +507,6 @@ def remove_rubble_from_node(game, player, node):
 
 def heal(game, player):
 
-    logging.info("UUU healed for %s" % player)
 
     for_each_unit(game, player, heal_unit)
 
@@ -510,10 +517,10 @@ def heal_unit(game, player, unit):
 
 def damage_unit(game, amount, target, source):
 
-    if not target['damage']:
-        target['damage'] = 0
-
-    target['damage'] += amount
+    try:
+        target['damage'] += amount
+    except KeyError:
+        target['damage'] = amount 
 
     if target['fields']['attack_type'] == 'counterattack':
         if source['fields']['attack_type'] != 'flying': 
@@ -521,17 +528,14 @@ def damage_unit(game, amount, target, source):
             damage_unit(game, target['fields']['attack'], source, target)
 
     if target['damage'] >= target['fields']['defense']:
-        logging.info("ZZ and it's dead")
         kill_unit(game, target)
 
 
 def kill_unit(game, target):
-    logging.info("ZZ killing unit")
 
     if target['fields']['rubble_duration'] > 0:
         # leave rubble
         target['type'] = 'rubble'
-        logging.info("ZZ set type to rubble")
 
     else:
         # remove from game
@@ -544,7 +548,7 @@ def is_game_over(game):
     for player in game['players']:
         if game['players'][player]['life'] <= 0:
             logging.info("*** game is over from loss of life: %s" % player)
-            return player
+            return get_opponent_name(game, player)
         
     if game['goal'] == 'kill units':
         opp = get_opponent_name(game, game['player'])

@@ -6,7 +6,6 @@ animation_example = [ { action: 'move', target: { player: 'ai', row: 2, x: 1 }, 
     { action: 'add_unit', target: { player: 'ai', row: 2, x: 1 }, value: { type: 'unit', pk: 123, fields: { stuff: 'stuff' } } },
     { action: 'remove_unit', target: { player: 'ai', row: 2, x: 1 }, value: null },
     { action: 'add_rubble', target: { player: 'ai', row: 2, x: 1 }, value: null },
-    { action: 'remove_rubble', target: { player: 'ai', row: 2, x: 1 }, value: null }
     ]
 
 var DEFAULT_DELAY = 200;
@@ -110,6 +109,9 @@ function play_remaining_effects() {
     var node_jq;
     try {
         node_jq = get_jq(effect);
+        while (node_jq.queue().length > 0) {
+            node_jq.stop(false, true);
+        }
     } catch(error) {
         node_jq = null;
     }
@@ -142,13 +144,35 @@ function play_remaining_effects() {
                 });
             }
             break;
+
+        case 'use_tech':
+            // temporarily spending some of the current tech supply
+            var tech = $("." + effect['target'] + "_tech"); 
+            var current = tech.find(".remaining");
+            var current_shown = parseInt(current.text());
+            current.text(current_shown - effect['delta']); 
+            show_number(tech, -1 * effect['delta']);
+            break;
+
+        case 'refill_tech':
+            // refilling the temporary supply of tech to max
+            var tech = $("." + effect['target'] + "_tech"); 
+            tech.find(".remaining").text( tech.find(".total").text() );
+            show_number(tech, effect['delta']);
+            break;
+
         case 'tech': 
-            var tech_h1 = $("." + effect['target'] + "_tech h1");
-            var current_shown = parseInt(tech_h1.text());
+            // permanently increase the total tech level
+            var tech = $("." + effect['target'] + "_tech"); 
+
+            //increase both the current and total tech levels
+            tech.find(".total, .remaining").each( function () { 
+                var current_shown = parseInt($(this).text());
+                $(this).text(current_shown + effect['delta']); 
+            });
+
             // +1 message on player tech
-            show_number(tech_h1.parent(), effect['delta']);
-            // increase tech #
-            tech_h1.text(current_shown + effect['delta']); 
+            show_number(tech, effect['delta']);
             break;
         case 'move':
             // scoot the unit by delta * step size
@@ -157,10 +181,7 @@ function play_remaining_effects() {
             var d_row = (row < 0 ? "-=" : "+=") + (100*Math.abs(row));
             var d_x = (x < 0 ? "-=" : "+=") + (100*Math.abs(x));
 
-            var node = get_node_view(effect['target']['player'], effect['target']['row'], effect['target']['x']);
-
-            node.stop(true, true);
-            node.animate( 
+            node_jq.animate( 
                     {
                         top: d_row,
                         left: d_x,
@@ -170,37 +191,51 @@ function play_remaining_effects() {
                 ); 
             break;
         case 'damage_unit':
-            // -1 on target
-            show_number(node_jq, -1 * effect['delta']); 
-            // shake
-            node_jq.stop(true, true);
-            node_jq.effect("bounce", "fast"); 
-            // fill in damage bubbles
-            for (var i = 0; i < effect['delta']; i ++) {
-                node_jq.find(".defense_point:first").removeClass('defense_point').addClass('damage_point');
+            
+            if (effect['delta'] != 0) {
+                // -1 on target
+                show_number(node_jq, -1 * effect['delta']); 
+                // fill in damage bubbles
+                for (var i = 0; i < effect['delta']; i ++) {
+                    node_jq.find(".defense_point:first").removeClass('defense_point').addClass('damage_point');
+                }
+                // shake
+                // node_jq.stop(true, true);
+                node_jq.effect("bounce", "fast"); 
             }
             break;
         case 'heal_unit':
-            show_number(node_jq, effect['delta']);
-            //clear damage bubbles
-            node_jq.find(".damage_point").each( function () {
-                    $(this).removeClass("damage_point").addClass("defense_point");
-            });
+            if (effect['delta'] != 0) {
+                show_number(node_jq, effect['delta']);
+                //clear damage bubbles
+                node_jq.find(".damage_point").each( function () {
+                        $(this).removeClass("damage_point").addClass("defense_point");
+                });
+            }
             break; 
         case 'remove_unit':
             // explode target
-            node_jq.stop(true, true);
-            node_jq.hide("explode", function() {
+            // node_jq.stop(true, true);
+            node_jq.find(".unit_piece").hide("explode", function() {
                     // remove target from screen
                     $(this).remove();
                 });
+            node_jq.removeClass("unit").removeClass("occupied").addClass("empty");
             break;
         case 'remove_rubble':
             // remove rubble
-            show_message(node_jq, "" + (-1 * effect['delta']));
+            // node_jq.stop(true, true);
+            node_jq.find(".rubble").fadeOut(function() {
+                    $(this).remove();
+                });
+            node_jq.removeClass("rubble").removeClass("occupied").addClass("empty");
+            show_message(node_jq, "-1");
             break;
         case 'add_rubble':
-            // place rubble w/ animation ( handled by unit? )
+            // node_jq.stop(true, true);
+            node_jq.addClass("rubble").addClass("occupied").removeClass("unit").removeClass("empty");
+            node_jq.children().remove();
+            $("<div title='Rubble appears when units dies and blocks new units from being placed for a turn' class='rubble r_1'><img src='/media/units/rubble.png'></div>").appendTo(node_jq);
             break;
         case 'add_unit': 
             // place unit w/ animation
