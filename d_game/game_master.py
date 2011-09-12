@@ -78,6 +78,7 @@ def init_game(match):
                     'life': match.friendly_life,
                     'tech': match.friendly_tech,
                     'current_tech': match.friendly_tech,
+                    'tech_ups_remaining_this_turn': 1,
                     'hand': [],
                     'library': cached.get_cards(match.friendly_deck_cards),
                     'board': { },
@@ -86,6 +87,7 @@ def init_game(match):
                     'life': match.ai_life,
                     'tech': match.ai_tech,
                     'current_tech': match.ai_tech,
+                    'tech_ups_remaining_this_turn': 1,
                     'hand': [],
                     'library': cached.get_cards(match.ai_deck_cards),
                     'board': { },
@@ -103,6 +105,8 @@ def init_game(match):
     if game['type'] != "puzzle":
         random.shuffle(get_player(game, player)['library'])
         random.shuffle(get_player(game, 'ai')['library'])
+
+    draw_up_to(game, 'ai', 5)
 
     return game
 
@@ -130,8 +134,7 @@ def get_censored(game, player):
 
 def do_turns(game, player_moves):
 
-    from d_game import ai
-
+    from d_game import ai 
 
     player_name = game['player']
     opponent_name = get_opponent_name(game, player_name)
@@ -139,18 +142,19 @@ def do_turns(game, player_moves):
     # turn init
     heal(game, player_name) 
     refill_tech(game, player_name)
+    remove_summoning_sickness(game, player_name)
 
     do_turn(game, player_name, player_moves)
 
     # AI turn init
     heal(game, opponent_name) 
     refill_tech(game, opponent_name)
-    draw_up_to(game, opponent_name, 5) 
+    draw(game, opponent_name, 1) 
+    remove_summoning_sickness(game, opponent_name)
 
     # AI decides what to do (but doens't actually affect the 
     # game state yet
-    ai_turn = ai.get_turn(game, opponent_name) 
-    ai_moves = [ ai_turn[0]['shorthand'], ai_turn[1]['shorthand'] ]
+    ai_moves, ai_turn = ai.get_turn(game, opponent_name) 
 
     # log the turn for client-server verification purposes
     # and process its decisions.
@@ -161,7 +165,7 @@ def do_turns(game, player_moves):
     # get 2 new cards for player 
     # this is out of order because we're actually drawing
     # for the player's next turn, not the current one just processed
-    draw_cards = draw_up_to(game, player_name, 5)
+    draw_cards = draw(game, player_name, 1)
 
     # save turn changes on server
     cached.save(game)
@@ -188,17 +192,11 @@ def do_turn(game, player, moves, is_ai=False):
         logging.info("********** game over, winner=%s" % winner)
         return 
 
-    log_board(game, "%s, before first play" % player)
-
-    # first play
-    do_turn_move(game, player, moves[0])
-
-    log_board(game, "%s, after first play" % player)
-
-    # attack!
-    do_attack_phase(game, player)
-
-    log_board(game, "%s, after attack" % player)
+    i = 1
+    for move in moves:
+        do_turn_move(game, player, move)
+        log_board(game, "%s, after play #%s" % (player, i))
+        i += 1 
 
     # check win condition
     winner = is_game_over(game) 
@@ -206,11 +204,13 @@ def do_turn(game, player, moves, is_ai=False):
         logging.info("********** game over, winner=%s" % is_game_over(game))
         return
 
-    # second play
-    do_turn_move(game, player, moves[1])
+    log_board(game, "%s, before attack" % player)
 
-    log_board(game, "%s, after second play" % player)
+    # attack!
+    do_attack_phase(game, player)
 
+    log_board(game, "%s, after attack" % player) 
+   
     # cleanup
     remove_rubble(game, player)
 
@@ -236,9 +236,9 @@ def do_turn_move(game, player, move):
         card_id = toks[2]
         if discard(game, player, card_id):
             tech(game, player, 1)
+            get_player(game, player)['tech_ups_remaining_this_turn'] -= 1
 
     elif action == 'play':
-        logging.info("WWW player %s playing card for move: %s" % (player, move))
         card_id = toks[2]
         node_owner = toks[3]
         row = toks[4]
@@ -249,6 +249,7 @@ def do_turn_move(game, player, move):
 
 def refill_tech(game, player):
     get_player(game, player)['current_tech'] = get_player(game, player)['tech'];
+    get_player(game, player)['tech_ups_remaining_this_turn'] = 1
         
 
 # return False if was an illegal play
@@ -267,6 +268,9 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
         else:
             # didn't have enough resources to cast it
             return False
+
+        if card['fields']['tech_change']:
+            tech(game, player, card['fields']['tech_change'])
     else:
         from d_cards.models import Card
         card = Card.objects.get(id=card_id)
@@ -290,9 +294,6 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
     for node in nodes:
         # loop to support 'all node' targetting as well as 'chosen'
 
-        if card['fields']['tech_change']:
-            tech(game, player, card['fields']['tech_change'])
-
         if card['fields']['direct_damage']:
             # direct damage 
             target = get_board(game, node_owner)["%s_%s" % (node["row"], node['x'])]
@@ -308,6 +309,7 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
             card['player'] = player
             card['row'] = int(node['row'])
             card['x'] = int(node['x'])
+            card['attack_delay'] = 1
 
             # deep copy in case of multiple targets for same card
             get_board(game, player)["%s_%s" % (node["row"], node["x"])] = copy.deepcopy(card)
@@ -325,7 +327,17 @@ def discard(game, player, card_id):
 
 
 def tech(game, player, amount):
-    get_player(game, player)['tech'] += amount 
+    p = get_player(game, player)
+    p['tech'] += amount 
+
+    if amount < 0 and p['current_tech'] > p['tech']:
+        # if we teched down via a card downside, and if and if our maximum tech
+        # is lower than our available tech, lop off a couple available tech so we
+        # don't have more than our max allocation. 
+        # This situation will rarely arise, however, since in casting something
+        # with a negative tech drawback, you'll have already used some of your 
+        # available tech.
+        p['current_tech'] = p['tech'] 
 
 
 def draw_up_to(game, player, total):
@@ -352,6 +364,11 @@ def do_attack_phase(game, attacking_player):
 
 
 def do_attack(game, attacking_player, unit):
+
+
+    if unit['attack_delay'] > 0:
+        # summoning sickness
+        return
 
     attacked_player = get_opponent_name(game, attacking_player)
 
@@ -505,14 +522,20 @@ def remove_rubble_from_node(game, player, node):
         set_node(game, player, node['row'], node['x'], {})
 
 
-def heal(game, player):
-
+def heal(game, player): 
 
     for_each_unit(game, player, heal_unit)
 
-
 def heal_unit(game, player, unit):
     unit['damage'] = 0
+
+def remove_summoning_sickness(game, player):
+
+    for_each_unit(game, player, remove_unit_summoning_sickness)
+
+def remove_unit_summoning_sickness(game, player, unit):
+    if unit['attack_delay'] > 0:
+        unit['attack_delay'] -= 1
 
 
 def damage_unit(game, amount, target, source):
@@ -547,7 +570,7 @@ def is_game_over(game):
 
     for player in game['players']:
         if game['players'][player]['life'] <= 0:
-            logging.info("*** game is over from loss of life: %s" % player)
+            logging.info("*** game is over from loss of life: %s" % get_opponent_name(game, player))
             return get_opponent_name(game, player)
         
     if game['goal'] == 'kill units':

@@ -19,49 +19,29 @@ function do_player_turn_consumable_resources(game, player, draw_cards) {
     heal(game, player); 
     refill_tech(game, player);
     draw(game, player, draw_cards); 
-    remove_summoning_sickness(game, player);
-
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
-
-    // wait for player to make as many plays as he pleases 
-    on_next_player_action = end_player_turn_consumable_resources;
-}
-
-function end_player_turn_consumable_resources(game, player) { 
 
     // attack!
     do_attack_phase(game, player)
 
-    remove_rubble(game, player);
+    // wait for player to make as many plays as he pleases
 
-    // start AI turn setup while it thinks about what to do
-    heal(game, opponent_name);
-    refill_tech(game, opponent_name);
-    remove_summoning_sickness(game, opponent_name);
-
-    // end turn
-    on_next_player_action = null;
-    game['current_phase'] = 4; 
+    // wait for player to make play 1 
+    on_next_player_action = function() {};
+    game['current_phase'] ++; 
     qfx({'action': 'next_phase'});
 
-    $.post("/playing/end_turn/",
-        $("#current_turn").serialize(),
-        function(data) {
-            try {
-                turn_data = eval('(' + data + ')');
-            } catch (error ) {
-                alert('caught error processing ai turn data: (' + data + ')');
-                return;
-            }
-
-            //do AI turn 
-            do_turn(game, opponent_name, turn_data['ai_turn']);
-            do_player_turn_consumable_resources(game, player_name, turn_data['player_draw']);
-        }
-    ); 
-    $("textarea[name='player_turn']").val("");
+    // if no cards in player hand, skip UI phase
+    if (game['players'][player]['hand'].length == 0) {
+        // no hand cards, skip phase
+        game['current_phase'] ++; 
+        qfx({'action': 'next_phase'});
+        on_next_player_action(game, player);
+    }
 }
+
+function do_player_turn_2(game, player) {
+
+
 
 function do_player_turn_1(game, player, draw_cards) {
 
@@ -90,9 +70,6 @@ function do_player_turn_2(game, player) {
 
     // attack!
     do_attack_phase(game, player)
-
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'}); 
 
     if (is_game_over(game)) {
         alert("game over from game master");
@@ -149,42 +126,6 @@ function do_player_turn_3(game, player) {
 }
 
 function do_turn(game, player, moves) { 
-
-    for (var i = 0; i < moves.length; i ++) {
-        do_turn_move(game, player, moves[i])
-    }
-
-    if (is_game_over(game)) {
-        var winner = is_game_over(game);
-        if (winner == player_name) {
-            qfx({ 'action': 'win' });
-        }
-        else {
-            qfx({ 'action': 'lose' });
-        } 
-        qfx_game_over();
-        $.post("/playing/end_turn/",
-            $("#current_turn").serialize(),
-            function(data) {
-                alert('game over from server: ' + data);
-            });
-        return;
-    }
-
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
-
-    // attack!
-    do_attack_phase(game, player)
-
-    // cleanup
-    remove_rubble(game, player)
-
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
-}
-
-function __dep_do_turn(game, player, moves) { 
 
     // heal
     heal(game, player);
@@ -343,12 +284,11 @@ function play(game, player, card, node_owner, row, x, ignore_constraints) {
             // summon critter
 
             // add a few fields to the card to represent a unit
-            card['type'] = 'unit';
-            card['damage'] = 0;
-            card['player'] = player;
-            card['row'] = parseInt(node['row']);
-            card['x'] = parseInt(node['x']);
-            card['attack_delay'] = 1;
+            card['type'] = 'unit'
+            card['damage'] = 0
+            card['player'] = player
+            card['row'] = parseInt(node['row'])
+            card['x'] = parseInt(node['x'])
 
             var card_copy = $.extend(true, {}, card);
             set_node(game, player, node["row"], node["x"], card_copy)
@@ -375,7 +315,6 @@ function discard(game, player, card) {
 
 
 function tech(game, player, amount) {
-
     var p = get_player(game, player);
     p['tech'] += amount; 
 
@@ -473,11 +412,6 @@ function get_attack_path(game, attacking_player, attack_type, row, x) {
 }
 
 function do_attack(game, attacking_player, unit) {
-
-    if (unit['attack_delay'] > 0) {
-        // summoning sickness
-        return;
-    } 
 
     var attacked_player = get_opponent_name(game, attacking_player);
 
@@ -765,25 +699,6 @@ function heal_unit(game, player, unit) {
             'target': unit,
             'delta': healed
         });
-}
-
-
-function remove_summoning_sickness(game, player) { 
-    for_each_unit(game, player, remove_unit_summoning_sickness);
-}
-
-
-function remove_unit_summoning_sickness(game, player, unit) {
-    if (unit['attack_delay'] > 0) {
-        unit['attack_delay'] -= 1;
-
-        if (unit['attack_delay'] == 0) {
-            qfx({
-                    'action': 'summoning_sickness_complete',
-                    'target': unit
-            });
-        }
-    }
 }
 
 

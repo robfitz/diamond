@@ -3,8 +3,9 @@ function pass_turn() {
     var turn = $("textarea[name='player_turn']");
     turn.val(turn.val() + player_name + " pass\n");
 
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    // game['current_phase'] ++; 
+    // qfx({'action': 'next_phase'});
+
     on_next_player_action(game, player_name);
 } 
 
@@ -36,7 +37,8 @@ function draw_starting_hand() {
                 var hand = game['players'][player_name]['hand'];
                 game['players'][player_name]['hand'] = [];
                 // draw starting cards 
-                do_player_turn_1(game, player_name, hand);
+                // do_player_turn_1(game, player_name, hand);
+                do_player_turn_consumable_resources(game, player_name, hand);
             }
     }); 
 }
@@ -109,10 +111,11 @@ function draw_starting_hand() {
                 },
             });
         }
-
-        $("#friendly_tech").addClass("targettable").click( function (event) {
-            trash($(".card.selected"));
-        });
+        if (game['players'][player_name]['tech_ups_remaining_this_turn'] > 0) {
+            $("#friendly_tech").addClass("targettable").click( function (event) {
+                trash($(".card.selected"));
+            });
+        }
     }
 
 
@@ -123,6 +126,12 @@ function draw_starting_hand() {
             return;
         }
 
+        if (game['players'][player_name]['tech_ups_remaining_this_turn'] <= 0) {
+            return;
+        }
+
+        game['players'][player_name]['tech_ups_remaining_this_turn'] --;
+
         var player = player_name;
         var card = get_hand_card(game, player, hand_card.attr("id"));
 
@@ -132,9 +141,9 @@ function draw_starting_hand() {
         var turn = $("textarea[name='player_turn']");
         turn.val(turn.val() + player_name + " tech " + hand_card.attr('id') + "\n"); 
 
-        qfx({'action': 'next_phase'});
-        game['current_phase'] ++; 
-        on_next_player_action(game, player_name);
+        // qfx({'action': 'next_phase'});
+        // game['current_phase'] ++; 
+        // on_next_player_action(game, player_name);
 
         cancel_cast(); 
     }
@@ -150,18 +159,6 @@ function draw_starting_hand() {
 
         action_indicator($("#ai_tech"), "AI teched by " + amount);
         show_number($("#ai_tech"), amount);
-    }
-
-    function tech_up(amount) {
-
-        //tech up one notch
-        match["tech"]["friendly"] += amount; 
-
-        if (match['tech']['friendly'] > MAX_TECH) tech_level = MAX_TECH;
-
-        $("#friendly_tech h1").text("T" + match['tech']['friendly']);
-
-        show_number($("#friendly_tech"), amount);
     }
 
     function cast(hand_card, node) { 
@@ -186,9 +183,9 @@ function draw_starting_hand() {
 
         play(game, player_name, card, target_owner, r, x, false);
 
-        qfx({'action': 'next_phase'});
-        game['current_phase'] ++; 
-        on_next_player_action(game, player_name);
+        // qfx({'action': 'next_phase'});
+        // game['current_phase'] ++; 
+        // on_next_player_action(game, player_name);
 
         cancel_cast();
     }

@@ -162,7 +162,7 @@ function play_remaining_effects() {
             break;
 
         case 'tech': 
-            // permanently increase the total tech level
+            // permanently change the max tech level
             var tech = $("." + effect['target'] + "_tech"); 
 
             //increase both the current and total tech levels
@@ -233,6 +233,10 @@ function play_remaining_effects() {
                 });
             node_jq.removeClass("rubble").removeClass("occupied").addClass("empty");
             show_message(node_jq, "-1");
+            break;
+
+        case 'summoning_sickness_complete':
+            show_message(node_jq, "Ready for combat");
             break;
 
         case 'add_rubble':
