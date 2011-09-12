@@ -1,12 +1,13 @@
 function pass_turn() {
 
-    var turn = $("textarea[name='player_turn']");
-    turn.val(turn.val() + player_name + " pass\n");
+    if (game['current_phase'] == 1) {
 
-    // game['current_phase'] ++; 
-    // qfx({'action': 'next_phase'});
+        var turn = $("textarea[name='player_turn']");
+        turn.val(turn.val() + player_name + " pass\n");
 
-    on_next_player_action(game, player_name);
+        on_next_player_action(game, player_name);
+
+    }
 } 
 
 var UNIT_R = 25;

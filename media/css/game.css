@@ -126,7 +126,7 @@ h1.green {
     margin:0 0 10px 24px;
     font-size:12px;
 }
-#game_controls .button {
+#game_controls .link_button {
     background:none;
     border:none; 
     text-shadow:none;
