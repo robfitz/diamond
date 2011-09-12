@@ -262,8 +262,8 @@ function play_remaining_effects() {
             break;
 
         case 'next_phase':
-            $("#phases").find("li.active").removeClass("active");
-            $("#phases").find("#" + game['current_phase']).addClass("active");
+            $("#phases li.active").removeClass("active");
+            $("#phases li:eq(" + effect['delta'] + ")").addClass("active"); 
             break;
 
         case 'alert':

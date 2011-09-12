@@ -13,7 +13,10 @@ function do_player_turn_consumable_resources(game, player, draw_cards) {
 
     // sync the phases
     game['current_phase'] = 0;
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // turn init
     heal(game, player); 
@@ -21,8 +24,12 @@ function do_player_turn_consumable_resources(game, player, draw_cards) {
     draw(game, player, draw_cards); 
     remove_summoning_sickness(game, player);
 
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    // play phase
+    game['current_phase'] = 1; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // wait for player to make as many plays as he pleases 
     on_next_player_action = end_player_turn_consumable_resources;
@@ -30,20 +37,35 @@ function do_player_turn_consumable_resources(game, player, draw_cards) {
 
 function end_player_turn_consumable_resources(game, player) { 
 
+    game['current_phase'] = 2; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
+
     // attack!
     do_attack_phase(game, player)
 
+    game['current_phase'] = 3; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
+
     remove_rubble(game, player);
+
+    // end turn
+    on_next_player_action = null;
+    game['current_phase'] = 4; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // start AI turn setup while it thinks about what to do
     heal(game, opponent_name);
     refill_tech(game, opponent_name);
     remove_summoning_sickness(game, opponent_name);
-
-    // end turn
-    on_next_player_action = null;
-    game['current_phase'] = 4; 
-    qfx({'action': 'next_phase'});
 
     $.post("/playing/end_turn/",
         $("#current_turn").serialize(),
@@ -66,7 +88,10 @@ function end_player_turn_consumable_resources(game, player) {
 function do_player_turn_1(game, player, draw_cards) {
 
     game['current_phase'] = 0;
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     heal(game, player); 
     refill_tech(game, player);
@@ -75,13 +100,19 @@ function do_player_turn_1(game, player, draw_cards) {
     // wait for player to make play 1 
     on_next_player_action = do_player_turn_2;
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // if no cards in player hand, skip UI phase
     if (game['players'][player]['hand'].length == 0) {
         // no hand cards, skip phase
         game['current_phase'] ++; 
-        qfx({'action': 'next_phase'});
+        qfx({
+                'action': 'next_phase',
+                'delta': game['current_phase']
+        });
         on_next_player_action(game, player);
     }
 }
@@ -92,7 +123,10 @@ function do_player_turn_2(game, player) {
     do_attack_phase(game, player)
 
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'}); 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     if (is_game_over(game)) {
         alert("game over from game master");
@@ -115,13 +149,19 @@ function do_player_turn_2(game, player) {
     // wait for player to make play 2 
     on_next_player_action = do_player_turn_3;
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // if no cards in player hand, skip UI phase
     if (game['players'][player]['hand'].length == 0) {
         // no hand cards, skip phase
         game['current_phase'] ++; 
-        qfx({'action': 'next_phase'});
+        qfx({
+                'action': 'next_phase',
+                'delta': game['current_phase']
+        });
         on_next_player_action(game, player);
     }
 }
@@ -133,7 +173,10 @@ function do_player_turn_3(game, player) {
     // end turn
     on_next_player_action = null;
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     $.post("/playing/end_turn/",
         $("#current_turn").serialize(),
@@ -149,6 +192,12 @@ function do_player_turn_3(game, player) {
 }
 
 function do_turn(game, player, moves) { 
+
+    game['current_phase'] = 5; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     for (var i = 0; i < moves.length; i ++) {
         do_turn_move(game, player, moves[i])
@@ -171,17 +220,24 @@ function do_turn(game, player, moves) {
         return;
     }
 
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    game['current_phase'] = 6; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // attack!
     do_attack_phase(game, player)
 
+    game['current_phase'] = 7; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
+
     // cleanup
     remove_rubble(game, player)
 
-    game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
 }
 
 function __dep_do_turn(game, player, moves) { 
@@ -193,13 +249,19 @@ function __dep_do_turn(game, player, moves) {
     // ai doesn't need to draw
 
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'}); 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // first play
     do_turn_move(game, player, moves[0])
 
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // attack!
     do_attack_phase(game, player)
@@ -222,19 +284,28 @@ function __dep_do_turn(game, player, moves) {
     }
 
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // second play
     do_turn_move(game, player, moves[1])
 
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 
     // cleanup
     remove_rubble(game, player)
 
     game['current_phase'] ++; 
-    qfx({'action': 'next_phase'});
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
 }
 
 
