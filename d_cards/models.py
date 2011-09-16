@@ -30,7 +30,7 @@ class Card(models.Model):
 
     tooltip = models.CharField(max_length=200, blank=True, default="")
 
-    icon_url = models.CharField(max_length=200, blank=True, default="")
+    icon_url = models.CharField(max_length=200, default="")
     icon_url_back = models.CharField(max_length=200, blank=True, default="")
 
     #how much damage this unit deals to a player or unit each time it attacks
@@ -53,7 +53,12 @@ class Card(models.Model):
     # how much playing this card changes your current tech level (usually ranging from -2 to +2)
     tech_change = models.IntegerField(default=0, help_text="If non-zero, it will change the player's current tech level by that positive or negative amount.")
 
-    rubble_duration = models.IntegerField(default=1)
+    resource_bonus = models.IntegerField(default=0, help_text="If non-zero, adds this much resource to their pool for this turn. Unused resources will disappear at end of turn. Use for Dark Ritual style effects")
+
+    draw_num = models.IntegerField(default=0, help_text="How many bonus cards the player gets to draw by casting this card. Use for cantrip creatures and straight up library manipulation")
+
+    rubble_duration = models.IntegerField(default=1, help_text="Only applies for creatures. Dictates the number of turns the spot will be blocked by rubble when this creature dies. Currently only 0 and 1 are supported, where 1 is standard and 0 is used by creatures without corpses (e.g. ephemeral spirits)")
+
 
     ALIGNMENT_CHOICES = (
             ("friendly", "Friendly"), 

@@ -80,6 +80,7 @@ def init_game(match):
                     'current_tech': match.friendly_tech,
                     'tech_ups_remaining_this_turn': 1,
                     'hand': [],
+                    'num_to_draw': 1,
                     'library': cached.get_cards(match.friendly_deck_cards),
                     'board': { },
                 },
@@ -89,6 +90,7 @@ def init_game(match):
                     'current_tech': match.ai_tech,
                     'tech_ups_remaining_this_turn': 1,
                     'hand': [],
+                    'num_to_draw': 1,
                     'library': cached.get_cards(match.ai_deck_cards),
                     'board': { },
                 }
@@ -139,6 +141,8 @@ def do_turns(game, player_moves):
     player_name = game['player']
     opponent_name = get_opponent_name(game, player_name)
 
+    logging.info("XXX player hand: %s" % get_player(game, player_name)['hand'])
+
     # turn init
     heal(game, player_name) 
     refill_tech(game, player_name)
@@ -149,7 +153,7 @@ def do_turns(game, player_moves):
     # AI turn init
     heal(game, opponent_name) 
     refill_tech(game, opponent_name)
-    draw(game, opponent_name, 1) 
+    draw(game, opponent_name, get_player(game, opponent_name)['num_to_draw'])
     remove_summoning_sickness(game, opponent_name)
 
     # AI decides what to do (but doens't actually affect the 
@@ -165,7 +169,9 @@ def do_turns(game, player_moves):
     # get 2 new cards for player 
     # this is out of order because we're actually drawing
     # for the player's next turn, not the current one just processed
-    draw_cards = draw(game, player_name, 1)
+    logging.info("XXX player is about to draw %s" % get_player(game, player_name)['num_to_draw'])
+
+    draw_cards = draw(game, player_name, get_player(game, player_name)['num_to_draw'])
 
     # save turn changes on server
     cached.save(game)
@@ -221,6 +227,9 @@ def do_turn_move(game, player, move):
 
     toks = move.split(' ')
 
+    if player == "robfitz":
+        logging.info("YYY turn move: %s %s" % (player, move))
+
     try:
         action = toks[1]
     except:
@@ -259,6 +268,7 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
         # remove card from hand
         card = discard(game, player, card_id) 
         if not card:
+            if player == 'robfitz': logging.info("XXX failed to discard")
             # fail if requested card was not in hand
             return False 
 
@@ -266,11 +276,10 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
             # remove casting cost from available tech resources
             get_player(game, player)['current_tech'] -= card['fields']['tech_level']
         else:
+            if player == 'robfitz': logging.info("XXX not enough resources")
             # didn't have enough resources to cast it
             return False
 
-        if card['fields']['tech_change']:
-            tech(game, player, card['fields']['tech_change'])
     else:
         from d_cards.models import Card
         card = Card.objects.get(id=card_id)
@@ -279,6 +288,24 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
         card = { 'pk': card.pk,
                 'fields': model_to_dict(card, fields=[], exclude=[]) 
             }
+
+    if player == "robfitz": logging.info("XXX robfitz playing")
+    
+    if player == "robfitz":
+        logging.info("XXX playing card: %s" % card['pk'])
+        logging.info("dir: %s" % dir(card['fields']))
+
+    # process 'on-cast' effects
+    if card['fields']['tech_change']:
+        tech(game, player, card['fields']['tech_change'])
+    if card['fields']['resource_bonus']:
+        get_player(game, player)['current_tech'] += card['fields']['resource_bonus']
+
+    if card['fields']['draw_num']:
+        logging.info("XXX card fields draw num")
+        # bonus cards are added to player's next draw phase
+        get_player(game, player)['num_to_draw'] += card['fields']['draw_num']
+        logging.info("XXX card cast increased player num to draw by %s to %s" % (card['fields']['draw_num'], get_player(game, player)['num_to_draw']))
 
 
     nodes = []
@@ -316,11 +343,19 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
 
 
 def discard(game, player, card_id):
+    if player=='robfitz':
+        logging.info("XXX Hand: %s" % get_player(game, player)['hand'])
+        logging.info("XXX trying to discard: %s" % card_id)
+
     i = 0
     for card in get_player(game, player)['hand']:
         if int(card['pk']) == int(card_id):
+            if player=='robfitz':
+                logging.info("XXX found card to discard")
             card = get_player(game, player)['hand'][i]
             del get_player(game, player)['hand'][i]
+            if player=='robfitz':
+                logging.info("XXX discarded")
             return card
         i += 1
     return False
@@ -345,6 +380,7 @@ def draw_up_to(game, player, total):
     num = total - len(get_player(game, player)['hand'])
     return draw(game, player, num)
 
+
 def draw(game, player, num):
 
     # remove from deck
@@ -353,6 +389,9 @@ def draw(game, player, num):
 
     # add to hand
     get_player(game, player)['hand'].extend(drawn)
+
+    # reset draw bonus to normal levels
+    get_player(game, player)['num_to_draw'] = 1
 
     # return the delta
     return drawn

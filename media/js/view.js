@@ -145,6 +145,11 @@ function play_remaining_effects() {
             }
             break;
 
+        case 'draw_bonus': 
+            var player = $("." + effect['target'] + "_hand"); 
+            show_message(player, "Draw bonus +" + effect['delta']);
+            break;
+
         case 'use_tech':
             // temporarily spending some of the current tech supply
             var tech = $("." + effect['target'] + "_tech"); 
@@ -157,7 +162,7 @@ function play_remaining_effects() {
         case 'refill_tech':
             // refilling the temporary supply of tech to max
             var tech = $("." + effect['target'] + "_tech"); 
-            tech.find(".remaining").text( tech.find(".total").text() );
+            tech.find(".remaining").text( parseInt(tech.find(".remaining").text()) + effect['delta'] );
             show_number(tech, effect['delta']);
             break;
 

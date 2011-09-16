@@ -1,5 +1,3 @@
-import logging
-
 from d_game.models import Match, Puzzle
 
 

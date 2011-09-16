@@ -89,13 +89,13 @@ padding:0;
 
             <div class="left_column">
 
-                <div class="ribbon_gui">
+                <div class="ribbon_gui {{opponent_name}}_hand">
                     <div id="ai_life" title="The enemy's life. Reduce it to 0 to win." class="top ai life {{ opponent_name }}_life">
                         <h1>10</h1> 
                     </div>
 
 
-                    <div id="friendly_life" title="Your life. Protect it with strategic unit placement." class="{{ player_name }}_life bottom friendly life">
+                    <div id="friendly_life" class="bottom friendly life friendly_life {{player_name}}_life" title="Your life. Protect it with strategic unit placement.">
                         <h1>10</h1> 
                     </div>
 
@@ -103,7 +103,7 @@ padding:0;
                     <div class="triangle-ribbon"></div>
                 </div>
 
-                <div id="friendly_hand">
+                <div id="friendly_hand" class="{{ player_name}}_hand">
                     <h2 class="ribbon">Reinforcements</h2>
                     <div class="triangle-ribbon"></div>
                 </div>

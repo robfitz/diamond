@@ -382,12 +382,31 @@ function play(game, player, card, node_owner, row, x, ignore_constraints) {
         discard(game, player, card);
         use_tech(game, player, card['fields']['tech_level']);
 
-        if (card['fields']['tech_change']) {
-            tech(game, player, card['fields']['tech_change'])
-        }
-
     }
             
+    /** do on-cast effects */
+    if (card['fields']['tech_change']) {
+        tech(game, player, card['fields']['tech_change'])
+    }
+    if (card['fields']['resource_bonus']) {
+        get_player(game, player)['current_tech'] += card['fields']['resource_bonus'];
+        qfx({
+                'action': 'refill_tech',
+                'delta': card['fields']['resource_bonus'],
+                'target': player,
+        });
+    }
+    if (card['fields']['draw_num']) {
+        // bonus cards are added to player's next draw phase
+        get_player(game, player)['num_to_draw'] += card['fields']['draw_num'];
+
+        qfx({
+                'action': 'draw_bonus',
+                'delta': card['fields']['draw_num'],
+                'target': player
+        }); 
+    }
+
     nodes = []
     if (card['fields']['target_aiming'] == 'chosen') { 
         nodes.push({ 'row' : row, 'x' : x})

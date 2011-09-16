@@ -1,0 +1,198 @@
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=- 1/12-09 -=-=
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+1 game on paper at lunch
+
+TRIED: spells are targetted immediately and resolve on the next battle phase
+ - L missed a cool opportunity when R's board was empty to zap the creature he knew i would probably cast before battle
+ - felt like the game flow was cleaner
+ - makes blast less useful
+ - overall seems like a gain
+
+BALANCE
+ - want/need more creature removal
+ - want/need more multi-hit spells (AOE & chains)
+ - melee/archer stack in middle row is insanely powerful. better removal and more high-HP walls will help
+ 
+RULE CHANGES:
+ - clutter is now cast as a summon rather than a battle spell
+ - clutter tokens are removed at beginning of turn instead of end
+ - spells are resolved at next battle phase
+ - tier 3 wall changed from 0-6 to 0-7 to survive T3 melee/archer stack
+
+THEME
+ - board is a map
+ - units are "actually" generals or commanders
+ - equipment slots (on commanders) are "actually" the units they command
+ - puts flanking into context
+ - feels more epic
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=- 27-11-09 -=-=
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+played 2 or 3 games on paper, 20-30 minutes each
+
+MISC NOTES: 
+- Had 3 tech+ cards in opening hand, was hugely powerful speed
+- Early clutters to block the anchor spot is power
+- Clutter + militia was really powerful to sneak damage through the cluttered anchor point
+
+RULES: beneficial spells resolve first, then negative spells
+
+BALANCE: all basic archers should have only 1 health
+
+DESIGN CONCERN: how to illustrate that all creatures can deal damage, which sometimes happens after they've already "died"
+
+TRY:
+ - to encourage spells, require a spell or reinforce in the first phase, and a creature in the 2nd (could make spell combos easier instead of always casting reactively BC creature momentum is so important)
+ - both players draw from the same deck, either a special theme deck or they just shuffle their cards together
+ - archers can only hit front row, and can NOT hit players. acts as a potential solution to the power of the melee-archer stack by only letting them control one space instead of the whole column
+ - spells can't be saved at all. they are instantly targetted when cast and go off during the next battle (reduces a major decision point and a somewhat confusing idea of storing spells). spells w/ incubation periods could allow for stacking/combos.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=- ???? -=-=
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+removed mechanic of adding clutter whenever a unit dies
+added techdown as a balancing factor to kill & militia
+decided militia is amazing
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=- ???? -=-=
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+added a bunch of tech up creatures & spells to Tier 1 & 2
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=- ???? -=-=
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+removed "ruin" effect from kill
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+-=- Original notes (date was just before karaoke) -=-=
+-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Intent: Build game w/ high lifetime revenue potential per player that is relatively simple to build
+
+Helpful qualities: 
+ - web based
+ - ongoing revenue (virtual goods, subscriptions, expansions, tournaments)
+ - low asset cost
+ - strong player acquisition strategy (need to work on this...)
+ - multiple access points (web, phone, widgets, etc)
+ - reward frequent engagement (log in, get reward, always want to look at it)
+ 
+Play: Fun
+ - quick turns, no waiting
+ - meaningful decisions
+ - multiple strategies
+ - creative deck building
+ - imperfect knowledge of game state
+ - minimize bad draws & "mana screw"
+
+Genre: Card game
+ - collectible
+ - tournaments
+ - drafts
+ - gambling
+ - expiring content
+ - rarity & value
+ 
+ 
+ 
+(pyramid shaped board, front rows protect units behind them)
+ 
+Initial gameplay notes
+
+Abilities
+ - Melee attacks what is directly in front of it
+ - Trample damages unit behind initial target
+ - Archery skips over one spot
+ - First strike can avoid retalation
+ - Immaterial doesn't count as a blocker but still attacks
+ - Flying can attack anywhere on board (but in danger from archers)
+ 
+Heroes
+ - Heroes begin in the back spot and create game-wide effects
+ - You win by killing the enemy hero
+ - Heroes can have wildly different life totals, card drawing capacity, etc
+   - life
+   - spell slots
+   - hand size (starting & max)
+   - play/attack speed
+   - equipment slots
+ - Could maybe level up during battle & gain new skills
+ - could get more powerful as you tech up
+ - can have their own win conditions
+   - reach tech level X
+   - survive X turns
+   - fill your whole board
+ 
+ 
+Effects
+ - Certain creatures only summonable to a certain row/spot
+ - Render a tile unusable for building
+ - Turn a tile into a melee wall that archers can still shoot over
+
+
+EARLY DESIGN MISTAKES:
+ - too many choice points
+   - initially imagined you could choose which lane to attack down
+ - abilities & effects that increase choice points (flying, etc)
+
+
+
+Turn phases
+- I draw 2
+- I cast
+- We both attack
+- I cast
+- Your turn
+
+
+
+Battle spells
+ - in the case of non-targetted spells (militia) maybe drag them to a target anyway for consistency
+ - play it to a staging area
+ - can trigger it at any point in the future during a battle
+ - can save up multiple spells
+ - possible combo effects from saved up spells
+ - NOTE: i think this was a mistake. spells should be targetted immediately and go into effect during the next battle phase (they can be hidden until then)
+ 
+
+Summoning
+ - can summon over top an old creature, killing it?
+ - can reinforce by summoning on top of another creature, giving it +x+x until end of turn (after which the reinforcer dies)
+
+Equipment
+ - can increase grind by allowing you to equip your cards during deck building
+ 
+
+
+
+
+ECONOMIES
+
+4 options
+- saveable time (spectro)
+- true time (warstorm)
+- saveable specialty (elements)
+- non-saveable specialty (mtg)
+
+First 2 options stop you from getting mana screwed
+Last 2 make for more interesting deck building.
+
+Possible economies
+- Happy workers: # of units alive is your tech level. tough to advance fast bc early units die fast
+- sacrificial - can sac any card in your hand to boost your tech. might or may not take a turn.
+- hero abilities: hero dictates how much tech you get
+- pure strategic: can boost tech for no cost instead of casting or attacking
+- mining: special summon slot where unit attacks a mine for resources
+- food - you can support X troops based on how much they eat
+- RTS - you buy resource gatherers and give them jobs (doesn't work w/ pen & paper)
+
+
+
+(at this point I started playing solitaire games on paper and made the initial set of cards, then played 2 player)
+

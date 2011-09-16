@@ -32,7 +32,6 @@ def log(request, match_id=None):
     return render_to_response("match_log.html", locals()) 
 
 
-@daily_activity
 def puzzle(request):
 
     puzzle = Puzzle.objects.get(id=request.GET.get('p'))
@@ -70,7 +69,6 @@ def puzzle(request):
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
-@daily_activity
 def playing(request): 
 
     if request.user.is_authenticated():
@@ -81,10 +79,12 @@ def playing(request):
 
     # init
     match = init_match(request) 
+    logging.info("QQQ playing() init match: %s" % match.id)
     request.session["match"] = match.id
 
-    board = Node.objects.all().order_by('-pk')
+    logging.info("XXX player name: %s" % player_name)
 
+    board = Node.objects.all().order_by('-pk') 
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
 
@@ -128,6 +128,10 @@ def init_match(request):
             player=player,
             type="ai")
     match.save()
+    logging.info("QQQ init_match() %s" % match.id)
+    import traceback
+
+    # boo = match['error_plz']
 
     return match 
 
@@ -137,6 +141,9 @@ def end_turn(request):
     # grab game info
     match_id = request.session['match'] 
     game = cached.get_game(match_id) 
+
+    logging.info("XXX player hand (in end turn): %s" % game_master.get_player(game, 'robfitz')['hand'])
+    logging.info("XXX_ for id %s and name %s" % (match_id, 'robfitz'))
 
     # get player's actions from requests
     player_moves = request.POST.get("player_turn").strip().split('\n')
@@ -193,6 +200,8 @@ def begin_ai_game(request):
 
     cached.save(game)
     censored = game_master.get_censored(game, player_name)
+    game = cached.get_game(match.id)
+    logging.info("XXX_ for id %s and name %s" % (match.id, player_name))
 
     return HttpResponse(simplejson.dumps(censored), "application/javascript")
 
