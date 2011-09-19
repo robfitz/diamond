@@ -58,11 +58,6 @@ class Puzzle(models.Model):
     GOAL = (("kill units", "Destroy enemy army"),
             ("kill player", "Kill enemy player"))
 
-    # if a user submitted this puzzle, keep track,
-    # or in case there are multiple team members working
-    # on puzzles.
-    creator = models.ForeignKey(User, blank=True, null=True)
-
     state = models.CharField(max_length=20, default="draft", choices=PUZZLE_STATES)
 
     # naming is mostly for admin convenience

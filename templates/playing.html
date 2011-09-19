@@ -3,6 +3,7 @@
 {% block meta %}
 
     <link rel="stylesheet" type="text/css" href="/media/css/game.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="/media/css/game_gui.css" type="text/css" />
 
     <script type="text/javascript" src="/media/js/verify.js"></script>
     <script type="text/javascript" src="/media/js/game.js"></script>
@@ -30,6 +31,8 @@ padding:0;
 {% endblock style %}
 
 {% block content %}
+
+    {% include 'game_gui/base.html' %}
 
     <textarea class="debug">
         {{ match.id }}

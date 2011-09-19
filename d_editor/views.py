@@ -1,4 +1,4 @@
-import json, logging, simplejson
+import logging, simplejson
 
 from d_cards.util import get_deck_from
 from d_game.util import daily_activity 
@@ -48,7 +48,7 @@ def edit_puzzle(request):
 
         json_str = request.POST.get("board_json")
         logging.info("getting this sweet board from json: %s" % json_str)
-        board_obj = json.loads( json_str )
+        board_obj = simplejson.loads( json_str )
 
         for old_unit in PuzzleStartingUnit.objects.filter(puzzle=puzzle):
             old_unit.delete()

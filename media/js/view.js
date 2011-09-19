@@ -48,6 +48,16 @@ function get_node_view(player, row, x) {
     return $(".board." + alignment + " .node[name='" + row + "_" + x + "']");
 }
 
+function refresh_tooltips() {
+    $("#hand .card, .board .occupied").mouseenter( function ( e ) { 
+            var data = $(this).data("game_object");
+            $("#tooltip").show();
+            $("#tooltip").html(data['fields']['tooltip']);
+    }); 
+    $("#hand .card, .board .occupied").mouseleave( function ( e ) { 
+            $("#tooltip").hide();
+    });
+}
 
 var effects_queue = [];
 var is_effects_playing = false;
@@ -129,7 +139,14 @@ function play_remaining_effects() {
             }
             else { 
                 var card_model = effect['delta'];
+
+                // old
                 var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
+                card.data("game_object", card_model);
+                // new
+                var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#hand");
+                card.data("game_object", card_model);
+                
 
                 init_tooltips("#friendly_hand");
 
@@ -142,6 +159,8 @@ function play_remaining_effects() {
                 card.click( function(event) {
                     begin_card_drag(event, card, card_model); 
                 });
+
+                refresh_tooltips();
             }
             break;
 
@@ -249,6 +268,7 @@ function play_remaining_effects() {
             node_jq.addClass("rubble").addClass("occupied").removeClass("unit").removeClass("empty");
             node_jq.children().remove();
             $("<div title='Rubble appears when units dies and blocks new units from being placed for a turn' class='rubble r_1'><img src='/media/units/rubble.png'></div>").appendTo(node_jq);
+            refresh_tooltips();
             break;
 
         case 'add_unit': 
@@ -351,6 +371,9 @@ function show_unit(model) {
             });
 
     show_message(node, model.fields.name);
+
+    unit_piece.data("game_object", model);
+    refresh_tooltips();
 
     node.mouseenter( function ( e ) { 
         var node = $(e.currentTarget);
