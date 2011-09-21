@@ -14,6 +14,7 @@
 
 .game_panel {
     height:500px;
+    overflow:hidden;
 }
 
 .bottom_panel {
@@ -67,4 +68,159 @@
 
 .right_panel {
     background-color:#bbb;
+}
+
+
+.board_area .friendly, .board_area .ai {
+    position:absolute; 
+}
+.board.ai {
+    top:0px;
+}
+.board.friendly {
+    top:240px;
+}
+
+.board_img {
+    position:absolute;
+    left:-120px;
+    height:480px;
+}
+
+.attacking_to {
+    position:absolute;
+    background: url(attack-forward.png); 
+    width:20px;
+    height:100px;
+    left:4px;
+    z-index:1;
+}
+.friendly .attacking_to {
+    top:16px;
+}
+.ai .attacking_to {
+    top:-84px;
+}
+
+.ai .r2.x-2 .attacking_to,
+.ai .r1.x-1 .attacking_to
+{
+    /* up and to the right */
+    background: url(attack-ne-sw.png); 
+    width:100px; 
+    left:12px; 
+} 
+.ai .r2.x2 .attacking_to,
+.ai .r1.x1 .attacking_to
+{
+    /* up and to the left */
+    background: url(attack-nw-se.png); 
+    width:100px; 
+    left:-84px;
+}
+.friendly .r2.x2 .attacking_to,
+.friendly .r1.x1 .attacking_to
+{
+    /* up and to the right */
+    background: url(attack-ne-sw.png); 
+    width:100px; 
+    left:-88px;
+} 
+.friendly .r2.x-2 .attacking_to,
+.friendly .r1.x-1 .attacking_to
+{
+    /* up and to the left */
+    background: url(attack-nw-se.png); 
+    width:100px; 
+    left:12px;
+}
+
+.attacking_from {
+    z-index:1;
+    position:absolute;
+    background: url(attack-forward.png); 
+    width:20px;
+    height:100px;
+    left:4px;
+}
+.friendly .attacking_from {
+    top:-84px;
+}
+.ai .attacking_from {
+    top:16px;
+}
+
+
+.tech {
+    position:relative;
+    left:400px;
+    height:100px;
+    width:100px;
+}
+#ai_tech {
+    top:0;
+}
+#friendly_tech {
+    top:160px;
+}
+
+#lifebars {
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+.life {
+    font-size:48px;
+    position:absolute;
+    top:22px;
+}
+#ai_life {
+    right:55px; 
+    text-align:right;
+}
+#friendly_life {
+    left:55px; 
+}
+
+.lifebar_container {
+    position:absolute;
+    overflow:hidden;
+    top:5px;
+    width:207px;
+    height:13px;
+}
+
+#friendly_lifebar_container {
+    left:58px;
+}
+
+#ai_lifebar_container {
+    right:57px;
+}
+
+.lifebar {
+    opacity:0.7;
+    height:100%;
+    position:absolute;
+}
+
+#friendly_lifebar_container .red,
+#ai_lifebar_container .green {
+    left:0;
+}
+
+#friendly_lifebar_container .green,
+#ai_lifebar_container .red {
+    right:0;
+}
+
+.lifebar.green {
+    background-color:#00ff00;
+    width:100%;
+}
+
+.lifebar.red {
+    background-color:#ff0000; 
+    width:0;
 }

@@ -4,7 +4,7 @@
         {% include 'board.html' %}
     </div>
 
-    <div id="hand" class="bottom_panel">
+    <div id="friendly_hand" class="bottom_panel">
     </div>
 
     <div id="messages" class="middle_panel">
@@ -21,4 +21,11 @@
         <a id="pass_button" class="button blue" href="javascript:void(0);" onclick="pass_turn()">Attack & end turn</a> 
     </div>
 
+    <div id="win_screen" class="modal hidden">
+        {% include 'menus/win.html' %} 
+    </div>
+
+    <div id="lose_screen" class="modal hidden">
+        {% include 'menus/lose.html' %} 
+    </div> 
 </div>

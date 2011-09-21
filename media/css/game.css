@@ -71,19 +71,9 @@ h1.green {
 
 .cast_info h1.msg {
     position:absolute;
-    //color:#fff !important;
     top:0;
     padding:10px 20px;
     font-size:24px;
-}
-
-.life, .tech {
-
-}
-.life h1, .tech h1 {
-    font-size:48px;
-    margin:13px;
-    text-align:right;
 }
 .gameplay_container {
 }
@@ -175,13 +165,14 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     -moz-border-radius: 3px 0px 3px 3px !important;
     -webkit-border-radius: 3px 0px 3px 3px !important; 
 }
+
 .right_column .ribbon_gui .triangle-ribbon {
     top: -35px !important;
     left:98px !important;
     border-color: transparent transparent transparent #0E425C !important;
 }
+
 .board_area {
-    margin:0 10px;
     float:left;
     width:500px;
     height:600px; 
@@ -360,67 +351,4 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     float:left;
 }
 
-
-.attacking_to {
-    position:absolute;
-    background: url(attack-forward.png); 
-    width:20px;
-    height:100px;
-    left:4px;
-    z-index:1;
-}
-.friendly .attacking_to {
-    top:16px;
-}
-.ai .attacking_to {
-    top:-84px;
-}
-
-.ai .r2.x-2 .attacking_to,
-.ai .r1.x-1 .attacking_to
-{
-    /* up and to the right */
-    background: url(attack-ne-sw.png); 
-    width:100px; 
-    left:12px; 
-} 
-.ai .r2.x2 .attacking_to,
-.ai .r1.x1 .attacking_to
-{
-    /* up and to the left */
-    background: url(attack-nw-se.png); 
-    width:100px; 
-    left:-84px;
-}
-.friendly .r2.x2 .attacking_to,
-.friendly .r1.x1 .attacking_to
-{
-    /* up and to the right */
-    background: url(attack-ne-sw.png); 
-    width:100px; 
-    left:-88px;
-} 
-.friendly .r2.x-2 .attacking_to,
-.friendly .r1.x-1 .attacking_to
-{
-    /* up and to the left */
-    background: url(attack-nw-se.png); 
-    width:100px; 
-    left:12px;
-}
-
-.attacking_from {
-    z-index:1;
-    position:absolute;
-    background: url(attack-forward.png); 
-    width:20px;
-    height:100px;
-    left:4px;
-}
-.friendly .attacking_from {
-    top:-84px;
-}
-.ai .attacking_from {
-    top:16px;
-}
 

@@ -32,12 +32,16 @@ padding:0;
 
 {% block content %}
 
+    <a href="javascript:void(0);" onclick="qfx({'action': 'damage_player', 'target': 'robfitz', 'delta': 1});">Ping</a>
+    <a href="javascript:void(0);" onclick="qfx({'action': 'damage_player', 'target': 'ai', 'delta': 1});">Pong</a>
+
     {% include 'game_gui/base.html' %}
 
     <textarea class="debug">
         {{ match.id }}
     </textarea>
 
+    <!--
     <div id="game_container" class="game_container">
 
         <div id="slider_alert" class="hidden"> 
@@ -131,9 +135,6 @@ padding:0;
                 </div>
                 <div id="game_controls">
                     <h3>Game controls</h3>
-                    <!--
-                    <a class="button green">Help!</a>
-                    -->
                     <a id="pass_button" class="button blue" href="javascript:void(0);" onclick="pass_turn()">Attack & end turn</a> 
                     <a id="surrender_button" class="link_button button red" href="javascript:void(0);" onclick="surrender();">Surrender</a>
                 </div>
@@ -149,6 +150,7 @@ padding:0;
             {% include 'menus/lose.html' %} 
         </div> 
     </div>
+    -->
 
     <form id="current_turn" method="post" action="/playing/end_turn/">
         {% csrf_token %}

@@ -1,10 +1,11 @@
 
 <div class="board_area">
 
-    <img style="position:absolute;width:100%;height:100%;" />
-    
+    <img class="board_img" />
 
-    <div class="ai" style="position:relative;" >
+    {% include 'game_gui/lifebars.html' %}
+    
+    <div class="board ai">
         {% for node in board %}
 
             <div class="attack_path_container r{{node.row}} x{{node.x}}" style="left:{{node.board_x_ai}}px;top:{{node.board_y_ai}}px;">
@@ -14,7 +15,7 @@
         {% endfor %}
     </div>
 
-    <div class="friendly" style="top:300px;position:relative;" >
+    <div class="board friendly">
         {% for node in board %}
 
                 <div class="attack_path_container r{{node.row}} x{{node.x}}" style="left:{{node.board_x_friendly}}px;top:{{node.board_y_friendly}}px;">
@@ -39,6 +40,10 @@
 
         {% endblock ai_nodes %}
 
+        <div id="ai_tech" title="The enemy's tech level allows tem to use more powerful cards." class="{{ opponent_name }}_tech top ai tech" name="tech">
+            <h1><span class="remaining">1</span>/<span class="total">1</span></h1>
+        </div> 
+
     </div>
 
     <div class="friendly board">
@@ -53,12 +58,18 @@
             {% endfor %}
 
         {% endblock friendly_nodes %}
+
+        <div id="friendly_tech" title="Increase your tech by dragging a card here during your turn. Certain cards need higher tech." class="{{ player_name}}_tech bottom tech" name="tech">
+            <h1><span class="remaining">1</span>/<span class="total">1</span></h1>
+        </div>
     </div>
+
+
 
     <script>
         $(function() {
             var num = Math.floor(Math.random() * 8);
-            $(".board_area img").attr("src", "/media/boards/board-" + num + ".jpg");
+            $(".board_img").attr("src", "/media/boards/board-" + num + ".jpg");
         });
     </script>
 

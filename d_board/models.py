@@ -18,13 +18,13 @@ class Node(models.Model):
 
     # layout helper functions
     def board_x_friendly(self):
-        return (self.x + 2) * 100 
+        return (self.x + 2) * 80 
     def board_y_friendly(self):
-        return (2 - self.row) * 100
+        return (2 - self.row) * 80
     def board_x_ai(self):
-        return (self.x + 2) * 100 
+        return (self.x + 2) * 80 
     def board_y_ai(self):
-        return (self.row) * 100
+        return (self.row) * 80
 
 
     def __unicode__(self):

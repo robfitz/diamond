@@ -49,12 +49,12 @@ function get_node_view(player, row, x) {
 }
 
 function refresh_tooltips() {
-    $("#hand .card, .board .occupied").mouseenter( function ( e ) { 
+    $("#friendly_hand .card, .board .occupied").mouseenter( function ( e ) { 
             var data = $(this).data("game_object");
             $("#tooltip").show();
             $("#tooltip").html(data['fields']['tooltip']);
     }); 
-    $("#hand .card, .board .occupied").mouseleave( function ( e ) { 
+    $("#friendly_hand .card, .board .occupied").mouseleave( function ( e ) { 
             $("#tooltip").hide();
     });
 }
@@ -143,10 +143,6 @@ function play_remaining_effects() {
                 // old
                 var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
                 card.data("game_object", card_model);
-                // new
-                var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#hand");
-                card.data("game_object", card_model);
-                
 
                 init_tooltips("#friendly_hand");
 
@@ -201,8 +197,8 @@ function play_remaining_effects() {
             // scoot the unit by delta * step size
             var row = effect['delta']['row'];
             var x = effect['delta']['x'];
-            var d_row = (row < 0 ? "-=" : "+=") + (100*Math.abs(row));
-            var d_x = (x < 0 ? "-=" : "+=") + (100*Math.abs(x));
+            var d_row = (row < 0 ? "-=" : "+=") + (80*Math.abs(row));
+            var d_x = (x < 0 ? "-=" : "+=") + (80*Math.abs(x));
 
             node_jq.animate( 
                     {
@@ -303,10 +299,13 @@ function play_remaining_effects() {
                 alert("trying to damage invuln ai in puzzle");
             }
             else {
-                var life_h1 = $("." + effect['target'] + "_life h1");
+                var life_h1 = $("." + effect['target'] + "_life .lifenum");
                 var current_shown_life = parseInt(life_h1.text());
-                life_h1.text(current_shown_life - effect['delta']); 
+                var new_life = parseInt(current_shown_life - effect['delta']);
+                life_h1.text("" + new_life); 
                 show_number(life_h1.parent(), -1 * effect['delta']); 
+
+                update_lifebar(effect['target'], new_life); 
             }
             break;
 
@@ -372,7 +371,7 @@ function show_unit(model) {
 
     show_message(node, model.fields.name);
 
-    unit_piece.data("game_object", model);
+    node.data("game_object", model);
     refresh_tooltips();
 
     node.mouseenter( function ( e ) { 
@@ -484,3 +483,4 @@ function show_message(target, message, color) {
             $(this).remove();    
         });
 } 
+

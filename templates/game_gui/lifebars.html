@@ -1,0 +1,32 @@
+<div id="lifebars">
+
+    <img id="lifebars_border" src="/media/game_gui/lifebars.png" />
+
+
+    <div id="friendly_lifebar_container" class="lifebar_container {{player_name}}">
+        <div id="{{player_name}}_greenbar" class="lifebar green"></div>
+        <div id="{{player_name}}_redbar" class="lifebar red"></div>
+    </div>
+
+    <div id="ai_lifebar_container" class="lifebar_container {{opponent_name}}">
+        <div id="{{opponent_name}}_greenbar" class="lifebar green"></div>
+        <div id="{{opponent_name}}_redbar" class="lifebar red"></div>
+    </div>
+
+    <div id="ai_life" title="The enemy's life. Reduce it to 0 to win." class="top ai life {{ opponent_name }}_life">
+        <h1 class="lifenum">10</h1> 
+    </div> 
+
+    <div id="friendly_life" class="bottom friendly life friendly_life {{player_name}}_life" title="Your life. Protect it with strategic unit placement.">
+        <h1 class="lifenum">10</h1> 
+    </div> 
+
+    <script>
+        function update_lifebar(player, new_life) {
+            var percent = Math.floor(100 * new_life / 10);
+            $(".lifebar_container." + player + " .green").css("width", percent + "%");
+            $(".lifebar_container." + player + " .red").css("width", (100-percent) + "%");
+        }
+    </script>
+
+</div>
