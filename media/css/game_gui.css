@@ -76,15 +76,16 @@
 }
 .board.ai {
     top:0px;
+    left:300px;
 }
 .board.friendly {
-    top:240px;
+    top:0px;
 }
 
 .board_img {
     position:absolute;
-    left:-120px;
-    height:480px;
+    left:0;
+    top:-150px;
 }
 
 .attacking_to {
@@ -223,4 +224,9 @@
 .lifebar.red {
     background-color:#ff0000; 
     width:0;
+}
+
+
+.turn_indicator {
+    position:absolute;
 }

@@ -14,6 +14,10 @@ function do_player_turn_consumable_resources(game, player, draw_cards) {
     // sync the phases
     game['current_phase'] = 0;
     qfx({
+            'action': 'begin_turn',
+            'target': player
+    });
+    qfx({
             'action': 'next_phase',
             'delta': game['current_phase']
     });
@@ -61,11 +65,16 @@ function end_player_turn_consumable_resources(game, player) {
             'action': 'next_phase',
             'delta': game['current_phase']
     });
+    qfx({
+            'action': 'begin_turn',
+            'target': opponent_name
+    });
 
     // start AI turn setup while it thinks about what to do
     heal(game, opponent_name);
     refill_tech(game, opponent_name);
     remove_summoning_sickness(game, opponent_name);
+
 
     $.post("/playing/end_turn/",
         $("#current_turn").serialize(),
@@ -80,112 +89,6 @@ function end_player_turn_consumable_resources(game, player) {
             //do AI turn 
             do_turn(game, opponent_name, turn_data['ai_turn']);
             do_player_turn_consumable_resources(game, player_name, turn_data['player_draw']);
-        }
-    ); 
-    $("textarea[name='player_turn']").val("");
-}
-
-function do_player_turn_1(game, player, draw_cards) {
-
-    game['current_phase'] = 0;
-    qfx({
-            'action': 'next_phase',
-            'delta': game['current_phase']
-    });
-
-    heal(game, player); 
-    refill_tech(game, player);
-    draw(game, player, draw_cards); 
-
-    // wait for player to make play 1 
-    on_next_player_action = do_player_turn_2;
-    game['current_phase'] ++; 
-    qfx({
-            'action': 'next_phase',
-            'delta': game['current_phase']
-    });
-
-    // if no cards in player hand, skip UI phase
-    if (game['players'][player]['hand'].length == 0) {
-        // no hand cards, skip phase
-        game['current_phase'] ++; 
-        qfx({
-                'action': 'next_phase',
-                'delta': game['current_phase']
-        });
-        on_next_player_action(game, player);
-    }
-}
-
-function do_player_turn_2(game, player) {
-
-    // attack!
-    do_attack_phase(game, player)
-
-    game['current_phase'] ++; 
-    qfx({
-            'action': 'next_phase',
-            'delta': game['current_phase']
-    });
-
-    if (is_game_over(game)) {
-        alert("game over from game master");
-        var winner = is_game_over(game);
-        if (winner == player_name) {
-            qfx({ 'action': 'win' });
-        }
-        else {
-            qfx({ 'action': 'lose' });
-        } 
-        qfx_game_over();
-        $.post("/playing/end_turn/",
-            $("#current_turn").serialize(),
-            function(data) {
-                alert('game over i think: ' + data);
-            });
-        return;
-    } 
-
-    // wait for player to make play 2 
-    on_next_player_action = do_player_turn_3;
-    game['current_phase'] ++; 
-    qfx({
-            'action': 'next_phase',
-            'delta': game['current_phase']
-    });
-
-    // if no cards in player hand, skip UI phase
-    if (game['players'][player]['hand'].length == 0) {
-        // no hand cards, skip phase
-        game['current_phase'] ++; 
-        qfx({
-                'action': 'next_phase',
-                'delta': game['current_phase']
-        });
-        on_next_player_action(game, player);
-    }
-}
-
-function do_player_turn_3(game, player) {
-
-    remove_rubble(game, player);
-
-    // end turn
-    on_next_player_action = null;
-    game['current_phase'] ++; 
-    qfx({
-            'action': 'next_phase',
-            'delta': game['current_phase']
-    });
-
-    $.post("/playing/end_turn/",
-        $("#current_turn").serialize(),
-        function(data) {
-            turn_data = eval('(' + data + ')');
-
-            //do AI turn 
-            do_turn(game, opponent_name, turn_data['ai_turn']);
-            do_player_turn_1(game, player_name, turn_data['player_draw']);
         }
     ); 
     $("textarea[name='player_turn']").val("");

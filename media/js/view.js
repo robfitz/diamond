@@ -129,8 +129,13 @@ function play_remaining_effects() {
     switch (action) {
         case 'discard':
             // remove visuals from hand view
-            $("#friendly_hand #" + effect['value']['pk']).remove();
-            $("#friendly_hand .card").removeClass("selected"); 
+            var hand_card = $("#friendly_hand #" + effect['value']['pk'] + ":first");
+            if (! hand_card || !effect['value']['pk']) { 
+                alert("tried to discard a non-existant card");
+                var party = "time";
+            }
+            hand_card.remove();
+            // $("#friendly_hand .card").removeClass("selected"); 
             break;
         case 'draw':
             // add visuals to hand
@@ -197,13 +202,13 @@ function play_remaining_effects() {
             // scoot the unit by delta * step size
             var row = effect['delta']['row'];
             var x = effect['delta']['x'];
-            var d_row = (row < 0 ? "-=" : "+=") + (80*Math.abs(row));
-            var d_x = (x < 0 ? "-=" : "+=") + (80*Math.abs(x));
+            var d_row = (row < 0 ? "+=" : "-=") + (100*Math.abs(row));
+            var d_x = (x < 0 ? "-=" : "+=") + (100*Math.abs(x));
 
             node_jq.animate( 
                     {
-                        top: d_row,
-                        left: d_x,
+                        left: d_row,
+                        top: d_x,
                         "z-index": 2 
                     },
                     { duration: get_delay(effect) }
@@ -280,6 +285,11 @@ function play_remaining_effects() {
         case 'lose':
             $("#slider_alert").hide();
             $("#lose_screen").show("slide", "slow");
+            break;
+
+        case 'begin_turn': 
+            $(".turn_indicator").hide();
+            $("#" + effect['target'] + "_turn_indicator").show(); 
             break;
 
         case 'next_phase':
