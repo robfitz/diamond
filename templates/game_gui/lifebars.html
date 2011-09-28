@@ -2,6 +2,9 @@
 
     <img id="lifebars_border" src="/media/game_gui/lifebars.png" />
 
+    <img class="left avatar" />
+    <img class="right avatar" />
+
 
     <div id="friendly_lifebar_container" class="lifebar_container {{player_name}}">
         <div id="{{player_name}}_greenbar" class="lifebar green"></div>
@@ -20,6 +23,27 @@
     <div id="friendly_life" class="bottom friendly life friendly_life {{player_name}}_life" title="Your life. Protect it with strategic unit placement.">
         <h1 class="lifenum">10</h1> 
     </div> 
+
+    <div id="left_icons">
+        <ul class="icons">
+            <a href=""><li class="library">Library</li></a>
+            <a href=""><li class="tech_level">Tech</li></a>
+            <a href=""><li class="life">Life</li></a>
+            <div class="break">&nbsp;</div>
+            <a href=""><li class="hand">Hand</li></a>
+            <a href=""><li class="resources">Resources</li></a>
+        </ul>
+    </div>
+    <div id="right_icons">
+        <ul class="icons">
+            <a href=""><li class="library">Library</li></a>
+            <a href=""><li class="tech_level">Tech</li></a>
+            <a href=""><li class="life">Life</li></a>
+            <div class="break">&nbsp;</div>
+            <a href=""><li class="hand">Hand</li></a>
+            <a href=""><li class="resources">Resources</li></a>
+        </ul>
+    </div>
 
     <script>
         function update_lifebar(player, new_life) {

@@ -4,6 +4,8 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
+from d_cards.models import Card
+
 urlpatterns = patterns('',
 
     ('^ah/warmup$', 'djangoappengine.views.warmup'),
@@ -50,7 +52,10 @@ urlpatterns = patterns('',
     #('', 'django.views.generic.simple.direct_to_template',
      #{'template': 'home.html'}),
 
-    #static assets (should be local-only)                   
+    (r'^media2/card/(?P<obj_id>.*)$', 'gae_images.views.show', 
+        {'obj_class': Card, 'img_call':'card_image()' }),
+
+    #static assets                   
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': 'media'}),
 )

@@ -32,6 +32,11 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: card_builder_keywordimage
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: d_board_node
   properties:
   - name: __key__

@@ -102,6 +102,8 @@ INSTALLED_APPS = (
     'd_feedback',
     'd_metrics',
     'utils.blog',
+    'gae_images',
+    'card_builder',
 
     'django.contrib.admin',
     'django.contrib.admindocs',

@@ -1,3 +1,7 @@
+.debug {
+    display:none;
+}
+
 #slider_alert {
     z-index:2000;
     background: url(black-50.png); 
@@ -39,48 +43,11 @@ h1.green {
     color:#0f0 !important;
 } 
 
-.cast_info {
-    border: 3px solid #191919;
-    color:#fff;
-    position:absolute;
-
-    width:250px;
-    height:50px;
-
-    left:-270px;
-    top:0;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-
-    background: #191919 url(/media/diagonals.gif);
-    z-index:1000;
-}
-.cast_info .tick {
-    position:absolute;
-    left:253px;
-    top:13px;
-
-    border-style: solid;
-    border-width: 13px;
-    height: 0;
-    position: relative;
-    width: 0;
-    border-color: transparent transparent transparent #191919; 
-}
-
-.cast_info h1.msg {
-    position:absolute;
-    top:0;
-    padding:10px 20px;
-    font-size:24px;
-}
 .gameplay_container {
 }
 .game_container {
     float:left; 
     border:1px solid gray;
-    background:#ccc;
     position: relative;
     width:800px;
     height:600px;
@@ -88,15 +55,10 @@ h1.green {
 }
 
 #friendly_hand {
-    border:1px solid black;
     position:absolute;
-    bottom:4px;
+    top:532px;
     left:4px;
-    background:#fff;
-    z-index:10;
-
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
+    height:104px;
 }
 #friendly_hand .ribbon {
     left:-13px;
@@ -298,8 +260,10 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     position:absolute;
     z-index:2;
 
+    /* 
     background-color:#fff;
-    border:1px solid black;
+    border:0px solid black;
+    */
 
     -webkit-border-radius: 30px;
     -moz-border-radius: 30px;

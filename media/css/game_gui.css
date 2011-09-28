@@ -4,8 +4,19 @@
     height:640px;
 }
 
+#game_frame .bg {
+    position:absolute;
+}
+
 .game_panel, .bottom_panel, .middle_panel, .right_panel, .bottom_right_panel, .tooltip_panel {
     position:absolute; 
+}
+
+.meta_panel {
+    position:absolute;
+    width:360px; 
+    top:4px;
+    left:608px;
 }
 
 .game_panel, .bottom_panel, .middle_panel {
@@ -14,7 +25,6 @@
 
 .game_panel {
     height:500px;
-    overflow:hidden;
 }
 
 .bottom_panel {
@@ -29,7 +39,7 @@
 
 .right_panel {
     width:360px;
-    left:600px;
+    left:608px;
     height:640px;
 }
 
@@ -41,7 +51,7 @@
 }
 
 .bottom_right_panel {
-    left:600px;
+    left:608px;
     top:500px;
     width:360px;
     height:140px;
@@ -56,18 +66,14 @@
 
 
 .game_panel {
-    background-color:#eee;
 }
 .bottom_panel {
-    background-color:#ddd;
 }
 
 .middle_panel {
-    background-color:#ccc;
 }
 
 .right_panel {
-    background-color:#bbb;
 }
 
 
@@ -88,69 +94,55 @@
     top:-150px;
 }
 
-.attacking_to {
+.attacking_to, .attacking_from {
     position:absolute;
     background: url(attack-forward.png); 
-    width:20px;
-    height:100px;
-    left:4px;
+    width:100px;
+    height:4px;
+    left:15px;
+    top:13px;
     z-index:1;
 }
-.friendly .attacking_to {
-    top:16px;
-}
-.ai .attacking_to {
-    top:-84px;
+.attacking_from {
 }
 
 .ai .r2.x-2 .attacking_to,
 .ai .r1.x-1 .attacking_to
 {
     /* up and to the right */
-    background: url(attack-ne-sw.png); 
+    background: url(attack-nw-se.png); 
     width:100px; 
+    height:100px;
     left:12px; 
 } 
 .ai .r2.x2 .attacking_to,
 .ai .r1.x1 .attacking_to
 {
     /* up and to the left */
-    background: url(attack-nw-se.png); 
+    background: url(attack-ne-sw.png); 
     width:100px; 
-    left:-84px;
+    height:100px;
+    left:15px;
+    top:-84px;
 }
 .friendly .r2.x2 .attacking_to,
 .friendly .r1.x1 .attacking_to
 {
     /* up and to the right */
-    background: url(attack-ne-sw.png); 
+    background: url(attack-nw-se.png); 
     width:100px; 
-    left:-88px;
+    height:100px;
+    left:0;
 } 
 .friendly .r2.x-2 .attacking_to,
 .friendly .r1.x-1 .attacking_to
 {
     /* up and to the left */
-    background: url(attack-nw-se.png); 
+    background: url(attack-ne-sw.png); 
     width:100px; 
-    left:12px;
-}
-
-.attacking_from {
-    z-index:1;
-    position:absolute;
-    background: url(attack-forward.png); 
-    width:20px;
     height:100px;
-    left:4px;
-}
-.friendly .attacking_from {
-    top:-84px;
-}
-.ai .attacking_from {
-    top:16px;
-}
-
+    left:15px;
+} 
 
 .tech {
     position:relative;
@@ -169,35 +161,37 @@
     position:absolute;
     top:0;
     left:0;
-}
-
-.life {
-    font-size:48px;
-    position:absolute;
-    top:22px;
-}
-#ai_life {
-    right:55px; 
-    text-align:right;
-}
-#friendly_life {
-    left:55px; 
+    width:608px;
 }
 
 .lifebar_container {
     position:absolute;
     overflow:hidden;
-    top:5px;
+    top:4px;
     width:207px;
     height:13px;
 }
 
+#left_icons {
+    position:absolute;
+    left:60px;
+    top:24px;
+}
+#right_icons {
+    position:absolute;
+    left:340px;
+    top:24px;
+}
+#right_icons li {
+    float:right;
+}
+
 #friendly_lifebar_container {
-    left:58px;
+    left:60px;
 }
 
 #ai_lifebar_container {
-    right:57px;
+    right:60px;
 }
 
 .lifebar {
@@ -229,4 +223,67 @@
 
 .turn_indicator {
     position:absolute;
+}
+
+
+img.avatar {
+    width:52px;
+    height:52px;
+    position:absolute;
+    top:4px;
+}
+img.avatar.left {
+    left:4px; 
+}
+img.avatar.right {
+    right:4px;
+}
+
+ul.icons {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+ul.icons li {
+    padding-left:20px;
+    background-repeat:no-repeat;
+    float:left;
+    margin:4px 10px 4px 4px;
+}
+ul.icons a, ul.icons a:visited {
+    color:#000;
+    text-decoration:none;
+}
+ul.icons a:hover {
+    color:#000;
+    text-decoration:underline;
+}
+
+#lifebars .icons li {
+    width:42px;
+}
+
+li.hand {
+    background-image: url('/media/icons/hand.png'); 
+}
+li.library {
+    background-image: url('/media/icons/library.png'); 
+}
+li.life {
+    background-image: url('/media/icons/life.png');
+}
+li.tech_level {
+    background-image: url('/media/icons/tech.png'); 
+}
+li.resources {
+    background-image: url('/media/icons/resources.png'); 
+}
+li.surrender {
+    background-image: url('/media/icons/surrender.png');
+}
+li.settings {
+    background-image: url('/media/icons/settings.png'); 
+}
+li.help {
+    background-image: url('/media/icons/help.png'); 
 }

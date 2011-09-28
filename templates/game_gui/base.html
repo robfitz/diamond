@@ -1,5 +1,7 @@
 <div id='game_frame'>
     
+    <img class='bg' src='/media/game_gui/bg.jpg' />
+
     <div class='game_panel'>
         {% include 'board.html' %}
     </div>
@@ -21,6 +23,17 @@
         <a id="pass_button" class="button blue" href="javascript:void(0);" onclick="pass_turn()">Attack & end turn</a> 
     </div>
 
+
+    <!-- game control icons -->
+    <div class="meta_panel">
+        <ul class='icons'>
+            <a href=""><li class="surrender">Surrender</li></a>
+            <a href=""><li class="settings">Settings</li></a>
+                <a href=""><li class="help">Help</li></a>
+        </ul> 
+    </div>
+
+    <!-- modal popup screens --> 
     <div id="win_screen" class="modal hidden">
         {% include 'menus/win.html' %} 
     </div>

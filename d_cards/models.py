@@ -7,8 +7,10 @@ from django.db import models
 from django.core import serializers
 from django.core.cache import cache
 from django.contrib import admin
-from djangotoolbox.fields import ListField 
+from djangotoolbox.fields import ListField, BlobField
 from django.db.models.signals import pre_save
+
+from card_builder.models import CardImage
 
 
 class Card(models.Model):
@@ -26,12 +28,28 @@ class Card(models.Model):
             ("wall", "Wall"),
         )
 
+    CASTES = (
+            ("revolution", "The Revolution"),
+            ("guild", "The Guild"),
+            ("freemen", "The Freemen"),
+            ("wonderers", "The Wonderers"),
+            ("untouchables", "The Untouchables")
+        )
+
     name = models.CharField(max_length=20, blank=True)
+    caste = models.CharField(max_length=20, default="freemen", choices=CASTES)
 
     tooltip = models.CharField(max_length=200, blank=True, default="")
 
     icon_url = models.CharField(max_length=200, default="")
     icon_url_back = models.CharField(max_length=200, blank=True, default="")
+
+    image_data = BlobField()
+
+    # handles the composition of various pieces of art & text to
+    # create the final card image
+    card_image_renderer = models.OneToOneField(CardImage, blank=True, null=True)
+
 
     #how much damage this unit deals to a player or unit each time it attacks
     attack = models.IntegerField(default=1, help_text="If this card summons a unit, how much damage it can deal per attack")
@@ -89,6 +107,18 @@ class Card(models.Model):
 
     # how much damage to do (or heal) a unit for
     direct_damage = models.IntegerField(default=0)
+
+    
+    def card_image(self):
+        logging.info("getting card image")
+        if not self.card_image_renderer:
+            logging.info("creating renderer")
+            card_img = CardImage()
+            card_img.save()
+            self.card_image_renderer = card_img
+            self.save()
+
+        return self.card_image_renderer.image() 
 
 
     def json(self):
