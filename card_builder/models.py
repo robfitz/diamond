@@ -15,7 +15,7 @@ def icon_text(icon_name, text):
     return file 
 
 # returns image data from text
-def text(message):
+def text(message, font_size=12, is_bold=True):
     toks = message.split(' ')
     wrapped_message = ""
     line_length = 0
@@ -30,7 +30,12 @@ def text(message):
             wrapped_message = "|".join([wrapped_message, tok])
             line_length = len(tok)
 
-    url = "https://chart.googleapis.com/chart?chst=d_text_outline&chld=000000|12|l|ffffff|b|%s" % wrapped_message
+    if is_bold:
+        bold = "b"
+    else:
+        bold = "_"
+
+    url = "https://chart.googleapis.com/chart?chst=d_text_outline&chld=000000|%s|l|ffffff|%s|%s" % (font_size, bold, wrapped_message)
 
     image = urllib.urlopen(url)
     file = image.read()
@@ -66,30 +71,51 @@ class CardImage(models.Model):
 
         ability_y = 312
 
+        #name
+        layers.append( ( text(card.name, 14, True), 17, 21, 1.0, images.TOP_LEFT ) )
+
+
+        #card image 
+        img = images.Image(card.image_data)
+        if img:
+            img.resize(width=290, height=244)
+            img = img.execute_transforms(output_encoding=images.PNG)
+            layers.append( ( img, 15, 48, 1.0, images.TOP_LEFT ) )
+
         # add the card's ability text
         if card.defense:
             # creature. add attack & defense.  
-
             img = keyword('defense', str(card.defense))
             layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
 
             ability_y += images.Image(img).height
 
-            logging.info("trying to get %s" % card.attack_type)
-
             img = keyword(card.attack_type, str(card.attack))
             layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
             ability_y += images.Image(img).height
 
-        # add the card image
-        # if card.image_data:
-            # layers.append(card.image_data)
-        # elif card.icon_url:
-            # do something w/ the actual image
-            # pass
+        if card.direct_damage:
+            img = keyword('direct_damage', str(card.direct_damage))
+            layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
+            ability_y += images.Image(img).height
+
+        if card.resource_bonus:
+            img = keyword('resources', str(card.resource_bonus))
+            layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
+            ability_y += images.Image(img).height
+
+        if card.tech_change:
+            img = keyword('tech', str(card.tech_change))
+            layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
+            ability_y += images.Image(img).height
+
+        if card.draw_num:
+            img = keyword('draw', str(card.draw))
+            layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
+            ability_y += images.Image(img).height 
+
 
         rendered = images.composite(layers, 350, 489, output_encoding=images.JPEG) 
-
         self.rendered = rendered 
 
 
@@ -125,7 +151,7 @@ class KeywordImage(models.Model):
 
     help_text = models.TextField(default="", blank=True, help_text="In the case of card abilities (e.g. flying), this help text is printed on the card along w/ the ability icon, which is held in image_data")
 
-    image_data = BlobField()
+    image_data = BlobField(blank=True, null=True)
 
 
 class KeywordImageAdmin(admin.ModelAdmin):
