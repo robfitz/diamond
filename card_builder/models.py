@@ -1,4 +1,4 @@
-import logging
+import logging, sys
 import urllib
 import png
 
@@ -74,10 +74,9 @@ class CardImage(models.Model):
         #name
         layers.append( ( text(card.name, 14, True), 17, 21, 1.0, images.TOP_LEFT ) )
 
-
         #card image 
-        img = images.Image(card.image_data)
-        if img:
+        if card.image_data():
+            img = images.Image(card.image_data())
             img.resize(width=290, height=244)
             img = img.execute_transforms(output_encoding=images.PNG)
             layers.append( ( img, 15, 48, 1.0, images.TOP_LEFT ) )
@@ -110,14 +109,39 @@ class CardImage(models.Model):
             ability_y += images.Image(img).height
 
         if card.draw_num:
-            img = keyword('draw', str(card.draw))
+            img = keyword('draw', str(card.draw_num))
             layers.append( ( img, 32, ability_y, 1.0, images.TOP_LEFT ) ) 
             ability_y += images.Image(img).height 
 
 
-        rendered = images.composite(layers, 350, 489, output_encoding=images.JPEG) 
+        rendered = smart_composite(layers, 350, 489, output_encoding=images.JPEG) 
         self.rendered = rendered 
 
+
+# if the composite fails due to bad or missing images,
+# smart_composite will try to make it work by removing
+# bad layers
+def smart_composite(layers, w, h, output_encoding):
+    
+    good_layers = []
+    for layer in layers:
+        try:
+            # this transform is meant to be thrown away. 
+            # it's just being used to find out if GAE 
+            # images API will accept the image data.
+            img = images.Image(layer[0])
+            img.resize(width=500, height=500)
+            img = img.execute_transforms()
+
+            good_layers.append(layer)
+        except:
+            # bad layer
+            pass
+
+    if len(layers) > 0:
+        return images.composite(good_layers, w, h, output_encoding=output_encoding) 
+    else:
+        return None
 
 
 def keyword(keyword, message=""):
@@ -138,7 +162,7 @@ def keyword(keyword, message=""):
     if keyword_image.help_text:
         layers.append( ( text(keyword_image.help_text), 50, 0, 1.0, images.TOP_LEFT) )
 
-    rendered = images.composite(layers, 290, 40, output_encoding=images.PNG) 
+    rendered = smart_composite(layers, 290, 40, output_encoding=images.PNG) 
 
     return rendered
 
@@ -147,7 +171,7 @@ class KeywordImage(models.Model):
 
     keyword = models.CharField(max_length=50)
 
-    google_icon_name = models.CharField(max_length=20, blank=True, default="", help_text="Icon names from here: http://code.google.com/apis/chart/image/docs/gallery/dynamic_icons.html#icon_list")
+    google_icon_name = models.CharField(max_length=50, blank=True, default="", help_text="Icon names from here: http://code.google.com/apis/chart/image/docs/gallery/dynamic_icons.html#icon_list")
 
     help_text = models.TextField(default="", blank=True, help_text="In the case of card abilities (e.g. flying), this help text is printed on the card along w/ the ability icon, which is held in image_data")
 

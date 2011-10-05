@@ -154,9 +154,6 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 .card {
     float:left;
     margin:2px; 
-    position:absolute;
-    left:-20px;
-    //top:-16px;
 }
 .card .card_name {
     display:block !important;
@@ -206,7 +203,15 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     //height:25%; 
 }
 
-.unit_piece > img, .rubble > img {
+.cropper {
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    overflow:hidden;
+    width:100%;
+    height:100%;
+}
+
+.rubble > img {
     margin-left:auto;
     margin-right:auto;
     margin-top:-20px;

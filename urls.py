@@ -52,7 +52,7 @@ urlpatterns = patterns('',
     #('', 'django.views.generic.simple.direct_to_template',
      #{'template': 'home.html'}),
 
-    (r'^media2/card/(?P<obj_id>.*)$', 'gae_images.views.show', 
+    (r'^media2/card/(?P<obj_id>.*)$', ('gae_images.views.show'), 
         {'obj_class': Card, 'img_call':'card_image()' }),
 
     #static assets                   

@@ -41,7 +41,6 @@ class Card(models.Model):
 
     tooltip = models.CharField(max_length=200, blank=True, default="")
 
-    image_data = BlobField(null=True, blank=True)
 
     # handles the composition of various pieces of art & text to
     # create the final card image
@@ -115,6 +114,13 @@ class Card(models.Model):
             self.save()
 
         return self.card_image_renderer.image() 
+
+    def image_data(self):
+        try:
+            return self.art.image_data
+        except:
+            return ""
+
 
 
     def json(self):
@@ -206,6 +212,16 @@ def set_tooltip(sender, instance, raw, **kwargs):
 pre_save.connect(set_tooltip, sender=Card)
 
 
+class CardArt(models.Model):
+
+    card = models.OneToOneField(Card, related_name='art')
+
+    image_data = BlobField(null=True, blank=True)
+
+    def __unicode__(self):
+        return unicode(self.card)
+
+
 class CardAdmin(admin.ModelAdmin):
     list_display_links = ('__unicode__',)
     list_display = ('__unicode__', 'tech_level', 'name', 'attack', 'defense', 'attack_type', 'unit_power_level', 'target_alignment', 'target_occupant', 'target_aiming', 'direct_damage')
@@ -278,3 +294,4 @@ class Deck(models.Model):
     
 admin.site.register(Card, CardAdmin) 
 admin.site.register(Deck)
+admin.site.register(CardArt)

@@ -302,11 +302,8 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
         get_player(game, player)['current_tech'] += card['fields']['resource_bonus']
 
     if card['fields']['draw_num']:
-        logging.info("XXX card fields draw num")
         # bonus cards are added to player's next draw phase
         get_player(game, player)['num_to_draw'] += card['fields']['draw_num']
-        logging.info("XXX card cast increased player num to draw by %s to %s" % (card['fields']['draw_num'], get_player(game, player)['num_to_draw']))
-
 
     nodes = []
     if card['fields']['target_aiming'] == 'chosen': 
@@ -343,19 +340,12 @@ def play(game, player, card_id, node_owner, row, x, ignore_constraints=False):
 
 
 def discard(game, player, card_id):
-    if player=='robfitz':
-        logging.info("XXX Hand: %s" % get_player(game, player)['hand'])
-        logging.info("XXX trying to discard: %s" % card_id)
 
     i = 0
     for card in get_player(game, player)['hand']:
         if int(card['pk']) == int(card_id):
-            if player=='robfitz':
-                logging.info("XXX found card to discard")
             card = get_player(game, player)['hand'][i]
             del get_player(game, player)['hand'][i]
-            if player=='robfitz':
-                logging.info("XXX discarded")
             return card
         i += 1
     return False
@@ -609,16 +599,14 @@ def is_game_over(game):
 
     for player in game['players']:
         if game['players'][player]['life'] <= 0:
-            logging.info("*** game is over from loss of life: %s" % get_opponent_name(game, player))
             return get_opponent_name(game, player)
         
     if game['goal'] == 'kill units':
         opp = get_opponent_name(game, game['player'])
         if len(each_unit(game, opp)) == 0:
-            logging.info("*** game is over from puzzle condition kill units: %s" % player)
             return game['player']
         else:
-            logging.info("*** goal is to kill units, but not empty because:%s has %s" % (opp, len(each_unit(game, opp))))
+            pass
         
     return False
 

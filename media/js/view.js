@@ -49,13 +49,24 @@ function get_node_view(player, row, x) {
 }
 
 function refresh_tooltips() {
-    $("#friendly_hand .card, .board .occupied").mouseenter( function ( e ) { 
+    $(".board .occupied").mouseenter( function ( e ) { 
             var data = $(this).data("game_object");
             $("#tooltip").show();
-            $("#tooltip").html(data['fields']['tooltip']);
+            $("#tooltip img").attr('src', '/media2/card/' + data['pk']);
+
+            var path = get_attack_path(game, data['player'], data['fields']['attack_type'], data.row, data.x);
+
+            draw_attack_path(data['player'], path); 
+    });
+    $("#friendly_hand .card").mouseenter( function ( e ) { 
+            var data = $(this).data("game_object");
+            $("#tooltip").show();
+            $("#tooltip img").attr('src', '/media2/card/' + data['pk']);
     }); 
     $("#friendly_hand .card, .board .occupied").mouseleave( function ( e ) { 
             $("#tooltip").hide();
+
+            clear_attack_paths();
     });
 }
 
@@ -145,8 +156,15 @@ function play_remaining_effects() {
             else { 
                 var card_model = effect['delta'];
 
-                // old
-                var card = get_unit_body(card_model).addClass("card").addClass("unit_piece").appendTo("#friendly_hand");
+                var card = $("<img id='" + card_model['pk'] + "' src='/media2/card/" + card_model['pk'] + "' />").addClass("card").appendTo("#friendly_hand");
+
+
+                var num_cards = $("#friendly_hand .card").length;
+                if (num_cards <= 5) {
+                    num_cards = 5;
+                }
+                $("#friendly_hand .card").css("width", Math.floor(90/num_cards) + "%"); 
+
                 card.data("game_object", card_model);
 
                 init_tooltips("#friendly_hand");
@@ -384,40 +402,15 @@ function show_unit(model) {
     node.data("game_object", model);
     refresh_tooltips();
 
-    node.mouseenter( function ( e ) { 
-        var node = $(e.currentTarget);
-
-        var path = get_attack_path(game, alignment, model['fields']['attack_type'], model.row, model.x);
-
-        draw_attack_path(alignment, path); 
-    });
-
-    node.mouseleave(function ( e ) {
-            clear_attack_paths();
-    });
 
 }
 
 function get_unit_body(model, alignment) {
     var model_fields = model.fields;
-    var unit_piece = $("<div title='" + model_fields.tooltip + "' class='attack_" + model_fields.attack + "' id='" + model.pk + "'></div>");
+    var unit_piece = $("<div class='attack_" + model_fields.attack + "' id='" + model.pk + "'></div>");
+    var cropper = $("<div class='cropper'></div>").appendTo(unit_piece);
 
-    var url = "";
-    try {
-        if (alignment == game['player'] && model_fields.icon_url_back) {
-            url = model_fields.icon_url_back;
-        } 
-        else {
-            url = model_fields.icon_url;
-        }
-    } catch (error) {
-            url = model_fields.icon_url; 
-    }
-
-    $("<img src='" + url + "' />").appendTo(unit_piece).load(function() {
-        var x_off = (60 - $(this).width()) / 2;
-        $(this).css("left", x_off); 
-    }); 
+    var card = $("<img id='" + model['pk'] + "' src='/media2/card/" + model['pk'] + "' />").appendTo(cropper).css("height", "122px").css("width", "88px").css("margin-left", "-25px").css("margin-top", "-20px"); 
 
     // container for holding attack icons
     var unit_attack = $("<div class='unit_attack'></div>").appendTo(unit_piece);

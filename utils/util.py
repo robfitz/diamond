@@ -23,6 +23,20 @@ def deepish_copy(to_copy):
     # return cPickle.loads(cPickle.dumps(to_copy, -1))
 
 
+def one_level_deepcopy(to_copy):
+    out = dict().fromkeys(to_copy)
+    for k,v in to_copy.iteritems():
+        try:
+            out[k] = v.copy()   # dicts, sets
+        except AttributeError:
+            try:
+                out[k] = v[:]   # lists, tuples, strings, unicode
+            except TypeError:
+                out[k] = v      # ints 
+    return out
+
+
+
 
 #return a randomized alphanumerical string with a
 #number of characters equal to length

@@ -47,6 +47,11 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: d_cards_cardart
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: d_cards_deck
   properties:
   - name: __key__

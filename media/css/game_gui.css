@@ -2,6 +2,7 @@
     position:relative;
     width:960px;
     height:640px;
+    overflow:hidden;
 }
 
 #game_frame .bg {
@@ -103,7 +104,8 @@
     top:13px;
     z-index:1;
 }
-.attacking_from {
+.ai .attacking_from {
+    left:-84px;
 }
 
 .ai .r2.x-2 .attacking_to,
@@ -132,7 +134,8 @@
     background: url(attack-nw-se.png); 
     width:100px; 
     height:100px;
-    left:0;
+    left:-84;
+    top:-84
 } 
 .friendly .r2.x-2 .attacking_to,
 .friendly .r1.x-1 .attacking_to
