@@ -31,7 +31,7 @@ example = {
 def get_all_possible_turns(game, player, time_log):
 
     turns = ["%s pass" % player]
-    simple_game_board = get_simple_board(game, player)
+    boards = get_simple_board(game, player)
     current_resources = game_master.get_player(game, player)['current_tech']
     hand = game_master.get_player(game, player)['hand']
 
@@ -43,7 +43,14 @@ def get_all_possible_turns(game, player, time_log):
 
     # get possibilities if we begin the turn by teching
     i = 0
+    teched_with_pks = []
     for card in hand:
+
+        if card['pk'] in teched_with_pks:
+            # fruitless to create paths for teching w/ identical cards
+            continue
+
+        teched_with_pks.append( card['pk'] )
 
         # hand without the discarded card
         without = hand[:i]
@@ -72,7 +79,15 @@ def get_moves(hand, boards, resources):
     turns = ["%s pass" % boards['friendly_name']] 
     card_i = 0
 
+    played_card_pks = []
+
     for card in hand:
+
+        if card['pk'] in played_card_pks:
+            # fruitless to create paths for playing identical cards at same point
+            continue
+
+        played_card_pks.append( card['pk'] )
 
         if resources >= card['fields']['tech_level']:
 

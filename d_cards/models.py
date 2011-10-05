@@ -105,9 +105,7 @@ class Card(models.Model):
 
     
     def card_image(self):
-        logging.info("getting card image")
         if not self.card_image_renderer:
-            logging.info("creating renderer")
             card_img = CardImage()
             card_img.save()
             self.card_image_renderer = card_img
@@ -157,6 +155,13 @@ class Card(models.Model):
 
 def set_tooltip(sender, instance, raw, **kwargs):
 
+    if not instance.card_image_renderer:
+        card_img = CardImage()
+        card_img.save()
+        instance.card_image_renderer = card_img
+        instance.save()
+
+    instance.card_image_render.render_image(instance, force_refresh=True)
 
     instance.tooltip = "<b>T%s: %s</b><br/>" % (instance.tech_level, instance.name)
 

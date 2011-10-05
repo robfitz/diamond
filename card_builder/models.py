@@ -47,14 +47,10 @@ class CardImage(models.Model):
     rendered = BlobField()
 
 
-    def image(self):
+    def image(self, force_refresh=False):
 
-        # if not self.rendered:
-            # self.render_image(self.card)
-
-        # this redoes the work every time, which is a bad
-        # idea, but okay for testing quick changes
-        self.render_image(self.card)
+        if not self.rendered or force_refresh:
+            self.render_image(self.card)
 
         return self.rendered
 
@@ -116,6 +112,7 @@ class CardImage(models.Model):
 
         rendered = smart_composite(layers, 350, 489, output_encoding=images.JPEG) 
         self.rendered = rendered 
+        self.save()
 
 
 # if the composite fails due to bad or missing images,
