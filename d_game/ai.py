@@ -35,8 +35,28 @@ def get_all_possible_turns(game, player, time_log):
     current_resources = game_master.get_player(game, player)['current_tech']
     hand = game_master.get_player(game, player)['hand']
 
-    # get possibilities if we don't tech at all
     simple_board = one_level_deepcopy(boards)
+
+    # sort cards so that anything with a positive immediate bonus
+    # is at the beginning of the list. this allows us to go strictly
+    # linearly instead of trying all paths
+    cards_insta_bonus = []
+    cards_regular = []
+    for card in hand:
+        if card['fields']['resource_bonus']:
+            cards_insta_bonus.append(card)
+        else:
+            cards_regular.append(card)
+
+    cards_insta_bonus = sorted(cards_insta_bonus, key=lambda card: card['fields']['tech_level'])
+    cards_regular = sorted(cards_insta_bonus, key=lambda card: card['fields']['tech_level'])
+
+    # bonus cards first, then others, sorted by cost in both cases (sorted so you can chain multiple
+    # resource-granting abilities to get to a higher total level)
+    hand = cards_insta_bonus
+    hand.extend(cards_regular) 
+
+    # get possibilities if we don't tech at all
     simple_hand = hand[:]
     for poss in get_moves(simple_hand, simple_board, current_resources):
         turns.append("%s" % poss)
@@ -71,6 +91,12 @@ def get_all_possible_turns(game, player, time_log):
     
     return turns
 
+def get_moves_2(hand, boards, resources):
+    ''' sort all cards, by whether it has an up-front effect
+    (like adding resources) and then either play or don't play
+    each card until out of resources '''
+
+    pass
 
 # assumes teching is already done. given what's remaining,
 # returns an array of shorthand moves showing what's possible
@@ -99,8 +125,14 @@ def get_moves(hand, boards, resources):
                 boards_copy = one_level_deepcopy(boards)
 
                 # remove the card we used from the hand
-                hand_copy = hand[:card_i]
-                hand_copy.extend(hand[card_i+1:])
+                # hand_copy = hand[:card_i]
+                # hand_copy.extend(hand[card_i+1:])
+
+                # I'm not 100% convinced this works, but because of the sorting done earlier,
+                # the idea is that we can ignore any hand cards with an index earlier than
+                # the one we're currently considering. If you cut this, also cut the blank
+                # non-cast done later in the loop.
+                hand_copy = hand[card_i + 1]
 
                 toks = node_str.split(" ")
                 simple_board_play(boards_copy, boards['friendly_name'], card, toks[0], int(toks[1]), int(toks[2]))
@@ -114,6 +146,13 @@ def get_moves(hand, boards, resources):
                 for poss in get_moves(hand_copy, boards_copy, resources_copy):
                     turns.append("%s\n%s" % (play_turn, poss))
 
+        # try playing the rest of the hand cards after NOT PLAYING this one.
+        # note that this is only necessary if we're throwing away the earlier index hand
+        # cards on the assumption they are sorted.
+        hand_copy = hand[card_i + 1]
+        for poss in get_moves(hand_copy, boards_copy, resources):
+            turns.append(poss) 
+    
         card_i += 1
 
     return turns
