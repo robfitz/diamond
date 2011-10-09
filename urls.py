@@ -25,6 +25,7 @@ urlpatterns = patterns('',
 
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/metrics/', 'd_metrics.views.user_metrics'),
+    (r'^admin/reset_card_images/', 'card_builder.views.reset_card_images'),
     (r'^admin/', include(admin.site.urls)),
 
     (r'^edit_puzzle/$', 'd_editor.views.edit_puzzle'),

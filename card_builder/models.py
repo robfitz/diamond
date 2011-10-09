@@ -68,14 +68,17 @@ class CardImage(models.Model):
         ability_y = 312
 
         #name
-        layers.append( ( text(card.name, 14, True), 17, 21, 1.0, images.TOP_LEFT ) )
+        layers.append( ( text(card.name, 14, True), 35, 35, 1.0, images.TOP_LEFT ) )
+
+        # cost
+        layers.append( ( text(str(card.tech_level), 14, True), 35, 303, 1.0, images.TOP_LEFT ) )
 
         #card image 
         if card.image_data():
             img = images.Image(card.image_data())
-            img.resize(width=290, height=244)
+            img.resize(width=294, height=243)
             img = img.execute_transforms(output_encoding=images.PNG)
-            layers.append( ( img, 15, 48, 1.0, images.TOP_LEFT ) )
+            layers.append( ( img, 27, 57, 1.0, images.TOP_LEFT ) )
 
         # add the card's ability text
         if card.defense:
