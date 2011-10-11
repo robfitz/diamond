@@ -43,16 +43,13 @@ def get_all_possible_turns(game, player, time_log):
     cards_insta_bonus = []
     cards_regular = []
     for card in hand:
-        logging.info("^^ checking nature of card: %s" % card['fields']['name'])
         if card['fields']['resource_bonus']:
             cards_insta_bonus.append(card)
         else:
             cards_regular.append(card)
 
-    logging.info("reg cards before sort: %s" % cards_regular)
-    sorted(cards_insta_bonus, key=lambda card: card['fields']['tech_level'])
-    sorted(cards_regular, key=lambda card: card['fields']['tech_level'])
-    logging.info("reg cards after sort: %s" % cards_regular)
+    cards_insta_bonus = sorted(cards_insta_bonus, key=lambda card: card['fields']['tech_level'])
+    cards_regular = sorted(cards_regular, key=lambda card: card['fields']['tech_level'])
 
     # bonus cards first, then others, sorted by cost in both cases (sorted so you can chain multiple
     # resource-granting abilities to get to a higher total level)
@@ -61,9 +58,8 @@ def get_all_possible_turns(game, player, time_log):
 
     str = ""
     for card in hand:
-        str = " ".join([str, card['fields']['name']])
-    logging.info("^^ ai hand sorted: %s" % str)
-
+        str = " ".join([str, card['fields']['name']]) 
+    logging.info("**** AI hand for get all poss turns: %s" % str)
 
     # get possibilities if we don't tech at all
     simple_hand = hand[:]
@@ -94,9 +90,6 @@ def get_all_possible_turns(game, player, time_log):
             turns.append("%s\n%s" % (tech_turn, poss))
 
         i += 1
-
-    # for turn in turns:
-        # logging.info("*** ai turn: %s" % turn) 
     
     return turns
 
@@ -118,10 +111,6 @@ def get_moves(hand, boards, resources):
 
     for card in hand:
 
-        logging.info("III card: %s" % card)
-
-        logging.info("III ai getting moves, cardpk, playedcardpks: %s %s" % (card['pk'], played_card_pks))
-
         if card['pk'] in played_card_pks:
             # fruitless to create paths for playing identical cards at same point
             continue
@@ -129,8 +118,10 @@ def get_moves(hand, boards, resources):
         played_card_pks.append( card['pk'] )
 
         if resources >= card['fields']['tech_level']:
+            # we can afford to play it -- give it a shot
 
             targets = get_simple_valid_targets(boards, boards['friendly_name'], card)
+            logging.info("### ai got targets: %s" % targets)
 
             for node_str in targets:
 
@@ -155,9 +146,9 @@ def get_moves(hand, boards, resources):
 
                 play_turn = "%s play %s %s" % (boards['friendly_name'], card['pk'], node_str)
 
-                # try playing the rest of the hand cards
-                for poss in get_moves(hand_copy, boards_copy, resources_copy):
-                    turns.append("%s\n%s" % (play_turn, poss))
+            # try playing the rest of the hand cards
+            for poss in get_moves(hand_copy, boards_copy, resources_copy):
+                turns.append("%s\n%s" % (play_turn, poss))
 
         # try playing the rest of the hand cards after NOT PLAYING this one.
         # note that this is only necessary if we're throwing away the earlier index hand
@@ -405,13 +396,17 @@ def get_turn(game, player):
     time_log_obj = {'get_valid_targets': timedelta(), 'deepcopy': timedelta(), 'play': timedelta()}
     turns = get_all_possible_turns(game, player, time_log_obj)
 
-    time_log = """get_all_possible_turns():   
+    time_log = """get_all_possible_turns(): %s  
   get valid targets:  %s
   deepcopy game:   %s 
   simulate play: %s\n
-""" % (time_log_obj['get_valid_targets'],
+""" % (len(turns),
+        time_log_obj['get_valid_targets'],
         time_log_obj['deepcopy'],
         time_log_obj['play'])
+
+    logging.info("**** ai deciding what to do, got __%s__ turns" % len(turns))
+    logging.info(turns)
 
     from d_game.models import Match
     match = Match.objects.get(id=game['pk'])
@@ -447,6 +442,7 @@ def get_turn(game, player):
         # remove [human] player summoning sickness and simulate attack
         # to make the AI a bit more defensive
         temp_timer = datetime.now()
+        game_master.heal(g_copy, opponent)
         game_master.remove_summoning_sickness(game, opponent) 
         game_master.do_attack_phase(g_copy, opponent) 
         time_in_human_attacks += datetime.now() - temp_timer

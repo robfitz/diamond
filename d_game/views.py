@@ -20,7 +20,7 @@ from d_metrics.models import UserMetrics
 from d_users.util import has_permissions_for
 
 from d_game import cached
-from d_game import game_master, ai
+from d_game import game_master, ai, deckgenerator
 
 
 def log(request, match_id=None):
@@ -82,8 +82,6 @@ def playing(request):
     logging.info("QQQ playing() init match: %s" % match.id)
     request.session["match"] = match.id
 
-    logging.info("XXX player name: %s" % player_name)
-
     board = Node.objects.all().order_by('-pk') 
 
     return render_to_response("playing.html", locals(), context_instance=RequestContext(request))
@@ -116,7 +114,7 @@ def init_match(request):
 
     deck = get_deck_from(request)
 
-    ai_deck = Deck.objects.all()[0]
+    ai_deck = deckgenerator.create_deck(40)
 
     if request.user.is_authenticated():
         player = request.user
@@ -142,9 +140,6 @@ def end_turn(request):
     match_id = request.session['match'] 
     game = cached.get_game(match_id) 
 
-    logging.info("XXX player hand (in end turn): %s" % game_master.get_player(game, 'robfitz')['hand'])
-    logging.info("XXX_ for id %s and name %s" % (match_id, 'robfitz'))
-
     # get player's actions from requests
     player_moves = request.POST.get("player_turn").strip().split('\n')
     if not player_moves:
@@ -153,11 +148,8 @@ def end_turn(request):
     # process the game turn and get data to give back to client
     hand_and_turn_json = game_master.do_turns(game, player_moves) 
 
-    logging.info("))))) end turn, did do_turns")
-
     # did the game end this turn?
     winner = game_master.is_game_over(game)
-    logging.info("))))) end turn, winner? %s" % winner)
     if winner:
         match = Match.objects.get(id=match_id)
         logging.info("))))) trying to set winner: %s for %s" % (winner, match.puzzle))
@@ -201,7 +193,6 @@ def begin_ai_game(request):
     cached.save(game)
     censored = game_master.get_censored(game, player_name)
     game = cached.get_game(match.id)
-    logging.info("XXX_ for id %s and name %s" % (match.id, player_name))
 
     return HttpResponse(simplejson.dumps(censored), "application/javascript")
 

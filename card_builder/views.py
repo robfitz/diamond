@@ -4,6 +4,13 @@ from d_cards.models import Card
 
 
 
+def card_editor(request):
+
+    cards = Card.object.all()
+
+    return render_to_response("/card_builder/editor.html", locals())
+
+
 def reset_card_images(request):
 
     if not request.user.is_staff: 

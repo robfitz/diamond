@@ -15,10 +15,6 @@ from card_builder.models import CardImage
 
 class Card(models.Model):
 
-    name = models.CharField(max_length="20", blank=True)
-    
-    unit_power_level = models.IntegerField(default=0)
-
     ATTACK_CHOICES = (
             ("na", "N/A"),
             ("melee", "Melee"),
@@ -26,21 +22,44 @@ class Card(models.Model):
             ("counterattack", "Counter-attack"),
             ("flying", "Flying"),
             ("wall", "Wall"),
-        )
-
+        ) 
     CASTES = (
             ("revolution", "The Revolution"),
             ("guild", "The Guild"),
             ("freemen", "The Freemen"),
             ("wonderers", "The Wonderers"),
             ("untouchables", "The Untouchables")
+        ) 
+    ALIGNMENT_CHOICES = (
+            ("friendly", "Friendly"), 
+            ("enemy", "Enemy"),
+            ("any", "Any")
+        )
+    OCCUPANT_CHOICES = (
+            ("unit", "Unit"),
+            ("empty", "Empty"),
+        )
+    LOCATION_CHOICES = (
+            ("chosen", "Chosen"),
+            ("random", "Random"),
+            ("all", "All")
         )
 
+    # Card title
     name = models.CharField(max_length=20, blank=True)
+
+    # Caste is the equivalent of magic's colours. Used as a restriction during deck building
+    # and influences the appearance of the card.
     caste = models.CharField(max_length=20, default="freemen", choices=CASTES)
 
-    tooltip = models.CharField(max_length=200, blank=True, default="")
+    # Used for AI heuristic to decide what to kill and cast
+    unit_power_level = models.IntegerField(default=0)
 
+    # Used during deck building. Total deck power is restricted to some number, e.g. 40 points.
+    card_power_level = models.IntegerField(default=1) 
+
+    # Deprecated -- No longer used when card images are displayed. Used to be an html description of card abilities.
+    tooltip = models.CharField(max_length=200, blank=True, default="") 
 
     # handles the composition of various pieces of art & text to
     # create the final card image
@@ -53,10 +72,10 @@ class Card(models.Model):
     defense = models.IntegerField(default=1, help_text="If this card summons a unit, how much damage it can endure per turn")
 
     # offensive behaviour:
-    ## melee runs forward until it hits any obstacle, attacking if it meets an enemy unit first. 
-    ## ranged passes over friendly units & rubble to hit the first hostile ones. 
-    ## defenders counter-attack anything that strikes them, but don't actively attack
-    ## on their own
+    #   melee runs forward until it hits any obstacle, attacking if it meets an enemy unit first. 
+    #   ranged passes over friendly units & rubble to hit the first hostile ones. 
+    #   defenders counter-attack anything that strikes them, but don't actively attack
+    #   on their own
     attack_type = models.CharField(max_length=20, choices=ATTACK_CHOICES, default="na", help_text="If this card summons a unit, how it behaves during an attack (e.g. ranged, melee, defender..)")
 
     # which tech level you need to be at in order to play this card.
@@ -72,21 +91,6 @@ class Card(models.Model):
 
     rubble_duration = models.IntegerField(default=1, help_text="Only applies for creatures. Dictates the number of turns the spot will be blocked by rubble when this creature dies. Currently only 0 and 1 are supported, where 1 is standard and 0 is used by creatures without corpses (e.g. ephemeral spirits)")
 
-
-    ALIGNMENT_CHOICES = (
-            ("friendly", "Friendly"), 
-            ("enemy", "Enemy"),
-            ("any", "Any")
-        )
-    OCCUPANT_CHOICES = (
-            ("unit", "Unit"),
-            ("empty", "Empty"),
-        )
-    LOCATION_CHOICES = (
-            ("chosen", "Chosen"),
-            ("random", "Random"),
-            ("all", "All")
-        )
 
     # whether it targets your units or enemy units.
     # rubble is a special case since it is usually on the opposite side
@@ -104,14 +108,14 @@ class Card(models.Model):
     direct_damage = models.IntegerField(default=0)
 
     
-    def card_image(self):
+    def card_image(self, force_refresh=False):
         if not self.card_image_renderer:
             card_img = CardImage()
             card_img.save()
             self.card_image_renderer = card_img
             self.save()
 
-        return self.card_image_renderer.image() 
+        return self.card_image_renderer.image(force_refresh) 
 
     def image_data(self):
         try:
@@ -159,9 +163,14 @@ def set_tooltip(sender, instance, raw, **kwargs):
         card_img = CardImage()
         card_img.save()
         instance.card_image_renderer = card_img
-        instance.save()
 
-    instance.card_image_render.render_image(instance, force_refresh=True)
+    # refresh the image whenever the card changes. this aims
+    # to prevent the player from seeing any out-of-date cards.
+    # optionally, this might be changed to only clear the image
+    # so that it's built on-demand the next time it's requested
+    # by a player, which might reduce the duration of certain
+    # batched server tasks, but probably isn't a good idea in general.  
+    instance.card_image_renderer.render_image(instance)
 
     instance.tooltip = "<b>T%s: %s</b><br/>" % (instance.tech_level, instance.name)
 
@@ -256,10 +265,12 @@ class PuzzleDeck(models.Model):
 
 class Deck(models.Model):
 
-    nickname = models.CharField(max_length=50)
+    nickname = models.CharField(max_length=50, default="My deck", blank=True)
 
     card_ids = ListField(models.PositiveIntegerField(), null=True, blank=True)
     max_size = models.IntegerField(default=20)
+
+    max_points = models.IntegerField(default=40)
 
     def create_starting_deck():
 

@@ -8,7 +8,7 @@ from d_cards.models import PuzzleDeck, Deck, Card
 from d_game.models import Puzzle
 
 
-def get_library_cards(request):
+def get_all_cards_sorted(request):
 
     all_cards = Card.objects.all()
 
@@ -41,6 +41,13 @@ def get_library_cards(request):
     json = simplejson.dumps(sorted_cards)
 
     return HttpResponse(json, "application/javascript")
+
+
+def get_library_cards(request):
+
+    # TODO: temporarily all players have access toa ll cards. change this
+    # to only return card sin their own library
+    return get_all_cards_sorted(request)
 
 
 def save_deck(request):

@@ -71,7 +71,7 @@ class CardImage(models.Model):
         layers.append( ( text(card.name, 14, True), 35, 35, 1.0, images.TOP_LEFT ) )
 
         # cost
-        layers.append( ( text(str(card.tech_level), 14, True), 35, 303, 1.0, images.TOP_LEFT ) )
+        layers.append( ( text(str(card.tech_level), 14, True), 303, 35, 1.0, images.TOP_LEFT ) )
 
         #card image 
         if card.image_data():

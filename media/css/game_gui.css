@@ -104,7 +104,7 @@
     top:13px;
     z-index:1;
 }
-.ai .attacking_from {
+.ai .attacking_from, .friendly .attacking_to {
     left:-84px;
 }
 
@@ -124,7 +124,7 @@
     background: url(attack-ne-sw.png); 
     width:100px; 
     height:100px;
-    left:15px;
+    left:-84px;
     top:-84px;
 }
 .friendly .r2.x2 .attacking_to,
@@ -134,8 +134,8 @@
     background: url(attack-nw-se.png); 
     width:100px; 
     height:100px;
-    left:-84;
-    top:-84
+    left:-84px;
+    top:-84px;
 } 
 .friendly .r2.x-2 .attacking_to,
 .friendly .r1.x-1 .attacking_to

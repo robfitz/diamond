@@ -265,11 +265,6 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     position:absolute;
     z-index:2;
 
-    /* 
-    background-color:#fff;
-    border:0px solid black;
-    */
-
     -webkit-border-radius: 30px;
     -moz-border-radius: 30px;
 }
@@ -308,6 +303,7 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 
     margin-bottom:10px;
 }
+
 #phases li.active {
     background-color:#ddd;
     border:1px solid #ccc;
@@ -318,6 +314,4 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
     width:100%;
     clear:both;
     float:left;
-}
-
-
+} 
