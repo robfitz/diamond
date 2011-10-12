@@ -48,6 +48,16 @@ function get_node_view(player, row, x) {
     return $(".board." + alignment + " .node[name='" + row + "_" + x + "']");
 }
 
+function refresh_playable_cards() {
+    $("#friendly_hand .card").removeClass("playable");
+    $("#friendly_hand .card").each( function() {
+            var data = $(this).data('game_object');
+            if ( data['fields']['tech_level'] <= game['players'][player_name]['current_tech']) {
+                $(this).addClass("playable");
+            }
+    });
+}
+
 function refresh_tooltips() {
     $(".board .occupied").mouseenter( function ( e ) { 
             var data = $(this).data("game_object");
@@ -105,6 +115,7 @@ function play_remaining_effects() {
 
     if ( ! effects_queue || effects_queue.length == 0) {
         is_effects_playing = false;
+        reset_icons(game);
         return;
     }
 
@@ -146,7 +157,7 @@ function play_remaining_effects() {
                 var party = "time";
             }
             hand_card.remove();
-            // $("#friendly_hand .card").removeClass("selected"); 
+            
             break;
         case 'draw':
             // add visuals to hand
@@ -157,7 +168,6 @@ function play_remaining_effects() {
                 var card_model = effect['delta'];
 
                 var card = $("<img id='" + card_model['pk'] + "' src='/media2/card/" + card_model['pk'] + "' />").addClass("card").appendTo("#friendly_hand");
-
 
                 var num_cards = $("#friendly_hand .card").length;
                 if (num_cards <= 5) {
@@ -180,6 +190,7 @@ function play_remaining_effects() {
                 });
 
                 refresh_tooltips();
+                refresh_playable_cards();
             }
             break;
 
@@ -195,6 +206,9 @@ function play_remaining_effects() {
             var current_shown = parseInt(current.text());
             current.text(current_shown - effect['delta']); 
             show_number(tech, -1 * effect['delta']);
+
+            refresh_playable_cards();
+
             break;
 
         case 'refill_tech':
@@ -202,6 +216,9 @@ function play_remaining_effects() {
             var tech = $("." + effect['target'] + "_tech"); 
             tech.find(".remaining").text( parseInt(tech.find(".remaining").text()) + effect['delta'] );
             show_number(tech, effect['delta']);
+
+            refresh_playable_cards();
+
             break;
 
         case 'tech': 
@@ -214,6 +231,9 @@ function play_remaining_effects() {
 
             // +1 message on player tech
             show_number(tech, effect['delta']);
+
+            refresh_playable_cards();
+
             break;
 
         case 'move':
@@ -308,6 +328,11 @@ function play_remaining_effects() {
         case 'begin_turn': 
             $(".turn_indicator").hide();
             $("#" + effect['target'] + "_turn_indicator").show(); 
+
+            if (effect['target'] == player_name) {
+                $("#pass_button").show();
+            }
+            else $("#pass_button").hide();
             break;
 
         case 'next_phase':
@@ -324,16 +349,12 @@ function play_remaining_effects() {
         case 'damage_player':
             if (effect['target'] == 'ai'
                     && game['goal'] == 'kill units') {
+
                 alert("trying to damage invuln ai in puzzle");
+
             }
             else {
-                var life_h1 = $("." + effect['target'] + "_life .lifenum");
-                var current_shown_life = parseInt(life_h1.text());
-                var new_life = parseInt(current_shown_life - effect['delta']);
-                life_h1.text("" + new_life); 
-                show_number(life_h1.parent(), -1 * effect['delta']); 
-
-                update_lifebar(effect['target'], new_life); 
+                var new_life = update_lifebar(effect['target'], -1 * effect['delta']); 
             }
             break;
 
@@ -410,7 +431,7 @@ function get_unit_body(model, alignment) {
     var unit_piece = $("<div class='attack_" + model_fields.attack + "' id='" + model.pk + "'></div>");
     var cropper = $("<div class='cropper'></div>").appendTo(unit_piece);
 
-    var card = $("<img id='" + model['pk'] + "' src='/media2/card/" + model['pk'] + "' />").appendTo(cropper).css("height", "122px").css("width", "88px").css("margin-left", "-25px").css("margin-top", "-20px"); 
+    var card = $("<img id='" + model['pk'] + "' src='/media2/card/" + model['pk'] + "' />").appendTo(cropper).css("height", "122px").css("width", "88px").css("margin-left", "-15px").css("margin-top", "-14px"); 
 
     // container for holding attack icons
     var unit_attack = $("<div class='unit_attack'></div>").appendTo(unit_piece);

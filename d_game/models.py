@@ -157,8 +157,8 @@ class Match(models.Model):
     friendly_deck_cards = ListField(models.IntegerField())
     ai_deck_cards = ListField(models.IntegerField())
 
-    friendly_life = models.IntegerField(default=10)
-    ai_life = models.IntegerField(default=10)
+    friendly_life = models.IntegerField(default=1)
+    ai_life = models.IntegerField(default=1)
 
     friendly_tech = models.IntegerField(default=1)
     ai_tech = models.IntegerField(default=1)

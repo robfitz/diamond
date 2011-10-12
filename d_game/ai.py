@@ -72,6 +72,7 @@ def get_all_possible_turns(game, player, time_log):
     for card in hand:
 
         if card['pk'] in teched_with_pks:
+            logging.info("***** already teched with %s" % card['pk'])
             # fruitless to create paths for teching w/ identical cards
             continue
 
@@ -82,6 +83,7 @@ def get_all_possible_turns(game, player, time_log):
         without.extend( hand[i+1:] ) 
 
         tech_turn = "%s tech %s" % (player, card['pk'])
+        turns.append(tech_turn)
 
         simple_hand = without
         simple_board = one_level_deepcopy(boards)
@@ -104,7 +106,7 @@ def get_moves_2(hand, boards, resources):
 # returns an array of shorthand moves showing what's possible
 def get_moves(hand, boards, resources):
 
-    turns = ["%s pass" % boards['friendly_name']] 
+    turns = []
     card_i = 0
 
     played_card_pks = []
@@ -113,6 +115,8 @@ def get_moves(hand, boards, resources):
 
         if card['pk'] in played_card_pks:
             # fruitless to create paths for playing identical cards at same point
+            logging.info("____ already played card %s" % card['pk'])
+            card_i += 1
             continue
 
         played_card_pks.append( card['pk'] )
@@ -121,22 +125,11 @@ def get_moves(hand, boards, resources):
             # we can afford to play it -- give it a shot
 
             targets = get_simple_valid_targets(boards, boards['friendly_name'], card)
-            logging.info("### ai got targets: %s" % targets)
 
             for node_str in targets:
 
                 # make some copies pointing at new data
                 boards_copy = one_level_deepcopy(boards)
-
-                # remove the card we used from the hand
-                # hand_copy = hand[:card_i]
-                # hand_copy.extend(hand[card_i+1:])
-
-                # I'm not 100% convinced this works, but because of the sorting done earlier,
-                # the idea is that we can ignore any hand cards with an index earlier than
-                # the one we're currently considering. If you cut this, also cut the blank
-                # non-cast done later in the loop.
-                hand_copy = hand[card_i + 1 : ]
 
                 toks = node_str.split(" ")
                 simple_board_play(boards_copy, boards['friendly_name'], card, toks[0], int(toks[1]), int(toks[2]))
@@ -145,10 +138,12 @@ def get_moves(hand, boards, resources):
                 resources_copy += card['fields']['resource_bonus']
 
                 play_turn = "%s play %s %s" % (boards['friendly_name'], card['pk'], node_str)
+                turns.append(play_turn)
 
-            # try playing the rest of the hand cards
-            for poss in get_moves(hand_copy, boards_copy, resources_copy):
-                turns.append("%s\n%s" % (play_turn, poss))
+                # try playing the rest of the hand cards
+                hand_copy = hand[card_i + 1 : ] 
+                for poss in get_moves(hand_copy, boards_copy, resources_copy):
+                    turns.append("%s\n%s" % (play_turn, poss))
 
         # try playing the rest of the hand cards after NOT PLAYING this one.
         # note that this is only necessary if we're throwing away the earlier index hand

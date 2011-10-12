@@ -71,16 +71,20 @@ function draw_starting_hand() {
             }
 
             var occ = card_json.fields.target_occupant;
+            var second_node_selector = null;
             if (occ == "unit" || occ == "occupied") {
-                node_selector += ".unit"; 
+                node_selector = ".node.unit"; 
+                $(board_selector + " .unit_piece").addClass("targettable")
             }
             else if (occ == "empty") {
                 node_selector += ".empty";
             }
 
+
             targets = $(board_selector + " " + node_selector); 
 
             // highlight valid targets and allow them to respond to click
+                
             targets.addClass("targettable").click( function (event) {
                 cast($(".card.selected"), $(event.currentTarget));
             });
@@ -196,6 +200,7 @@ function draw_starting_hand() {
 
         //clear old targetting events 
         $(".node").removeClass("targettable").unbind("click").unbind("mouseenter");
+        $(".unit_piece").removeClass("targettable").unbind("click").unbind("mouseenter");
 
         $("#friendly_tech").removeClass("targettable").unbind("click");
     }

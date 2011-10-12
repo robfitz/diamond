@@ -53,9 +53,17 @@
 
 .bottom_right_panel {
     left:608px;
-    top:500px;
-    width:360px;
-    height:140px;
+    top:532px;
+    width:348px;
+    height:104px;
+
+}
+
+#pass_button { 
+    position:absolute;
+    left:10px;
+    top:32px;
+    width:294px;
 }
 
 .middle_panel .friendly {
@@ -124,7 +132,6 @@
     background: url(attack-ne-sw.png); 
     width:100px; 
     height:100px;
-    left:-84px;
     top:-84px;
 }
 .friendly .r2.x2 .attacking_to,
@@ -178,12 +185,12 @@
 #left_icons {
     position:absolute;
     left:60px;
-    top:24px;
+    top:20px;
 }
 #right_icons {
     position:absolute;
-    left:340px;
-    top:24px;
+    left:390px;
+    top:20px;
 }
 #right_icons li {
     float:right;
@@ -263,7 +270,7 @@ ul.icons a:hover {
 }
 
 #lifebars .icons li {
-    width:42px;
+    width:22px;
 }
 
 li.hand {
@@ -289,4 +296,24 @@ li.settings {
 }
 li.help {
     background-image: url('/media/icons/help.png'); 
+}
+
+#friendly_hand {
+    position:absolute;
+    top:532px;
+    left:4px;
+    height:104px;
+}
+
+.card {
+
+}
+
+.card {
+    float:left;
+    margin:2px; 
+}
+
+#friendly_hand .card.playable {
+    margin-top:-20px;
 }

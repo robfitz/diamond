@@ -54,21 +54,6 @@ h1.green {
     background: #ccc url('../boards/board-2.jpg');
 }
 
-#friendly_hand {
-    position:absolute;
-    top:532px;
-    left:4px;
-    height:104px;
-}
-#friendly_hand .ribbon {
-    left:-13px;
-    margin-top:-50px;
-}
-#friendly_hand .triangle-ribbon {
-    left:-26px;
-    margin-top:0;
-}
-
 #game_controls {
     position:absolute;
     bottom:10px;
@@ -151,18 +136,6 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 .board.ai {
 }
 
-.card {
-    float:left;
-    margin:2px; 
-}
-.card .card_name {
-    display:block !important;
-    position:absolute;
-    color: #000;
-    font-weight:bold; 
-    font-size:10px;
-    top:84px;
-}
 .card:hover {
     background-color:yellow;
 }
@@ -277,12 +250,15 @@ div.ribbon triangle-ribbon, .ribbon_gui .triangle-ribbon {
 }
 .targettable, .board.friendly .targettable .unit_piece {
    background-color:#0f0 !important;
+   border:3px solid #0f0;
 }
-.unit.targettable, .board.ai .targettable .unit_piece {
+.unit.targettable, .unit_piece.targettable, .board.ai .targettable.unit_piece {
     background-color:#f00 !important;
+    border:3px solid #f00;
 }
 .targettable.hovered {
     background-color:#9f9 !important;
+    border-width:6px;
 }
 
 #phases {

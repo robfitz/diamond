@@ -50,6 +50,21 @@ function end_player_turn_consumable_resources(game, player) {
     // attack!
     do_attack_phase(game, player)
 
+    if (is_game_over(game)) {
+        var winner = is_game_over(game);
+        if (winner == player_name) {
+            qfx({ 'action': 'win' });
+        }
+        else {
+            qfx({ 'action': 'lose' });
+        } 
+        qfx_game_over();
+        $.post("/playing/end_turn/",
+            $("#current_turn").serialize()
+            );
+        return;
+    }
+
     game['current_phase'] = 3; 
     qfx({
             'action': 'next_phase',
@@ -75,14 +90,13 @@ function end_player_turn_consumable_resources(game, player) {
     refill_tech(game, opponent_name);
     remove_summoning_sickness(game, opponent_name);
 
-
     $.post("/playing/end_turn/",
         $("#current_turn").serialize(),
         function(data) {
             try {
                 turn_data = eval('(' + data + ')');
             } catch (error ) {
-                alert('caught error processing ai turn data: (' + data + ')');
+                //alert('caught error processing ai turn data: (' + data + ')');
                 return;
             }
 
@@ -106,6 +120,15 @@ function do_turn(game, player, moves) {
         do_turn_move(game, player, moves[i])
     }
 
+    game['current_phase'] = 6; 
+    qfx({
+            'action': 'next_phase',
+            'delta': game['current_phase']
+    });
+
+    // attack!
+    do_attack_phase(game, player)
+
     if (is_game_over(game)) {
         var winner = is_game_over(game);
         if (winner == player_name) {
@@ -115,22 +138,8 @@ function do_turn(game, player, moves) {
             qfx({ 'action': 'lose' });
         } 
         qfx_game_over();
-        $.post("/playing/end_turn/",
-            $("#current_turn").serialize(),
-            function(data) {
-                alert('game over from server: ' + data);
-            });
         return;
     }
-
-    game['current_phase'] = 6; 
-    qfx({
-            'action': 'next_phase',
-            'delta': game['current_phase']
-    });
-
-    // attack!
-    do_attack_phase(game, player)
 
     game['current_phase'] = 7; 
     qfx({

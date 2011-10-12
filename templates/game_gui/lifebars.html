@@ -16,15 +16,7 @@
         <div id="{{opponent_name}}_redbar" class="lifebar red"></div>
     </div>
 
-    <div id="ai_life" title="The enemy's life. Reduce it to 0 to win." class="top ai life {{ opponent_name }}_life">
-        <h1 class="lifenum">10</h1> 
-    </div> 
-
-    <div id="friendly_life" class="bottom friendly life friendly_life {{player_name}}_life" title="Your life. Protect it with strategic unit placement.">
-        <h1 class="lifenum">10</h1> 
-    </div> 
-
-    <div id="left_icons">
+    <div id="left_icons" class="{{player_name}} icons">
         <ul class="icons">
             <a href=""><li class="library">Library</li></a>
             <a href=""><li class="tech_level">Tech</li></a>
@@ -34,7 +26,7 @@
             <a href=""><li class="resources">Resources</li></a>
         </ul>
     </div>
-    <div id="right_icons">
+    <div id="right_icons" class="{{opponent_name}} icons">
         <ul class="icons">
             <a href=""><li class="library">Library</li></a>
             <a href=""><li class="tech_level">Tech</li></a>
@@ -46,10 +38,46 @@
     </div>
 
     <script>
-        function update_lifebar(player, new_life) {
+
+        function reset_icons(game) {
+            var left = game['player'];
+            var right = get_opponent_name(game, left); 
+
+            var player = left;
+            var icons = $('#left_icons');
+
+            icons.find(".library").text( game['players'][player]['library'].length );
+            icons.find(".tech_level").text( game['players'][player]['tech'] );
+            icons.find(".life").text( game['players'][player]['life'] );
+            icons.find(".hand").text( game['players'][player]['hand'].length );
+            icons.find(".resources").text( game['players'][player]['current_tech'] );
+
+            player = right;
+            icons = $("#right_icons");
+
+            icons.find(".library").text( game['players'][player]['library'].length );
+            icons.find(".tech_level").text( game['players'][player]['tech'] );
+            icons.find(".life").text( game['players'][player]['life'] );
+            icons.find(".hand").text( game['players'][player]['hand'].length );
+            icons.find(".resources").text( game['players'][player]['current_tech'] );
+        }
+
+        function update_lifebar(player, delta) {
+
+            var icons = $("#lifebars ." + player + ".icons");
+            var life_icon = icons.find(".life");
+            var lifebar = $("#lifebars ." + player + ".lifebar_container");
+            show_number(lifebar, delta); 
+
+            var current_shown_life = parseInt(life_icon.text());
+            var new_life = parseInt(current_shown_life + delta);
+            life_icon.text("" + new_life); 
+
             var percent = Math.floor(100 * new_life / 10);
             $(".lifebar_container." + player + " .green").css("width", percent + "%");
-            $(".lifebar_container." + player + " .red").css("width", (100-percent) + "%");
+            $(".lifebar_container." + player + " .red").css("width", (100-percent) + "%"); 
+
+            return new_life;
         }
     </script>
 
